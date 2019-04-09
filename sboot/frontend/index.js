@@ -1,58 +1,52 @@
 $(function(){ 
 
- 
 	const CVS_HEIGHT = 1500;
 	const CVS_WIDTH = 1500;
-	
 	const ZOOM_OUT = Math.pow(0.875,3).toFixed(3);
+
 	//Canvas全局状态量
-	let environment = $("#environment");
+    let environment = $("#environment");
 	environment.data("GrpZoomOut",1);
 	environment.data("GrpLocate","950,700");
-	
-	
 	environment.data("LineWidth",0.5);
 	environment.data("LineColor","#000000");
 	environment.data("PointSize",0);
 	environment.data("PointColor","#000000");
 	environment.data("GridZoom",1.0);
 	environment.data("GridWidth",0.5);
-	
 	environment.data("GridColor","#ccc");
 	environment.data("BkgdColor","#ffffff");
- 
-	
-	const canvas = document.getElementById("canvas");
-    const width = canvas.offsetWidth;
-    const height = canvas.offsetWidth;
-	canvas.width = CVS_WIDTH;
-	canvas.height = CVS_HEIGHT; 
-	const ctx = canvas.getContext("2d", { alpha: false });   
 
-	
+	const canvas = document.getElementById("canvas");
+    //const width = canvas.offsetWidth;
+    //const height = canvas.offsetWidth;
+	canvas.width = CVS_WIDTH;
+	canvas.height = CVS_HEIGHT;
+	const ctx = canvas.getContext("2d", { alpha: false });
+
 	////////////////// 柱状图
     const canvas_right_top = document.getElementById("canvas-right-top");
     const ctx_right_top = echarts.init(canvas_right_top);
-    const app = {};
-	option = null;
-	
+    //const app = {};
+	let option = null;
+
 	//console.log(environment);
 	ctx.strokeStyle = 'black'; /////////////////// xx
 	ctx.lineWidth=environment.data("LineWidth"); /////////////////// xx
 
     let len = 0;
     let boo = false;
-    let dataset;
+    let dataset = null;
 
-//===========================================================================================================
+	//===========================================================================================================
 	$.ajax({
-		type: "GET", 
-		//url: "Wiki-Vote.txt_of_780_without_800.json", 
+		type: "GET",
+		//url: "Wiki-Vote.txt_of_780_without_800.json",
 		url: "Vote.txt_of_800_without_800.json",
-		//url: "simple5.txt_of_800_without_800.json", 
+		//url: "simple5.txt_of_800_without_800.json",
 		async: false,
-		dataType: "json", 
-		success: function(data){ 
+		dataType: "json",
+		success: function(data){
 			boo = true;
 			len = data.links.length;
 			dataset = data;
@@ -63,16 +57,14 @@ $(function(){
     let getInnerVariable;
     let timeOutEvent = 0;//区分拖拽和点击的参数
 
-	
-	
 	function drawGrid(stepxy, canvasxy) {
 		ctx.save();
 		ctx.fillStyle = environment.data("BkgdColor"); /////////////////// xx;
-	   
+	  
 		ctx.fillRect(0, 0, canvasxy, canvasxy);
 		ctx.lineWidth = environment.data("GridWidth"); /////////////////// xx
 		ctx.strokeStyle = environment.data("GridColor"); /////////////////// xx;
-		
+
 		if(environment.data("GridWidth") !== 0){
 		    for (let i = stepxy; i < canvasxy; i += stepxy) {
 		        ctx.beginPath();
@@ -87,9 +79,6 @@ $(function(){
 		ctx.restore();
 	}
 
- 
-	
-	
 	function trans(sets,addx,addy,r){
 		//console.log(addx,addy,r);
 	    let param = sets.links;
@@ -112,34 +101,30 @@ $(function(){
 		return ({nodes:banana,links:param});
 	}
 
- 	
+
 	function createImg(addx,addy,wholesets,r,isdrawleft){
 
-		if(boo){
-		
-			const beginTime = +new Date();
+        wholesets = trans(wholesets,addx,addy,r);
+        let lset = wholesets.links;
+        let nset = wholesets.nodes;
+        const beginTime = +new Date();
 
-			console.log("createImg");
+        if(boo){
+            console.log("createImg");
 			//console.log("NOW:"+environment.data("LineWidth"));
 			ctx.strokeStyle = environment.data("LineColor");; /////////////////// xx
 			ctx.lineWidth = environment.data("LineWidth"); /////////////////// xx
-			
 			ctx.clearRect(0,0,canvas.width,canvas.height);
-			
+
 			let GridZoom = environment.data("GridZoom"); /////////////////// xx
 			//let CanvasZoom = environment.data("Grp"); /////////////////// xx
 			//let widthandheight = 1500*CanvasZoom;
-			let xyValue = CVS_WIDTH;
- 
+			//let xyValue = CVS_WIDTH;
 			drawGrid(20*GridZoom, CVS_WIDTH);
 
-			wholesets = trans(wholesets,addx,addy,r);
-			let lset = wholesets.links;
-            let nset = wholesets.nodes;
-			
 			if(environment.data("LineWidth") !== 0 ){
 				ctx.beginPath(); //优化
-				
+
 				for(let i = 0; i < lset.length; i++){
                     let tmp = lset[i];
 					ctx.moveTo(tmp.x1 , tmp.y1);
@@ -152,20 +137,19 @@ $(function(){
 			// var i = 0;
 			// const sh = setInterval((function(){
 			  // return function(){
-				 
+
 				// var tmp = sset[i];
-				
+
 				// ctx.moveTo(Math.round(tmp.x1 ), Math.round(tmp.y1));
 				// ctx.lineTo(Math.round(tmp.x2 ), Math.round(tmp.y2));
 				// ctx.stroke();
 				// console.log("draw:"+i);
-				// if(++i == len){ 
+				// if(++i == len){
 					// clearInterval(sh); // 画完
 					// console.log("over");
 				// }
 			  // }
-			// })(i),10);	
-			
+			// })(i),10);
 
 			//console.log(nset);
 			//console.log(lset);
@@ -176,7 +160,7 @@ $(function(){
 			if(environment.data("PointSize") !== 0 ){
 				//console.log("R = "+rsize+", CL = "+pcolor);
 				if(rsize){
-					
+
 					for(let i = 0; i < nset.length; i++){
                         let tmp = nset[i];
 						ctx.beginPath(); // 开启绘制路径
@@ -189,7 +173,7 @@ $(function(){
 			}
 			const midTime = +new Date();
 			$("#timer").text("Canvas render time: "+(midTime-beginTime)+" ms");
-			
+
 			if(isdrawleft){
 				drawLeft();
 				const endTime = +new Date();
@@ -198,6 +182,7 @@ $(function(){
 		}
 		return ({nodes:nset,links:lset});
 	}
+
 
 	function longPress(){
 		timeOutEvent = 0;
@@ -208,10 +193,10 @@ $(function(){
 		let e = ev||event;
         let x = e.clientX;
         let y = e.clientY;
-	 
+
 		timeOutEvent = setTimeout("longPress()",500); //防误判
 		e.preventDefault();
-		
+
 		drag(x,y,0,0);
 
 	}
@@ -221,34 +206,34 @@ $(function(){
 	// ctx.scale(20,20);
 	// ctx.translate(100,00);
 
-	
+
 	// 失败的方法
 	// document.body.addEventListener('touchmove', function(e){
 		// e.preventDefault();
 	// }, { passive: false });  //passive 参数不能省略，用来兼容ios和android
 
 	// 旧版本的方法，chrome73内已失效
-	let p_Cvs = $("#canvas");
-	p_Cvs.mouseover(function(){
-	    $(document).bind('mousewheel', function(event, delta, ) {return false;});
-	});
-    p_Cvs.mouseout(function(){
-	    $(document).unbind('mousewheel');
-	});
+	//let p_Cvs = $("#canvas");
+	//p_Cvs.mouseover(function(){
+	//    $(document).bind('mousewheel', function(event, delta, ) {return false;});
+	//});
+    //p_Cvs.mouseout(function(){
+	//    $(document).unbind('mousewheel');
+	//});
 
 	// 焦点进入时禁止全局滚动
-	//$("#canvas").mouseover(function(){
-	//	 $(document.body).css({
-	//	   "overflow-x":"hidden",
-	//	   "overflow-y":"hidden"
-	//	 });
-	//}).mouseout(function(){
-	//	 $(document.body).css({
-	//	   "overflow-x":"auto",
-	//	   "overflow-y":"auto"
-	//	 });
-	//});	
-		
+	$("#canvas").mouseover(function(){
+		 $(document.body).css({
+		   "overflow-x":"hidden",
+		   "overflow-y":"hidden"
+		 });
+	}).mouseout(function(){
+		 $(document.body).css({
+		   "overflow-x":"auto",
+		   "overflow-y":"auto"
+		 });
+	});
+
 	//缩放
 	let old = 1;
 	canvas.onmousewheel = function(ev){
@@ -263,7 +248,7 @@ $(function(){
 			//const d = ( environment.data("GrpZoomOut") *r ).toFixed(5);
 			environment.data("GrpZoomOut",old);
 			dataset = createImg(0,0,dataset,r,false);
-			
+
 			//old = r;
 			// function inner() {
 				// return newset;
@@ -271,7 +256,7 @@ $(function(){
 			// getInnerVariable = inner;
 		}
 
-	} 
+	}
 
 	// var preventScroll = function(dom){
         // if(dom.jquery){
@@ -289,10 +274,9 @@ $(function(){
                 // return false;
             // };
         // }
-    // };	
-	
-	
-	
+    // };
+
+
 	//拖拽
 
 	function drag(oldx,oldy,newx,newy){
@@ -308,7 +292,7 @@ $(function(){
 			//鼠标移动每一帧都清楚画布内容，然后重新画
 			addx = newx-oldx;
 			addy = newy-oldy;
-			
+
 		};
 		//鼠标移开事件
 		canvas.onmouseup = function(){
@@ -320,29 +304,26 @@ $(function(){
 			}else{
 
 				// newset = createImg(addx,addy,getInnerVariable(),1);
-				let oldarr = environment.data("GrpLocate").split(",");  
+				let oldarr = environment.data("GrpLocate").split(",");
 				let axx = (parseInt(oldarr[0])+addx);
 				let ayy = (parseInt(oldarr[1])+addy);
 				console.log(axx+","+ayy);
 				environment.data("GrpLocate",axx+","+ayy);
 				dataset = createImg(addx,addy,dataset,1,false);
 				//drawLeft();
-				
+
 			}
-			 
+
 		}
-	 
+
 	}
 
-	 
 	////////////////// 柱状图
- 
- 
 	function drawLeft(){
 
 
         let data = generateData();
-		
+
 		drawLeftMid(data.valueData);
 
         let option = {
@@ -391,7 +372,7 @@ $(function(){
 						color: '#000',
 						fontSize:'6'
 					}
-					
+
 				}
 			],
 			xAxis: {
@@ -400,7 +381,7 @@ $(function(){
 				splitLine: {
 					show: false
 				},
-				axisLabel: {        
+				axisLabel: {
 					show: true,
 					textStyle: {
 						color: '#000',
@@ -412,7 +393,7 @@ $(function(){
 				}
 			},
 			yAxis: {
-				axisLabel: {        
+				axisLabel: {
 					show: true,
 					textStyle: {
 						color: '#000',
@@ -451,20 +432,20 @@ $(function(){
             let map = {};
 
 			//console.log(newset);
-			
+
 			for(let i = 0; i < dataset.links.length; i++){
 
                 let tmp = dataset.links[i];
                 let p1 = tmp.x1 + "+" + tmp.y1;
                 let p2 = tmp.x2 + "+" + tmp.y2;
-				
+
 				if(typeof(map[p1]) === 'undefined')
 					map[p1] = 1;
-				else 
+				else
 					map[p1] += 1;
 				if(typeof(map[p2]) === 'undefined')
 					map[p2] = 1;
-				else 
+				else
 					map[p2] += 1;
 
 			}
@@ -478,17 +459,12 @@ $(function(){
 			}
 			//console.log(map);
 		}
-
-
-
 		if (option && typeof option === "object") {
-			
+
 			ctx_right_top.clear();
 			ctx_right_top.setOption(option, true); //////// 注入配置项      解决重复绑定事件：clear(), true, off(click)
-			
-			
 			ctx_right_top.off('click');
-			ctx_right_top.on('click', function (params) { 
+			ctx_right_top.on('click', function (params) {
 
 				//console.log(option.xAxis.data[params.dataIndex],params.value);
                 let arr = option.xAxis.data[params.dataIndex].split("+");
@@ -499,31 +475,25 @@ $(function(){
 				ctx.closePath(); // 关闭绘制路径
 			});
 		}
-		 
-	} 
- 
-  
- 
- 
- 
+
+	}
+
 	////////////////////////////////////////////////////////////////////////////////////////////////////////// 度分布
 
     let canvas_right_mid = document.getElementById("canvas-right-mid");
     let ctx_right_mid = echarts.init(canvas_right_mid);
 	option = null;
-	
-	
-	
+
+
+
 	function drawLeftMid(all_degree){
 
         let degreeData = [];
         let amountData = [];
-		
         const max_d = Math.max.apply(null, all_degree); //返回最大度
 		//console.log(max_d);
         let arr_d = new Array(max_d);
- 
-		
+
 		// 生成度分布
 		for(let key in all_degree){
 			let index = all_degree[key];
@@ -533,23 +503,23 @@ $(function(){
 			   arr_d[index] += 1;
 		    }
 		}
-		
+
 		$.each(arr_d,function(de,amount){
 		    if(typeof(arr_d[de]) !== "undefined"){
 				degreeData.push(de);
 				amountData.push(amount);
- 
+
 		    }
 		});
-		
+
 		drawLeftBottom({x:degreeData, y:amountData});
-		
+
 		//console.log(arr_d);
         let option = {
 			title: {
 				show: false
 			},
- 
+
 			tooltip: {
 				trigger: 'axis',
 				axisPointer: {
@@ -571,7 +541,7 @@ $(function(){
 				splitLine: {
 					show: false
 				},
-				axisLabel: {        
+				axisLabel: {
 					show: true,
 					textStyle: {
 						color: '#000',
@@ -583,7 +553,7 @@ $(function(){
 				}
 			},
 			yAxis: {
-				axisLabel: {        
+				axisLabel: {
 					show: true,
 					textStyle: {
 						color: '#000',
@@ -611,34 +581,30 @@ $(function(){
 				// Set `large` for large data amount
 				large: false
 			}]
-		};
- 
-
+		}
 		if (option && typeof option === "object") {
-			
 			ctx_right_mid.clear();
 			ctx_right_mid.setOption(option, true); //////// 注入配置项      解决重复绑定事件：clear(), true, off(click)
-			
 		}
-		 
-	} 
- 
+
+	}
+
 	////////////////////////////////////////////////////////////////////////////////////////////////////////// 对数坐标
 
     let canvas_right_bottom = document.getElementById("canvas-right-bottom");
     let ctx_right_bottom = echarts.init(canvas_right_bottom);
 	option = null;
-	
-	
-	
+
 	function drawLeftBottom(obj){
 
         let logx = [];
         let logy = [];
-		
-		$.each(obj.x, function(i, item){logx.push(Math.log(item));});
-		$.each(obj.y, function(i, item){logy.push(Math.log(item));});
-
+		$.each(obj.x, function(i, item){
+			logx.push(Math.log(item));
+		});
+		$.each(obj.y, function(i, item){
+			logy.push(Math.log(item));
+		});
 
         let option = {
 			title: {
@@ -713,19 +679,14 @@ $(function(){
 				// Set `large` for large data amount
 				large: false
 			}]
-		};
- 
-
+		}
 		if (option && typeof option === "object") {
-			
 			ctx_right_bottom.clear();
 			ctx_right_bottom.setOption(option, true); //////// 注入配置项      解决重复绑定事件：clear(), true, off(click)
-			
 		}
 		 
 	} 
- 
- 
+
 	///////////////////// init
 	let oldarr = environment.data("GrpLocate").split(",");
 	//newset = trans(dataset,400,400,1);
@@ -737,18 +698,14 @@ $(function(){
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-
 	$('select').selectpicker();
  
 	/*
-
 		var xhr = new XMLHttpRequest();
 		xhr.open("GET", "http://219.216.65.14:4040/api/v1/applications",true);
 		xhr.send();
 
 	*/
-
 
 	//try{/////// 语法错误无法被捕获，只能捕获 异常，异常 不等于 错误
 	//int a = 1;
@@ -877,35 +834,36 @@ $(function(){
 	//updateInfo();
 	//
 
+	let sendBtn = $("#sendBtn");
 	//建立连接
 	let stdoutSocket = new WebSocket('ws://219.216.65.14:8001/');
 	//开启连接
 	stdoutSocket.onopen = function () {
 		console.log('stdoutSocket open');
 		isSolved = true;
-		$("#sendBtn").removeClass("disabled").addClass("btn-mysuccess");
+        sendBtn.removeClass("disabled").addClass("btn-mysuccess");
 	};
 	//关闭连接
 	stdoutSocket.onclose = function () {
 		console.log('stdoutSocket close');
 		//console.log(isSolved);
-		$("#sendBtn").removeClass("btn-mysuccess").addClass("disabled");
+        sendBtn.removeClass("btn-mysuccess").addClass("disabled");
 	};
 	let constr = '';
 	//拿到返回
 	stdoutSocket.onmessage = function (e) {
-		var pdiv=document.getElementById("proccesdiv");
+		let pdiv=document.getElementById("proccesdiv");
 		pdiv.style.visibility='visible';
-		if(e.data=='@done'){
+		if(e.data === '@done'){
 			constr += e.data;
 			// $('#proccestitle').text("Finished").css("color","#3a87ad");
 			//$('#proccesdiv').removeClass("active");
 			pdiv.style.visibility='hidden';
 			if(isSolved){
-				$("#sendBtn").removeClass("disabled");
-				$("#sendBtn").text("Go!");
+                sendBtn.removeClass("disabled");
+                sendBtn.text("Go!");
 			}else{
-				$("#sendBtn").text("Offline");
+                sendBtn.text("Offline");
 			}
 			$('#panel-title').text("").text("任务描述（离线）");
 			//window.clearInterval(oTimer);
@@ -920,7 +878,7 @@ $(function(){
 			$("#tb9").html('WorkerMaxmem:&nbsp;<span class=\"label label-default\">366.3MB</span>');
 			$("#tb10").html('DriverHost:&nbsp;<span class=\"label label-default\">192.168.0.2</span>');
 
-			var off2 = '<tr style="height:0px;border:none !important;"><td>192.168.0.7 </td><td>-</td><td>-</td><td>-</td></tr>'
+			let off2 = '<tr style="height:0px;border:none !important;"><td>192.168.0.7 </td><td>-</td><td>-</td><td>-</td></tr>'
 					  +'<tr style="height:0px;border:none !important;"><td>192.168.0.8 </td><td>-</td><td>-</td><td>-</td></tr>'
 					  +'<tr style="height:0px;border:none !important;"><td>192.168.0.19</td><td>-</td><td>-</td><td>-</td></tr>'
 					  +'<tr style="height:0px;border:none !important;"><td>192.168.0.20</td><td>-</td><td>-</td><td>-</td></tr>'
@@ -962,20 +920,15 @@ $(function(){
 		$("#sendBtn").addClass("disabled");
 		$("#sendBtn").text("Running");
 		//$('#proccesdiv').addClass("active progress-striped");
-
-
 		//oTimer = setInterval(updateInfo,2000);
 		//var pzxC = $('#pzxC').val();
-
 		var select3 = $('#select3').val();
 		var pzxD = $('#pzxD').val();
 		//console.log(">>>>>>>"+select3);
 		//var text = $('#sendTxt').val();
 
 		webSocket.send(select3+','+pzxD);
-
 	};
-
 
 	function executeAnimeDrawing(index){
 		if(index < 200){
@@ -1036,8 +989,6 @@ $(function(){
 	};
 
 
-
-
 	//////////////////////////////////////////////////////////////////////////////////////////
 	//建立连接
 	let monitorSocket = new WebSocket('ws://219.216.65.14:10001/');
@@ -1075,7 +1026,6 @@ $(function(){
 				 +field.hostPort+'</td><td>'+str+'</td><td>'+field.rddBlocks
 				 +'</td><td><div class="progress" style="margin-bottom:0px;border-radius: 0px !important;height: 17px !important;"><div class="progress-bar progress-success"style="width:'
 				 +field.memoryUsed+';"></div></div></td></tr>'
-
 		});
 		$('#thead').nextAll().remove();
 		$("#node_info").append(tbstr);
@@ -1093,20 +1043,12 @@ $(function(){
 		let select3 = $('#select3').val();
 		let pzxD = $('#pzxD').val();
 
-
-
 		stdoutSocket.send(select3+','+pzxD);
 		monitorSocket.send("111");
 
 		//canvasSocket.send("simple5.txt_of_@_without_200.json,1,196");
 		//canvasSocket.send("Vote.txt_of_@_without_800.json,760,800");
 	};
-
-
-
-
-
-
 
 
 
@@ -1150,8 +1092,6 @@ $(function(){
 
 	///////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////
-
-
 
 	//console.log(environment.data("LineWidth"));
 
@@ -1240,28 +1180,28 @@ $(function(){
 	function update_CONST_CANVAS(id,latest){
 		let isRun = false;
 		let older;
-		if(id=="#cp1"){
+		if(id === "#cp1"){
 		 
 			older = environment.data("LineColor");
-			if(latest!=older){
+			if(latest !== older){
 				isRun = true;
 				environment.data("LineColor",latest);   
 			}
-		}else if(id=="#cp3"){
+		}else if(id === "#cp3"){
 			older = environment.data("PointColor");
-			if(latest!=older){
+			if(latest !== older){
 				isRun = true;
 				environment.data("PointColor",latest);   
 			}
-		}else if(id=="#cp2"){
+		}else if(id === "#cp2"){
 			older = environment.data("GridColor");
-			if(latest!=older){
+			if(latest !== older){
 				isRun = true;
 				environment.data("GridColor",latest);   
 			}
-		}else if(id=="#cp4"){
+		}else if(id === "#cp4"){
 			older = environment.data("BkgdColor");
-			if(latest!=older){
+			if(latest !== older){
 				isRun = true;
 				environment.data("BkgdColor",latest);   
 			}
@@ -1278,42 +1218,42 @@ $(function(){
 				//	break;
 				case "#cp6": 
 					older = environment.data("LineWidth");
-					if(latest!=older){
+					if(latest !== older){
 						isRun = true;
 						environment.data("LineWidth",latest);   
 					}
 					break;
 				case "#cp7": 
 					older = environment.data("PointSize");
-					if(latest!=older){
+					if(latest !== older){
 						isRun = true;
 						environment.data("PointSize",latest);   
 					}
 					break;
 				case "#cp8": 
 					older = environment.data("GridZoom");
-					if(latest!=older){
+					if(latest !== older){
 						isRun = true;
 						environment.data("GridZoom",latest);   
 					}
 					break;
 				case "#cp9": 
 					older = environment.data("GridWidth");
-					if(latest!=older){
+					if(latest !== older){
 						isRun = true;
 						environment.data("GridWidth",latest);   
 					}
 					break;
 				case "#cp1": 
 					older = environment.data("LineColor");
-					if(latest!=older){
+					if(latest !== older){
 						isRun = true;
 						environment.data("LineColor",latest);   
 					}
 					break;
 				case "#cp3": 
 					older = environment.data("PointColor");
-					if(latest!=older){
+					if(latest !== older){
 						isRun = true;
 						environment.data("PointColor",latest);   
 					}
@@ -1400,158 +1340,129 @@ $(function(){
 		update_CONST_CANVAS("#"+this.id,cpval);
 	});
 
-	
-	
- 
 
-
-
-
-
-
-        ///(function con() {  //con就是画每一帧动画的函数。
-        ///    console.log(111);
-        ///    requestAnimationFrame( con );  //动画更流畅  实现setInterval的效果
-        ///}());
- 
+	///(function con() {  //con就是画每一帧动画的函数。
+	///    console.log(111);
+	///    requestAnimationFrame( con );  //动画更流畅  实现setInterval的效果
+	///}());
 
  
- 
-////////////////////////////////////////////////////////////////////////////////////////////////////////// 重叠坐标
- 
-var canvas_central_left = document.getElementById("canvas-central-left");
-var ctx_central_left = echarts.init(canvas_central_left);
-var option = null;
-const MAXX = 6000;
+	////////////////////////////////////////////////////////////////////////////////////////////////////////// 重叠坐标
 
-$("#canvas-central-left").hide();
+    let canvas_central_left = document.getElementById("canvas-central-left");
+    let ctx_central_left = echarts.init(canvas_central_left);
 
-$('#closeCVS').click(function(){
-	$("#canvas-central-left").hide();	
-});
+    option = null;
+	const MAXX = 6000;
 
-$('#checkComplex').click(function(){
- 
-	option = {
-		xAxis: {
-			scale: true
-		},
-		yAxis: {
-			scale: true
-		},
-		dataZoom: [{
-				type: 'inside'
-			}
-		],
-		series: [{
-			type: 'effectScatter',
-			symbolSize: 10,
-			data: getErrData()
-		}, {
-			type: 'scatter',
-			symbolSize: 2,
-			data: getZipData()
-		}]
-	};
+	$("#canvas-central-left").hide();
 
-	ctx_central_left.setOption(option, true);
-	$("#canvas-central-left").show();//显示div
-	
-});
+	$('#closeCVS').click(function(){
+		$("#canvas-central-left").hide();
+	});
 
+	$('#checkComplex').click(function(){
 
+		option = {
+			xAxis: {
+				scale: true
+			},
+			yAxis: {
+				scale: true
+			},
+			dataZoom: [{
+					type: 'inside'
+				}
+			],
+			series: [{
+				type: 'effectScatter',
+				symbolSize: 10,
+				data: getErrData()
+			}, {
+				type: 'scatter',
+				symbolSize: 2,
+				data: getZipData()
+			}]
+		};
 
-function getZipData(){
- 
-	var zips = [];
-	var matrix = new Array();             //声明一维数组        
-	for(var x = 0; x < MAXX; x ++){
-		  matrix[x]=new Array();        //声明二维数组
-		  for(var y = 0; y < MAXX; y ++){
-			   matrix[x][y] = 0;          //数组初始化为0
-		  }
+		ctx_central_left.setOption(option, true);
+		$("#canvas-central-left").show();//显示div
+	});
+
+	function getZipData(){
+
+        let zips = [];
+        let matrix = new Array();             //声明一维数组
+		for(let x = 0; x < MAXX; x ++){
+			  matrix[x]=new Array();        //声明二维数组
+			  for(let y = 0; y < MAXX; y ++){
+				   matrix[x][y] = 0;          //数组初始化为0
+			  }
+		}
+		const nodelist = dataset.nodes;
+		for(let i = 0; i < nodelist.length; i ++){
+			const tmp = nodelist[i];
+			//if(tmp.cx > 0 && tmp.cy > 0 && tmp.cx < 1500 && tmp.cy < 1500){
+				//console.log((tmp.cx+1000)+","+(tmp.cy+1000));
+				matrix[tmp.cx+2000][tmp.cy+2000] += 1;
+			//	}
+		}
+		for(let x = 0; x < MAXX; x ++){
+			  for(let y = 0; y < MAXX; y ++){
+				   if( matrix[x][y] === 1){
+						zips.push(new Array(x,y,matrix[x][y]));
+				   }
+			  }
+		}
+		//console.log(zips);
+		return zips;
+
 	}
-	const nodelist = dataset.nodes;
-	for(var i = 0; i < nodelist.length; i ++){
-		const tmp = nodelist[i];
-		//if(tmp.cx > 0 && tmp.cy > 0 && tmp.cx < 1500 && tmp.cy < 1500){
-			//console.log((tmp.cx+1000)+","+(tmp.cy+1000));
-			matrix[tmp.cx+2000][tmp.cy+2000] += 1;
-		//	}
+	function getErrData(){
+
+		let errs = [];
+        let matrix = new Array();             //声明一维数组
+		for(let x = 0; x < MAXX; x ++){
+			  matrix[x]=new Array();        //声明二维数组
+			  for(let y = 0; y < MAXX; y ++){
+				   matrix[x][y] = 0;          //数组初始化为0
+			  }
+		}
+		const nodelist = dataset.nodes;
+		for(let i = 0; i < nodelist.length; i ++){
+			const tmp = nodelist[i];
+			//if(tmp.cx > 0 && tmp.cy > 0 && tmp.cx < 1500 && tmp.cy < 1500){
+				//console.log((tmp.cx+1000)+","+(tmp.cy+1000));
+				matrix[tmp.cx+2000][tmp.cy+2000] += 1;
+			//	}
+		}
+		for(let x = 0; x < MAXX; x ++){
+			  for(let y = 0; y < MAXX; y ++){
+				   if( matrix[x][y] > 1){
+						errs.push(new Array(x,y,matrix[x][y]));
+				   }
+			  }//
+		}
+		//errs.push([0,0]);
+		//console.log(zips);
+		return errs;
 	}
-	for(var x = 0; x < MAXX; x ++){
-		  for(var y = 0; y < MAXX; y ++){
-			   if( matrix[x][y] == 1){
-					zips.push(new Array(x,y,matrix[x][y]));	
-			   }
-		  }
-	}
-	//console.log(zips);
-	return zips;
 
-}
-function getErrData(){
- 
-	var errs = [];
-	var matrix = new Array();             //声明一维数组        
-	for(var x = 0; x < MAXX; x ++){
-		  matrix[x]=new Array();        //声明二维数组
-		  for(var y = 0; y < MAXX; y ++){
-			   matrix[x][y] = 0;          //数组初始化为0
-		  }
-	}
-	const nodelist = dataset.nodes;
-	for(var i = 0; i < nodelist.length; i ++){
-		const tmp = nodelist[i];
-		//if(tmp.cx > 0 && tmp.cy > 0 && tmp.cx < 1500 && tmp.cy < 1500){
-			//console.log((tmp.cx+1000)+","+(tmp.cy+1000));
-			matrix[tmp.cx+2000][tmp.cy+2000] += 1;
-		//	}
-	}
-	for(var x = 0; x < MAXX; x ++){
-		  for(var y = 0; y < MAXX; y ++){
-			   if( matrix[x][y] > 1){
-					errs.push(new Array(x,y,matrix[x][y]));	
-			   }
-		  }//
-	}
-	//errs.push([0,0]);
-	//console.log(zips);
-	return errs;
+	////////// show bones
 
-}
+    let canvas_central_mid = document.getElementById("canvas-central-mid");
+    //let ctx_central_mid = echarts.init(canvas_central_mid);
+    let cvs_ctmid = $("#canvas-central-mid");
+    cvs_ctmid.hide();
+	$('#closeCVSmid').click(function(){
+        cvs_ctmid.hide();
+	});
+
+	$('#checkBones').click(function(){
+		console.log(11111);
+        cvs_ctmid.show();
+	});
 
 
-////////// show bones
-
-var canvas_central_mid = document.getElementById("canvas-central-mid");
-var ctx_central_mid = echarts.init(canvas_central_mid);
-$("#canvas-central-mid").hide();
-$('#closeCVSmid').click(function(){
-	$("#canvas-central-mid").hide();	
-});
-
-$('#checkBones').click(function(){
-	console.log(11111);
-	$("#canvas-central-mid").show();
-});
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
 });
  

@@ -6,42 +6,43 @@ $(function(){
 	
 	const ZOOM_OUT = Math.pow(0.875,3).toFixed(3);
 	//Canvas全局状态量
-	$("#environment").data("GrpZoomOut",1);
-	$("#environment").data("GrpLocate","950,700");
+	let environment = $("#environment");
+	environment.data("GrpZoomOut",1);
+	environment.data("GrpLocate","950,700");
 	
 	
-	$("#environment").data("LineWidth",0.5);
-	$("#environment").data("LineColor","#000000");
-	$("#environment").data("PointSize",0);
-	$("#environment").data("PointColor","#000000");
-	$("#environment").data("GridZoom",1.0);
-	$("#environment").data("GridWidth",0.5);
+	environment.data("LineWidth",0.5);
+	environment.data("LineColor","#000000");
+	environment.data("PointSize",0);
+	environment.data("PointColor","#000000");
+	environment.data("GridZoom",1.0);
+	environment.data("GridWidth",0.5);
 	
-	$("#environment").data("GridColor","#ccc");
-	$("#environment").data("BkgdColor","#ffffff");	
+	environment.data("GridColor","#ccc");
+	environment.data("BkgdColor","#ffffff");
  
 	
-	var canvas = document.getElementById("canvas");
-	var width = canvas.offsetWidth;
-	var height = canvas.offsetWidth;
+	const canvas = document.getElementById("canvas");
+    const width = canvas.offsetWidth;
+    const height = canvas.offsetWidth;
 	canvas.width = CVS_WIDTH;
 	canvas.height = CVS_HEIGHT; 
 	const ctx = canvas.getContext("2d", { alpha: false });   
 
 	
 	////////////////// 柱状图
-	var canvas_right_top = document.getElementById("canvas-right-top");
-	var ctx_right_top = echarts.init(canvas_right_top);
-	var app = {};
+    const canvas_right_top = document.getElementById("canvas-right-top");
+    const ctx_right_top = echarts.init(canvas_right_top);
+    const app = {};
 	option = null;
 	
-	//console.log($("#environment"));
+	//console.log(environment);
 	ctx.strokeStyle = 'black'; /////////////////// xx
-	ctx.lineWidth=$("#environment").data("LineWidth"); /////////////////// xx
-	  
-	var len=0;
-	var boo = false;
-	var dataset;
+	ctx.lineWidth=environment.data("LineWidth"); /////////////////// xx
+
+    let len = 0;
+    let boo = false;
+    let dataset;
 
 //===========================================================================================================
 	$.ajax({
@@ -59,21 +60,21 @@ $(function(){
 	});
 
 	//var newset;
-	var getInnerVariable;
-	var timeOutEvent = 0;//区分拖拽和点击的参数
+    let getInnerVariable;
+    let timeOutEvent = 0;//区分拖拽和点击的参数
 
 	
 	
 	function drawGrid(stepxy, canvasxy) {
-		ctx.save()
-		ctx.fillStyle = $("#environment").data("BkgdColor"); /////////////////// xx;
+		ctx.save();
+		ctx.fillStyle = environment.data("BkgdColor"); /////////////////// xx;
 	   
 		ctx.fillRect(0, 0, canvasxy, canvasxy);
-		ctx.lineWidth = $("#environment").data("GridWidth"); /////////////////// xx
-		ctx.strokeStyle = $("#environment").data("GridColor"); /////////////////// xx;
+		ctx.lineWidth = environment.data("GridWidth"); /////////////////// xx
+		ctx.strokeStyle = environment.data("GridColor"); /////////////////// xx;
 		
-		if($("#environment").data("GridWidth") != 0){
-		    for (var i = stepxy; i < canvasxy; i += stepxy) {
+		if(environment.data("GridWidth") !== 0){
+		    for (let i = stepxy; i < canvasxy; i += stepxy) {
 		        ctx.beginPath();
 		        ctx.moveTo(i, 0);
 		        ctx.lineTo(i, canvasxy);
@@ -91,9 +92,9 @@ $(function(){
 	
 	function trans(sets,addx,addy,r){
 		//console.log(addx,addy,r);
-	    var param = sets.links;
-		var banana = sets.nodes;
-		for(var i = 0; i < param.length; i++){	//优化（位运算要包在括号内）
+	    let param = sets.links;
+        let banana = sets.nodes;
+		for(let i = 0; i < param.length; i++){	//优化（位运算要包在括号内）
 			param[i].x1 = ((0.5 + param[i].x1*r) << 0) + addx; //Math.round(param[i].x1*r) + addx;//
 			param[i].x2 = ((0.5 + param[i].x2*r) << 0) + addx; //Math.round(param[i].x2*r) + addx;//
 			param[i].y1 = ((0.5 + param[i].y1*r) << 0) + addy; //Math.round(param[i].y1*r) + addy;//
@@ -103,7 +104,7 @@ $(function(){
 			     Mathround：大，初次170ms  中，初次50ms   未分层时，移动：大30ms 中8ms
 			*/
 		}
-		for(var i = 0; i < banana.length; i++){	
+		for(let i = 0; i < banana.length; i++){
 			banana[i].cx = ((0.5 + banana[i].cx*r) << 0) + addx;  //Math.round(banana[i].cx*r) + addx;//
 			banana[i].cy = ((0.5 + banana[i].cy*r) << 0) + addy;  //Math.round(banana[i].cy*r) + addy;//
 		}
@@ -119,28 +120,28 @@ $(function(){
 			const beginTime = +new Date();
 
 			console.log("createImg");
-			//console.log("NOW:"+$("#environment").data("LineWidth"));
-			ctx.strokeStyle = $("#environment").data("LineColor");; /////////////////// xx
-			ctx.lineWidth = $("#environment").data("LineWidth"); /////////////////// xx
+			//console.log("NOW:"+environment.data("LineWidth"));
+			ctx.strokeStyle = environment.data("LineColor");; /////////////////// xx
+			ctx.lineWidth = environment.data("LineWidth"); /////////////////// xx
 			
 			ctx.clearRect(0,0,canvas.width,canvas.height);
 			
-			let GridZoom = $("#environment").data("GridZoom"); /////////////////// xx
-			//let CanvasZoom = $("#environment").data("Grp"); /////////////////// xx
+			let GridZoom = environment.data("GridZoom"); /////////////////// xx
+			//let CanvasZoom = environment.data("Grp"); /////////////////// xx
 			//let widthandheight = 1500*CanvasZoom;
 			let xyValue = CVS_WIDTH;
  
 			drawGrid(20*GridZoom, CVS_WIDTH);
 
 			wholesets = trans(wholesets,addx,addy,r);
-			var lset = wholesets.links;
-			var nset = wholesets.nodes;
+			let lset = wholesets.links;
+            let nset = wholesets.nodes;
 			
-			if($("#environment").data("LineWidth") !=0 ){
+			if(environment.data("LineWidth") !== 0 ){
 				ctx.beginPath(); //优化
 				
-				for(var i = 0; i < lset.length; i++){
-					var tmp = lset[i];
+				for(let i = 0; i < lset.length; i++){
+                    let tmp = lset[i];
 					ctx.moveTo(tmp.x1 , tmp.y1);
 					ctx.lineTo(tmp.x2 , tmp.y2);
 				}
@@ -169,15 +170,15 @@ $(function(){
 			//console.log(nset);
 			//console.log(lset);
 			//画点
-			//ctx.strokeStyle = $("#environment").data("PointColor"); /////////////////// xx
-			let rsize = $("#environment").data("PointSize"); /////////////////// xx
-			let pcolor = $("#environment").data("PointColor"); /////////////////// xx
-			if($("#environment").data("PointSize") !=0 ){
+			//ctx.strokeStyle = environment.data("PointColor"); /////////////////// xx
+			let rsize = environment.data("PointSize"); /////////////////// xx
+			let pcolor = environment.data("PointColor"); /////////////////// xx
+			if(environment.data("PointSize") !== 0 ){
 				//console.log("R = "+rsize+", CL = "+pcolor);
 				if(rsize){
 					
-					for(var i = 0; i < nset.length; i++){
-						var tmp = nset[i];
+					for(let i = 0; i < nset.length; i++){
+                        let tmp = nset[i];
 						ctx.beginPath(); // 开启绘制路径
 						ctx.arc(tmp.cx, tmp.cy, rsize, 0, 2*Math.PI); // 绘制圆 参数依次为 圆的横坐标/纵坐标/半径/绘制圆的起始位置/绘制圆的弧度大小
 						ctx.fillStyle = pcolor; /////////////////// xx
@@ -204,16 +205,16 @@ $(function(){
 
 
 	canvas.onmousedown = function(ev){
-		var e = ev||event;
-		var x = e.clientX;
-		var y = e.clientY;
+		let e = ev||event;
+        let x = e.clientX;
+        let y = e.clientY;
 	 
 		timeOutEvent = setTimeout("longPress()",500); //防误判
 		e.preventDefault();
 		
 		drag(x,y,0,0);
 
-	} 
+	}
 
 
 	// 缩放的函数是像素缩放，细节丢失！！！不能用
@@ -227,9 +228,11 @@ $(function(){
 	// }, { passive: false });  //passive 参数不能省略，用来兼容ios和android
 
 	// 旧版本的方法，chrome73内已失效
-	$("#canvas").mouseover(function(){
+	let p_Cvs = $("#canvas");
+	p_Cvs.mouseover(function(){
 	    $(document).bind('mousewheel', function(event, delta, ) {return false;});
-	}).mouseout(function(){
+	});
+    p_Cvs.mouseout(function(){
 	    $(document).unbind('mousewheel');
 	});
 
@@ -247,18 +250,18 @@ $(function(){
 	//});	
 		
 	//缩放
-	var old = 1;
+	let old = 1;
 	canvas.onmousewheel = function(ev){
-		var e = ev||event;
+        let e = ev||event;
 		//console.log(e.wheelDelta/1200);
-		var r = 1 + e.wheelDelta/1200;
+        let r = 1 + e.wheelDelta/1200;
 		old  = old * r;
 		//console.log(r);
 
 		if(r>0){
 			$("#cp5").val(r);
-			//const d = ( $("#environment").data("GrpZoomOut") *r ).toFixed(5);
-			$("#environment").data("GrpZoomOut",old);
+			//const d = ( environment.data("GrpZoomOut") *r ).toFixed(5);
+			environment.data("GrpZoomOut",old);
 			dataset = createImg(0,0,dataset,r,false);
 			
 			//old = r;
@@ -294,10 +297,10 @@ $(function(){
 
 	function drag(oldx,oldy,newx,newy){
 
-		var addx,addy;
+        let addx,addy;
 		//路径正确，鼠标移动事件
 		canvas.onmousemove = function(ev){
-			var e = ev||event;
+            let e = ev||event;
 			newx = e.clientX;
 			newy = e.clientY;
 			clearTimeout(timeOutEvent);
@@ -312,16 +315,16 @@ $(function(){
 			canvas.onmousemove = null;
 			canvas.onmouseup = null;
 			clearTimeout(timeOutEvent);
-			if(timeOutEvent!=0){
+			if(timeOutEvent !== 0){
 				alert("你这是点击，不是拖拽");
 			}else{
 
 				// newset = createImg(addx,addy,getInnerVariable(),1);
-				let oldarr = $("#environment").data("GrpLocate").split(",");  
+				let oldarr = environment.data("GrpLocate").split(",");  
 				let axx = (parseInt(oldarr[0])+addx);
 				let ayy = (parseInt(oldarr[1])+addy);
 				console.log(axx+","+ayy);
-				$("#environment").data("GrpLocate",axx+","+ayy);
+				environment.data("GrpLocate",axx+","+ayy);
 				dataset = createImg(addx,addy,dataset,1,false);
 				//drawLeft();
 				
@@ -336,13 +339,13 @@ $(function(){
  
  
 	function drawLeft(){
-		 
-		
-		var data = generateData();
+
+
+        let data = generateData();
 		
 		drawLeftMid(data.valueData);
-		
-		var option = {
+
+        let option = {
 			title: {
 				// text: echarts.format.addCommas(dataCount) + ' Data',
 				// textStyle: {
@@ -442,30 +445,30 @@ $(function(){
 		// 柱状图 得当前画布显示的数据 【计算全部节点的度】
 		function generateData() {
 
-			var categoryData = [];
-			var valueData = [];
-			
-			var map = {};
+            let categoryData = [];
+            let valueData = [];
+
+            let map = {};
 
 			//console.log(newset);
 			
-			for(var i = 0; i < dataset.links.length; i++){
-			
-				var tmp = dataset.links[i];
-				var p1 = tmp.x1 + "+" + tmp.y1;
-				var p2 = tmp.x2 + "+" + tmp.y2;
+			for(let i = 0; i < dataset.links.length; i++){
+
+                let tmp = dataset.links[i];
+                let p1 = tmp.x1 + "+" + tmp.y1;
+                let p2 = tmp.x2 + "+" + tmp.y2;
 				
-				if(typeof(map[p1])=='undefined')
+				if(typeof(map[p1]) === 'undefined')
 					map[p1] = 1;
 				else 
 					map[p1] += 1;
-				if(typeof(map[p2])=='undefined') 
+				if(typeof(map[p2]) === 'undefined')
 					map[p2] = 1;
 				else 
 					map[p2] += 1;
 
 			}
-			for(var key in map){
+			for(let key in map){
 			   categoryData.push(key);
 			   valueData.push(map[key]);
 			}
@@ -488,7 +491,7 @@ $(function(){
 			ctx_right_top.on('click', function (params) { 
 
 				//console.log(option.xAxis.data[params.dataIndex],params.value);
-				var arr = option.xAxis.data[params.dataIndex].split("+");
+                let arr = option.xAxis.data[params.dataIndex].split("+");
 				ctx.beginPath(); // 开启绘制路径
 				ctx.arc(arr[0], arr[1], 10, 0, 2*Math.PI); // 绘制圆 参数依次为 圆的横坐标/纵坐标/半径/绘制圆的起始位置/绘制圆的弧度大小
 				ctx.fillStyle = "red"; // 设置填充颜色
@@ -504,27 +507,27 @@ $(function(){
  
  
 	////////////////////////////////////////////////////////////////////////////////////////////////////////// 度分布
- 
-	var canvas_right_mid = document.getElementById("canvas-right-mid");
-	var ctx_right_mid = echarts.init(canvas_right_mid);
+
+    let canvas_right_mid = document.getElementById("canvas-right-mid");
+    let ctx_right_mid = echarts.init(canvas_right_mid);
 	option = null;
 	
 	
 	
 	function drawLeftMid(all_degree){
-		 
-		var degreeData = [];
-		var amountData = [];
+
+        let degreeData = [];
+        let amountData = [];
 		
         const max_d = Math.max.apply(null, all_degree); //返回最大度
 		//console.log(max_d);
-		var arr_d = new Array(max_d);
+        let arr_d = new Array(max_d);
  
 		
 		// 生成度分布
-		for(var key in all_degree){
+		for(let key in all_degree){
 			let index = all_degree[key];
-		    if(typeof(arr_d[index])=="undefined"){
+		    if(typeof(arr_d[index]) === "undefined"){
 			   arr_d[index] = 1;
 		    }else{
 			   arr_d[index] += 1;
@@ -532,7 +535,7 @@ $(function(){
 		}
 		
 		$.each(arr_d,function(de,amount){
-		    if(typeof(arr_d[de])!="undefined"){
+		    if(typeof(arr_d[de]) !== "undefined"){
 				degreeData.push(de);
 				amountData.push(amount);
  
@@ -542,7 +545,7 @@ $(function(){
 		drawLeftBottom({x:degreeData, y:amountData});
 		
 		//console.log(arr_d);
-		var option = {
+        let option = {
 			title: {
 				show: false
 			},
@@ -621,23 +624,23 @@ $(function(){
 	} 
  
 	////////////////////////////////////////////////////////////////////////////////////////////////////////// 对数坐标
- 
-	var canvas_right_bottom = document.getElementById("canvas-right-bottom");
-	var ctx_right_bottom = echarts.init(canvas_right_bottom);
+
+    let canvas_right_bottom = document.getElementById("canvas-right-bottom");
+    let ctx_right_bottom = echarts.init(canvas_right_bottom);
 	option = null;
 	
 	
 	
 	function drawLeftBottom(obj){
-		 
-		var logx = [];
-		var logy = [];
+
+        let logx = [];
+        let logy = [];
 		
 		$.each(obj.x, function(i, item){logx.push(Math.log(item));});
 		$.each(obj.y, function(i, item){logy.push(Math.log(item));});
-		
 
-		var option = {
+
+        let option = {
 			title: {
 				// text: echarts.format.addCommas(dataCount) + ' Data',
 				// textStyle: {
@@ -723,380 +726,381 @@ $(function(){
 	} 
  
  
-///////////////////// init 
-	let oldarr = $("#environment").data("GrpLocate").split(",");
+	///////////////////// init
+	let oldarr = environment.data("GrpLocate").split(",");
 	//newset = trans(dataset,400,400,1);
 	//console.log(oldarr);
-	dataset = createImg(parseInt(oldarr[0]),parseInt(oldarr[1]),dataset,ZOOM_OUT*$("#environment").data("GrpZoomOut"),true); //初始
+	dataset = createImg(parseInt(oldarr[0]),parseInt(oldarr[1]),dataset,ZOOM_OUT*environment.data("GrpZoomOut"),true); //初始
 	//drawLeft();
 	
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 
-$('select').selectpicker();
+	$('select').selectpicker();
  
-/*
+	/*
 
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET", "http://219.216.65.14:4040/api/v1/applications",true);
-    xhr.send();
-	
-*/
+		var xhr = new XMLHttpRequest();
+		xhr.open("GET", "http://219.216.65.14:4040/api/v1/applications",true);
+		xhr.send();
+
+	*/
 
 
-//try{/////// 语法错误无法被捕获，只能捕获 异常，异常 不等于 错误
-  //int a = 1;
-  
-var isSolved = false;
-//var oTimer = null; 
-//var updateInfo = function() {
-//
-//	$.ajax({
-//		url: "http://219.216.65.14:4040/api/v1/applications",
-//		dataType: "json"
-//	}).done(function (result) {
-//		//$('#panel-heading').nextAll().remove();
-//		$('#panel-title').text("").text("任务描述（运行中）");
-//		var infos = result[0];
-//		var details = infos.attempts[0];
-//		//console.log(infos);
-//		var times = details.startTime.split(".");
-//		var timess = times[0].split("T");
-//		//let str = '<div class="panel-body" style="padding-top: 5px;padding-left: 5px;padding-right: 5px;padding-bottom: 5px;">';
-//		$("#tb1").html('AppId:&nbsp;<span class="label label-online">'+infos.id+'</span>');
-//		$("#tb2").html('AppName:&nbsp;<span class="label label-online">'+infos.name+'</span>');
-//		$("#tb3").html('StartTime:&nbsp;<span class="label label-online">'+timess[0]+'&nbsp;'+timess[1]+'</span>');
-//		$("#tb4").html('Completed:&nbsp;<span class="label label-online">Running</span>');
-//
-//			$.ajax({
-//				url: "http://219.216.65.14:4040/api/v1/applications/"+infos.id+"/allexecutors",
-//				dataType: "json"
-//			}).done(function (executor) {
-//				//console.log(executor);
-//				$('#thead').nextAll().remove();
-//				var counter = 0;
-//				var appendstr = "";
-//				$.each(executor, function(i, field){
-//					//if(i % 2 == 0){
-//						let str = '';
-//						counter++;
-//						if(field.isActive){
-//							str = "<span class=\"glyphicon glyphicon-ok-circle\" style=\"color:green\"></span>";
-//						}else{
-//							str = "<span class=\"glyphicon glyphicon-remove-circle\" style=\"color:red\"></span>";
-//						}
-//						//console.log(field.memoryUsed*100/1073741824);
-//						appendstr += '<tr style="height:0px;border:none !important;padding:0 0 0 0 !important;border:0px !important;line-height: 1.37 !important;"><td>'
-//								     +field.hostPort.split(":")[0]+'</td><td>'+str+'</td><td>'+field.rddBlocks
-//								     +'</td><td><div class="progress" style="margin-bottom:0px;border-radius: 0px !important;height: 17px !important;"><div class="progress-bar progress-success"style="width:'
-//								     +(field.memoryUsed*8000/field.maxMemory)+'%;"></div></div></td></tr>'
-//						$("#tb9").html('WorkerMaxmem:&nbsp;<span class="label label-online">'+(field.maxMemory/1024/1024).toFixed(1)+'MB</span>');
-//					//}else{
-//								    
-//						//$("#node_info").append('<tr class=\'success\'><td>'+field.hostPort.split(":")[0]+'</td><td>'+field.isActive+'</td><td>'+field.rddBlocks+'</td><td>'+field.memoryUsed+'</td></tr>');
-//					//}
-//				});	
-//				counter
-//				if(counter==executor.length) $("#node_info").append(appendstr);
-//				
-//			}).fail(function (jqXHR, textStatus, errorThrown) {
-//				// net::ERR_CONNECTION_REFUSED 发生时，也能进入
-//				console.info("轮询结束");
-//			});
-//
-//			$.ajax({
-//				url: "http://219.216.65.14:4040/api/v1/applications/"+infos.id+"/environment",
-//				dataType: "json"
-//			}).done(function (environ) {
-//				//console.log(environ.sparkProperties);
-//				var tmp = environ.sparkProperties;
-//				//let str = '<div class="panel-body" style="padding-top: 5px;padding-left: 5px;padding-right: 5px;padding-bottom: 5px;">';
-//				$("#tb5").html('DriverMemory:&nbsp;<span class="label label-online">'+tmp[5][1]+'</span>');
-//				$("#tb6").html('MasterNode:&nbsp;<span class="label label-online">'+tmp[9][1]+'</span>');
-//				$("#tb7").html('DeployMode:&nbsp;<span class="label label-online">'+tmp[13][1]+'</span>');
-//				$("#tb8").html('ExecuteJAr:&nbsp;<span class="label label-online">'+tmp[8][1].split("/bin/")[1]+'</span>');
-//							
-//				$("#tb10").html('DriverHost:&nbsp;<span class="label label-online">'+tmp[4][1]+'</span>');		
-//			}).fail(function (jqXHR, textStatus, errorThrown) {
-//				// net::ERR_CONNECTION_REFUSED 发生时，也能进入
-//				console.info("轮询结束");
-//			});
-//
-//	}).fail(function (jqXHR, textStatus, errorThrown) {
-//		// net::ERR_CONNECTION_REFUSED 发生时，也能进入
-//		console.info("轮询结束");
-//		
-//		if(isSolved){
-//			$("#sendBtn").removeClass("disabled");
-//			$("#sendBtn").text("Go!");
-//		}
-//		
-//		window.clearInterval(oTimer);
-//		
-//
-//		$("#tb1").html('AppId:&nbsp;<span class=\"label label-default\">app-20190327220504-0015</span>');		
-//		$("#tb2").html('AppName:&nbsp;<span class=\"label label-default\">RemoteGraphX</span>');									
-//		$("#tb3").html('StartTime:&nbsp;<span class=\"label label-default\">2019-03-27 14:05:03</span>');						
-//		$("#tb4").html('Completed:&nbsp;<span class=\"label label-default\">True</span>');										
-//		$("#tb5").html('DriverMemory:&nbsp;<span class=\"label label-default\">1g</span>');							
-//		$("#tb6").html('MasterNode:&nbsp;<span class=\"label label-default\">spark://hadoop02:7077</span>');					
-//		$("#tb7").html('DeployMode:&nbsp;<span class=\"label label-default\">client</span>');			
-//		$("#tb8").html('ExecuteJAr:&nbsp;<span class=\"label label-default\">visualization-build.jar</span>');		
-//		$("#tb9").html('WorkerMaxmem:&nbsp;<span class=\"label label-default\">366.3MB</span>');			
-//		$("#tb10").html('DriverHost:&nbsp;<span class=\"label label-default\">192.168.0.2</span>');		
-//		
-//		var off2 = '<tr style="height:0px;border:none !important;"><td>192.168.0.7 </td><td>-</td><td>-</td><td>-</td></tr>'
-//				  +'<tr style="height:0px;border:none !important;"><td>192.168.0.8 </td><td>-</td><td>-</td><td>-</td></tr>'
-//				  +'<tr style="height:0px;border:none !important;"><td>192.168.0.19</td><td>-</td><td>-</td><td>-</td></tr>'
-//				  +'<tr style="height:0px;border:none !important;"><td>192.168.0.20</td><td>-</td><td>-</td><td>-</td></tr>'
-//				  +'<tr style="height:0px;border:none !important;"><td>192.168.0.24</td><td>-</td><td>-</td><td>-</td></tr>'
-//				  +'<tr style="height:0px;border:none !important;"><td>192.168.0.29</td><td>-</td><td>-</td><td>-</td></tr>'
-//				  +'<tr style="height:0px;border:none !important;"><td>192.168.0.32</td><td>-</td><td>-</td><td>-</td></tr>'
-//				  +'<tr style="height:0px;border:none !important;"><td>192.168.0.33</td><td>-</td><td>-</td><td>-</td></tr>'
-//				  +'<tr style="height:0px;border:none !important;"><td>192.168.0.34</td><td>-</td><td>-</td><td>-</td></tr>'
-//				  +'<tr style="height:0px;border:none !important;"><td>192.168.0.35</td><td>-</td><td>-</td><td>-</td></tr>'
-//				  +'<tr style="height:0px;border:none !important;"><td>192.168.0.42</td><td>-</td><td>-</td><td>-</td></tr>'
-//				  +'<tr style="height:0px;border:none !important;"><td>192.168.0.43</td><td>-</td><td>-</td><td>-</td></tr>'
-//				  +'<tr style="height:0px;border:none !important;"><td>192.168.0.44</td><td>-</td><td>-</td><td>-</td></tr>'
-//				  +'<tr style="height:0px;border:none !important;"><td>192.168.0.46</td><td>-</td><td>-</td><td>-</td></tr>';		
-// 
-//		$('#panel-title').text("").text("任务描述（离线）");
-//		$('#thead').nextAll().remove();
-//		$("#node_info").append(off2);
-//	});
-//
-//}
-//
-// 
-//updateInfo();
-//
-//建立连接
-let stdoutSocket = new WebSocket('ws://219.216.65.14:8001/');
-//开启连接
-stdoutSocket.onopen = function () {
-	console.log('stdoutSocket open');
-	isSolved = true;
-	$("#sendBtn").removeClass("disabled").addClass("btn-mysuccess");
-};
-//关闭连接
-stdoutSocket.onclose = function () {
-	console.log('stdoutSocket close');
-	//console.log(isSolved);
-	$("#sendBtn").removeClass("btn-mysuccess").addClass("disabled");
-};
-let constr = '';
-//拿到返回
-stdoutSocket.onmessage = function (e) {
-	var pdiv=document.getElementById("proccesdiv");
-	pdiv.style.visibility='visible';
-	if(e.data=='@done'){
-		constr += e.data;
-		// $('#proccestitle').text("Finished").css("color","#3a87ad");
-		//$('#proccesdiv').removeClass("active");
-		pdiv.style.visibility='hidden';
-		if(isSolved){
-			$("#sendBtn").removeClass("disabled");
-			$("#sendBtn").text("Go!");
+	//try{/////// 语法错误无法被捕获，只能捕获 异常，异常 不等于 错误
+	//int a = 1;
+
+    let isSolved = false;
+	//var oTimer = null;
+	//var updateInfo = function() {
+	//
+	//	$.ajax({
+	//		url: "http://219.216.65.14:4040/api/v1/applications",
+	//		dataType: "json"
+	//	}).done(function (result) {
+	//		//$('#panel-heading').nextAll().remove();
+	//		$('#panel-title').text("").text("任务描述（运行中）");
+	//		var infos = result[0];
+	//		var details = infos.attempts[0];
+	//		//console.log(infos);
+	//		var times = details.startTime.split(".");
+	//		var timess = times[0].split("T");
+	//		//let str = '<div class="panel-body" style="padding-top: 5px;padding-left: 5px;padding-right: 5px;padding-bottom: 5px;">';
+	//		$("#tb1").html('AppId:&nbsp;<span class="label label-online">'+infos.id+'</span>');
+	//		$("#tb2").html('AppName:&nbsp;<span class="label label-online">'+infos.name+'</span>');
+	//		$("#tb3").html('StartTime:&nbsp;<span class="label label-online">'+timess[0]+'&nbsp;'+timess[1]+'</span>');
+	//		$("#tb4").html('Completed:&nbsp;<span class="label label-online">Running</span>');
+	//
+	//			$.ajax({
+	//				url: "http://219.216.65.14:4040/api/v1/applications/"+infos.id+"/allexecutors",
+	//				dataType: "json"
+	//			}).done(function (executor) {
+	//				//console.log(executor);
+	//				$('#thead').nextAll().remove();
+	//				var counter = 0;
+	//				var appendstr = "";
+	//				$.each(executor, function(i, field){
+	//					//if(i % 2 == 0){
+	//						let str = '';
+	//						counter++;
+	//						if(field.isActive){
+	//							str = "<span class=\"glyphicon glyphicon-ok-circle\" style=\"color:green\"></span>";
+	//						}else{
+	//							str = "<span class=\"glyphicon glyphicon-remove-circle\" style=\"color:red\"></span>";
+	//						}
+	//						//console.log(field.memoryUsed*100/1073741824);
+	//						appendstr += '<tr style="height:0px;border:none !important;padding:0 0 0 0 !important;border:0px !important;line-height: 1.37 !important;"><td>'
+	//								     +field.hostPort.split(":")[0]+'</td><td>'+str+'</td><td>'+field.rddBlocks
+	//								     +'</td><td><div class="progress" style="margin-bottom:0px;border-radius: 0px !important;height: 17px !important;"><div class="progress-bar progress-success"style="width:'
+	//								     +(field.memoryUsed*8000/field.maxMemory)+'%;"></div></div></td></tr>'
+	//						$("#tb9").html('WorkerMaxmem:&nbsp;<span class="label label-online">'+(field.maxMemory/1024/1024).toFixed(1)+'MB</span>');
+	//					//}else{
+	//
+	//						//$("#node_info").append('<tr class=\'success\'><td>'+field.hostPort.split(":")[0]+'</td><td>'+field.isActive+'</td><td>'+field.rddBlocks+'</td><td>'+field.memoryUsed+'</td></tr>');
+	//					//}
+	//				});
+	//				counter
+	//				if(counter==executor.length) $("#node_info").append(appendstr);
+	//
+	//			}).fail(function (jqXHR, textStatus, errorThrown) {
+	//				// net::ERR_CONNECTION_REFUSED 发生时，也能进入
+	//				console.info("轮询结束");
+	//			});
+	//
+	//			$.ajax({
+	//				url: "http://219.216.65.14:4040/api/v1/applications/"+infos.id+"/environment",
+	//				dataType: "json"
+	//			}).done(function (environ) {
+	//				//console.log(environ.sparkProperties);
+	//				var tmp = environ.sparkProperties;
+	//				//let str = '<div class="panel-body" style="padding-top: 5px;padding-left: 5px;padding-right: 5px;padding-bottom: 5px;">';
+	//				$("#tb5").html('DriverMemory:&nbsp;<span class="label label-online">'+tmp[5][1]+'</span>');
+	//				$("#tb6").html('MasterNode:&nbsp;<span class="label label-online">'+tmp[9][1]+'</span>');
+	//				$("#tb7").html('DeployMode:&nbsp;<span class="label label-online">'+tmp[13][1]+'</span>');
+	//				$("#tb8").html('ExecuteJAr:&nbsp;<span class="label label-online">'+tmp[8][1].split("/bin/")[1]+'</span>');
+	//
+	//				$("#tb10").html('DriverHost:&nbsp;<span class="label label-online">'+tmp[4][1]+'</span>');
+	//			}).fail(function (jqXHR, textStatus, errorThrown) {
+	//				// net::ERR_CONNECTION_REFUSED 发生时，也能进入
+	//				console.info("轮询结束");
+	//			});
+	//
+	//	}).fail(function (jqXHR, textStatus, errorThrown) {
+	//		// net::ERR_CONNECTION_REFUSED 发生时，也能进入
+	//		console.info("轮询结束");
+	//
+	//		if(isSolved){
+	//			$("#sendBtn").removeClass("disabled");
+	//			$("#sendBtn").text("Go!");
+	//		}
+	//
+	//		window.clearInterval(oTimer);
+	//
+	//
+	//		$("#tb1").html('AppId:&nbsp;<span class=\"label label-default\">app-20190327220504-0015</span>');
+	//		$("#tb2").html('AppName:&nbsp;<span class=\"label label-default\">RemoteGraphX</span>');
+	//		$("#tb3").html('StartTime:&nbsp;<span class=\"label label-default\">2019-03-27 14:05:03</span>');
+	//		$("#tb4").html('Completed:&nbsp;<span class=\"label label-default\">True</span>');
+	//		$("#tb5").html('DriverMemory:&nbsp;<span class=\"label label-default\">1g</span>');
+	//		$("#tb6").html('MasterNode:&nbsp;<span class=\"label label-default\">spark://hadoop02:7077</span>');
+	//		$("#tb7").html('DeployMode:&nbsp;<span class=\"label label-default\">client</span>');
+	//		$("#tb8").html('ExecuteJAr:&nbsp;<span class=\"label label-default\">visualization-build.jar</span>');
+	//		$("#tb9").html('WorkerMaxmem:&nbsp;<span class=\"label label-default\">366.3MB</span>');
+	//		$("#tb10").html('DriverHost:&nbsp;<span class=\"label label-default\">192.168.0.2</span>');
+	//
+	//		var off2 = '<tr style="height:0px;border:none !important;"><td>192.168.0.7 </td><td>-</td><td>-</td><td>-</td></tr>'
+	//				  +'<tr style="height:0px;border:none !important;"><td>192.168.0.8 </td><td>-</td><td>-</td><td>-</td></tr>'
+	//				  +'<tr style="height:0px;border:none !important;"><td>192.168.0.19</td><td>-</td><td>-</td><td>-</td></tr>'
+	//				  +'<tr style="height:0px;border:none !important;"><td>192.168.0.20</td><td>-</td><td>-</td><td>-</td></tr>'
+	//				  +'<tr style="height:0px;border:none !important;"><td>192.168.0.24</td><td>-</td><td>-</td><td>-</td></tr>'
+	//				  +'<tr style="height:0px;border:none !important;"><td>192.168.0.29</td><td>-</td><td>-</td><td>-</td></tr>'
+	//				  +'<tr style="height:0px;border:none !important;"><td>192.168.0.32</td><td>-</td><td>-</td><td>-</td></tr>'
+	//				  +'<tr style="height:0px;border:none !important;"><td>192.168.0.33</td><td>-</td><td>-</td><td>-</td></tr>'
+	//				  +'<tr style="height:0px;border:none !important;"><td>192.168.0.34</td><td>-</td><td>-</td><td>-</td></tr>'
+	//				  +'<tr style="height:0px;border:none !important;"><td>192.168.0.35</td><td>-</td><td>-</td><td>-</td></tr>'
+	//				  +'<tr style="height:0px;border:none !important;"><td>192.168.0.42</td><td>-</td><td>-</td><td>-</td></tr>'
+	//				  +'<tr style="height:0px;border:none !important;"><td>192.168.0.43</td><td>-</td><td>-</td><td>-</td></tr>'
+	//				  +'<tr style="height:0px;border:none !important;"><td>192.168.0.44</td><td>-</td><td>-</td><td>-</td></tr>'
+	//				  +'<tr style="height:0px;border:none !important;"><td>192.168.0.46</td><td>-</td><td>-</td><td>-</td></tr>';
+	//
+	//		$('#panel-title').text("").text("任务描述（离线）");
+	//		$('#thead').nextAll().remove();
+	//		$("#node_info").append(off2);
+	//	});
+	//
+	//}
+	//
+	//
+	//updateInfo();
+	//
+
+	//建立连接
+	let stdoutSocket = new WebSocket('ws://219.216.65.14:8001/');
+	//开启连接
+	stdoutSocket.onopen = function () {
+		console.log('stdoutSocket open');
+		isSolved = true;
+		$("#sendBtn").removeClass("disabled").addClass("btn-mysuccess");
+	};
+	//关闭连接
+	stdoutSocket.onclose = function () {
+		console.log('stdoutSocket close');
+		//console.log(isSolved);
+		$("#sendBtn").removeClass("btn-mysuccess").addClass("disabled");
+	};
+	let constr = '';
+	//拿到返回
+	stdoutSocket.onmessage = function (e) {
+		var pdiv=document.getElementById("proccesdiv");
+		pdiv.style.visibility='visible';
+		if(e.data=='@done'){
+			constr += e.data;
+			// $('#proccestitle').text("Finished").css("color","#3a87ad");
+			//$('#proccesdiv').removeClass("active");
+			pdiv.style.visibility='hidden';
+			if(isSolved){
+				$("#sendBtn").removeClass("disabled");
+				$("#sendBtn").text("Go!");
+			}else{
+				$("#sendBtn").text("Offline");
+			}
+			$('#panel-title').text("").text("任务描述（离线）");
+			//window.clearInterval(oTimer);
+			$("#tb1").html('AppId:&nbsp;<span class=\"label label-default\">app-20190327220504-0015</span>');
+			$("#tb2").html('AppName:&nbsp;<span class=\"label label-default\">RemoteGraphX</span>');
+			$("#tb3").html('StartTime:&nbsp;<span class=\"label label-default\">2019-03-27 14:05:03</span>');
+			$("#tb4").html('Completed:&nbsp;<span class=\"label label-default\">True</span>');
+			$("#tb5").html('DriverMemory:&nbsp;<span class=\"label label-default\">1g</span>');
+			$("#tb6").html('MasterNode:&nbsp;<span class=\"label label-default\">spark://hadoop02:7077</span>');
+			$("#tb7").html('DeployMode:&nbsp;<span class=\"label label-default\">client</span>');
+			$("#tb8").html('ExecuteJAr:&nbsp;<span class=\"label label-default\">visualization-build.jar</span>');
+			$("#tb9").html('WorkerMaxmem:&nbsp;<span class=\"label label-default\">366.3MB</span>');
+			$("#tb10").html('DriverHost:&nbsp;<span class=\"label label-default\">192.168.0.2</span>');
+
+			var off2 = '<tr style="height:0px;border:none !important;"><td>192.168.0.7 </td><td>-</td><td>-</td><td>-</td></tr>'
+					  +'<tr style="height:0px;border:none !important;"><td>192.168.0.8 </td><td>-</td><td>-</td><td>-</td></tr>'
+					  +'<tr style="height:0px;border:none !important;"><td>192.168.0.19</td><td>-</td><td>-</td><td>-</td></tr>'
+					  +'<tr style="height:0px;border:none !important;"><td>192.168.0.20</td><td>-</td><td>-</td><td>-</td></tr>'
+					  +'<tr style="height:0px;border:none !important;"><td>192.168.0.24</td><td>-</td><td>-</td><td>-</td></tr>'
+					  +'<tr style="height:0px;border:none !important;"><td>192.168.0.29</td><td>-</td><td>-</td><td>-</td></tr>'
+					  +'<tr style="height:0px;border:none !important;"><td>192.168.0.32</td><td>-</td><td>-</td><td>-</td></tr>'
+					  +'<tr style="height:0px;border:none !important;"><td>192.168.0.33</td><td>-</td><td>-</td><td>-</td></tr>'
+					  +'<tr style="height:0px;border:none !important;"><td>192.168.0.34</td><td>-</td><td>-</td><td>-</td></tr>'
+					  +'<tr style="height:0px;border:none !important;"><td>192.168.0.35</td><td>-</td><td>-</td><td>-</td></tr>'
+					  +'<tr style="height:0px;border:none !important;"><td>192.168.0.42</td><td>-</td><td>-</td><td>-</td></tr>'
+					  +'<tr style="height:0px;border:none !important;"><td>192.168.0.43</td><td>-</td><td>-</td><td>-</td></tr>'
+					  +'<tr style="height:0px;border:none !important;"><td>192.168.0.44</td><td>-</td><td>-</td><td>-</td></tr>'
+					  +'<tr style="height:0px;border:none !important;"><td>192.168.0.46</td><td>-</td><td>-</td><td>-</td></tr>';
+			$('#thead').nextAll().remove();
+			$("#node_info").append(off2);
+
+			console.log("本次执行结束");
+		}else if((e.data).indexOf("\\n") >= 0||(e.data).indexOf("\\r") >= 0){
+			constr += e.data;
+		}else if(e.data.length <= 1){
 		}else{
-			$("#sendBtn").text("Offline");
+			//进度条
+			if((e.data).indexOf("( ") >= 0){
+
+				let regex1 = /\((.+?)\)/g;  // () 小括号
+				let proces = (e.data).match(regex1)[0].replace("( ","").replace(" )","");
+				let bfs = proces*100/$('#pzxD').val();
+				console.log(bfs);
+				$('#myproccess').css("width",bfs+"%");
+			}
+			constr += e.data+'<br>';
 		}
-		$('#panel-title').text("").text("任务描述（离线）");
-		//window.clearInterval(oTimer);
-		$("#tb1").html('AppId:&nbsp;<span class=\"label label-default\">app-20190327220504-0015</span>');		
-		$("#tb2").html('AppName:&nbsp;<span class=\"label label-default\">RemoteGraphX</span>');									
-		$("#tb3").html('StartTime:&nbsp;<span class=\"label label-default\">2019-03-27 14:05:03</span>');						
-		$("#tb4").html('Completed:&nbsp;<span class=\"label label-default\">True</span>');										
-		$("#tb5").html('DriverMemory:&nbsp;<span class=\"label label-default\">1g</span>');							
-		$("#tb6").html('MasterNode:&nbsp;<span class=\"label label-default\">spark://hadoop02:7077</span>');					
-		$("#tb7").html('DeployMode:&nbsp;<span class=\"label label-default\">client</span>');			
-		$("#tb8").html('ExecuteJAr:&nbsp;<span class=\"label label-default\">visualization-build.jar</span>');		
-		$("#tb9").html('WorkerMaxmem:&nbsp;<span class=\"label label-default\">366.3MB</span>');			
-		$("#tb10").html('DriverHost:&nbsp;<span class=\"label label-default\">192.168.0.2</span>');		
-		
-		var off2 = '<tr style="height:0px;border:none !important;"><td>192.168.0.7 </td><td>-</td><td>-</td><td>-</td></tr>'
-				  +'<tr style="height:0px;border:none !important;"><td>192.168.0.8 </td><td>-</td><td>-</td><td>-</td></tr>'
-				  +'<tr style="height:0px;border:none !important;"><td>192.168.0.19</td><td>-</td><td>-</td><td>-</td></tr>'
-				  +'<tr style="height:0px;border:none !important;"><td>192.168.0.20</td><td>-</td><td>-</td><td>-</td></tr>'
-				  +'<tr style="height:0px;border:none !important;"><td>192.168.0.24</td><td>-</td><td>-</td><td>-</td></tr>'
-				  +'<tr style="height:0px;border:none !important;"><td>192.168.0.29</td><td>-</td><td>-</td><td>-</td></tr>'
-				  +'<tr style="height:0px;border:none !important;"><td>192.168.0.32</td><td>-</td><td>-</td><td>-</td></tr>'
-				  +'<tr style="height:0px;border:none !important;"><td>192.168.0.33</td><td>-</td><td>-</td><td>-</td></tr>'
-				  +'<tr style="height:0px;border:none !important;"><td>192.168.0.34</td><td>-</td><td>-</td><td>-</td></tr>'
-				  +'<tr style="height:0px;border:none !important;"><td>192.168.0.35</td><td>-</td><td>-</td><td>-</td></tr>'
-				  +'<tr style="height:0px;border:none !important;"><td>192.168.0.42</td><td>-</td><td>-</td><td>-</td></tr>'
-				  +'<tr style="height:0px;border:none !important;"><td>192.168.0.43</td><td>-</td><td>-</td><td>-</td></tr>'
-				  +'<tr style="height:0px;border:none !important;"><td>192.168.0.44</td><td>-</td><td>-</td><td>-</td></tr>'
-				  +'<tr style="height:0px;border:none !important;"><td>192.168.0.46</td><td>-</td><td>-</td><td>-</td></tr>';		
+		$('#stdout').html(constr);
+
+	};
+	/*
+	//发送信息
+	document.getElementById('sendBtn').onclick = function () {
+		$("#sendBtn").addClass("disabled");
+		$("#sendBtn").text("Running");
+		//$('#proccesdiv').addClass("active progress-striped");
+
+
+		//oTimer = setInterval(updateInfo,2000);
+		//var pzxC = $('#pzxC').val();
+
+		var select3 = $('#select3').val();
+		var pzxD = $('#pzxD').val();
+		//console.log(">>>>>>>"+select3);
+		//var text = $('#sendTxt').val();
+
+		webSocket.send(select3+','+pzxD);
+
+	};
+
+
+	function executeAnimeDrawing(index){
+		if(index < 200){
+
+			setTimeout(function(){
+				$.ajax({
+					type: "POST",
+					//url: "Wiki-Vote.txt_of_780_without_800.json",
+					data:{"filename":"simple5.txt_of_"+index+"_without_200.json"},
+					url: "http://219.216.65.14:9999/fetch_layout_rst",
+					//url: "simple5.txt_of_800_without_800.json",
+					contentType: "application/json",//传入参数格式
+					async: false,
+					dataType: "json", //返回参数格式
+					success: function(jsonstr){
+						//var data = $.parseJSON( jsonstr );
+						let oldarr = environment.data("GrpLocate").split(",");
+						dataset = createImg(parseInt(oldarr[0]),parseInt(oldarr[1]),jsonstr,ZOOM_OUT*environment.data("GrpZoomOut"), false); //初始
+					}
+				});
+
+			},500+50*(index-1));
+			//if(index==799)index = 760;
+			executeAnimeDrawing(++index);
+			//setTimeout(function(){
+			//  executeAnimeDrawing(index);
+			//},500);
+		}
+	}
+	*/
+	//////////////////////////////////////////////////////////////////////////////////////////
+	//建立连接
+	let canvasSocket = new WebSocket('ws://219.216.65.14:7001/');
+	//开启连接
+	canvasSocket.onopen = function () {
+		console.log('canvasSocket open');
+	};
+	//关闭连接
+	canvasSocket.onclose = function () {
+		console.log('canvasSocket close');
+		//console.log(isSolved);
+	};
+	canvasSocket.onmessage = function (e) {
+		//console.log($.parseJSON(e.data));
+		let currentLoc = environment.data("GrpLocate").split(",");
+		dataset = createImg(
+			parseInt(currentLoc[0]),
+			parseInt(currentLoc[1]),
+			$.parseJSON(e.data),
+			ZOOM_OUT*environment.data("GrpZoomOut"),
+			false
+		);
+	};
+	////发送信息
+	document.getElementById('testttt').onclick = function () {
+		canvasSocket.send("simple5.txt_of_@_without_200.json,1,196");
+		//canvasSocket.send("Vote.txt_of_@_without_800.json,760,800");
+	};
+
+
+
+
+	//////////////////////////////////////////////////////////////////////////////////////////
+	//建立连接
+	let monitorSocket = new WebSocket('ws://219.216.65.14:10001/');
+	//开启连接
+	monitorSocket.onopen = function () {
+		console.log('monitorSocket open');
+	};
+	monitorSocket.onmessage = function (e) {
+		//console.log($.parseJSON(e.data));
+
+		let obj = $.parseJSON(e.data);
+		$("#tb1").html('AppId:&nbsp;<span class="label label-online">'+obj.AppId+'</span>');
+		$("#tb2").html('AppName:&nbsp;<span class="label label-online">'+obj.AppName+'</span>');
+		$("#tb3").html('StartTime:&nbsp;<span class="label label-online">'+obj.StartTime+'</span>');
+		$("#tb4").html('Completed:&nbsp;<span class="label label-online">Running</span>');
+		$("#tb5").html('DriverMemory:&nbsp;<span class="label label-online">'+obj.DriverMemory+'</span>');
+		$("#tb6").html('MasterNode:&nbsp;<span class="label label-online">'+obj.MasterNode+'</span>');
+		$("#tb7").html('DeployMode:&nbsp;<span class="label label-online">'+obj.DeployMode+'</span>');
+		$("#tb8").html('ExecuteJAr:&nbsp;<span class="label label-online">'+obj.ExecuteJAr+'</span>');
+		$("#tb9").html('WorkerMaxmem:&nbsp;<span class="label label-online">'+obj.WorkerMaxmem+'</span>');
+		$("#tb10").html('DriverHost:&nbsp;<span class=\"label label-online\">'+obj.DriverHost+'</span>');
+
+		let tbstr = '';
+		//console.log(obj);
+		$.each(obj.executors, function(i, field){
+
+			let str = '';
+			if(field.isActive){
+				str = "<span class=\"glyphicon glyphicon-ok-circle\" style=\"color:green\"></span>";
+			}else{
+				str = "<span class=\"glyphicon glyphicon-remove-circle\" style=\"color:red\"></span>";
+			}
+			//console.log(field.memoryUsed*100/1073741824);
+			tbstr+= '<tr style="height:0px;border:none !important;padding:0 0 0 0 !important;border:0px !important;line-height: 1.37 !important;"><td>'
+				 +field.hostPort+'</td><td>'+str+'</td><td>'+field.rddBlocks
+				 +'</td><td><div class="progress" style="margin-bottom:0px;border-radius: 0px !important;height: 17px !important;"><div class="progress-bar progress-success"style="width:'
+				 +field.memoryUsed+';"></div></div></td></tr>'
+
+		});
 		$('#thead').nextAll().remove();
-		$("#node_info").append(off2);
-		
-		console.log("本次执行结束");
-	}else if((e.data).indexOf("\\n") >= 0||(e.data).indexOf("\\r") >= 0){
-		constr += e.data;
-	}else if(e.data.length <= 1){
-	}else{
-		//进度条
-		if((e.data).indexOf("( ") >= 0){
-			
-			let regex1 = /\((.+?)\)/g;  // () 小括号
-			let proces = (e.data).match(regex1)[0].replace("( ","").replace(" )","");
-			let bfs = proces*100/$('#pzxD').val();
-			console.log(bfs); 
-			$('#myproccess').css("width",bfs+"%");
-		}
-		constr += e.data+'<br>';
-	}
-	$('#stdout').html(constr);
-   
-};
-/*
-//发送信息
-document.getElementById('sendBtn').onclick = function () {
-	$("#sendBtn").addClass("disabled");
-	$("#sendBtn").text("Running");
-	//$('#proccesdiv').addClass("active progress-striped");
-	
-	
-	//oTimer = setInterval(updateInfo,2000);
-	//var pzxC = $('#pzxC').val();
-	
-	var select3 = $('#select3').val();
-	var pzxD = $('#pzxD').val();
-	//console.log(">>>>>>>"+select3);
-	//var text = $('#sendTxt').val();
- 
-	webSocket.send(select3+','+pzxD);
- 
-};
+		$("#node_info").append(tbstr);
+	};
+	//关闭连接
+	monitorSocket.onclose = function () {
+		console.log('monitorSocket close');
+		console.info("轮询结束");
 
+	};
 
-function executeAnimeDrawing(index){
-	if(index < 200){
-		
-		setTimeout(function(){
-			$.ajax({
-				type: "POST", 
-				//url: "Wiki-Vote.txt_of_780_without_800.json", 
-				data:{"filename":"simple5.txt_of_"+index+"_without_200.json"},
-				url: "http://219.216.65.14:9999/fetch_layout_rst",
-				//url: "simple5.txt_of_800_without_800.json", 
-				contentType: "application/json",//传入参数格式
-				async: false,
-				dataType: "json", //返回参数格式
-				success: function(jsonstr){ 
-					//var data = $.parseJSON( jsonstr );
-					let oldarr = $("#environment").data("GrpLocate").split(",");
-					dataset = createImg(parseInt(oldarr[0]),parseInt(oldarr[1]),jsonstr,ZOOM_OUT*$("#environment").data("GrpZoomOut"), false); //初始	
-				}
-			});
-			
-		},500+50*(index-1)); 
-		//if(index==799)index = 760;
-		executeAnimeDrawing(++index);
-		//setTimeout(function(){
-		//  executeAnimeDrawing(index);
-		//},500); 
-	}
-}
-*/
-//////////////////////////////////////////////////////////////////////////////////////////
-//建立连接
-let canvasSocket = new WebSocket('ws://219.216.65.14:7001/');
-//开启连接
-canvasSocket.onopen = function () {
-	console.log('canvasSocket open');
-};
-//关闭连接
-canvasSocket.onclose = function () {
-	console.log('canvasSocket close');
-	//console.log(isSolved);
-};
-canvasSocket.onmessage = function (e) {
-	//console.log($.parseJSON(e.data));
-	let currentLoc = $("#environment").data("GrpLocate").split(",");
-	dataset = createImg(
-		parseInt(currentLoc[0]),
-		parseInt(currentLoc[1]), 
-		$.parseJSON(e.data), 
-		ZOOM_OUT*$("#environment").data("GrpZoomOut"), 
-		false
-	);
-};
-////发送信息
-document.getElementById('testttt').onclick = function () {
-	canvasSocket.send("simple5.txt_of_@_without_200.json,1,196");
-	//canvasSocket.send("Vote.txt_of_@_without_800.json,760,800");
-};
+	document.getElementById('sendBtn').onclick = function () {
+		$("#sendBtn").addClass("disabled");
+		$("#sendBtn").text("Running");
+		let select3 = $('#select3').val();
+		let pzxD = $('#pzxD').val();
 
 
 
+		stdoutSocket.send(select3+','+pzxD);
+		monitorSocket.send("111");
 
-//////////////////////////////////////////////////////////////////////////////////////////
-//建立连接
-let monitorSocket = new WebSocket('ws://219.216.65.14:10001/');
-//开启连接
-monitorSocket.onopen = function () {
-	console.log('monitorSocket open');
-};
-monitorSocket.onmessage = function (e) {
-	//console.log($.parseJSON(e.data));
-	
-	let obj = $.parseJSON(e.data);
-	$("#tb1").html('AppId:&nbsp;<span class="label label-online">'+obj.AppId+'</span>');
-	$("#tb2").html('AppName:&nbsp;<span class="label label-online">'+obj.AppName+'</span>');
-	$("#tb3").html('StartTime:&nbsp;<span class="label label-online">'+obj.StartTime+'</span>');
-	$("#tb4").html('Completed:&nbsp;<span class="label label-online">Running</span>');
-	$("#tb5").html('DriverMemory:&nbsp;<span class="label label-online">'+obj.DriverMemory+'</span>');
-	$("#tb6").html('MasterNode:&nbsp;<span class="label label-online">'+obj.MasterNode+'</span>');
-	$("#tb7").html('DeployMode:&nbsp;<span class="label label-online">'+obj.DeployMode+'</span>');
-	$("#tb8").html('ExecuteJAr:&nbsp;<span class="label label-online">'+obj.ExecuteJAr+'</span>');
-	$("#tb9").html('WorkerMaxmem:&nbsp;<span class="label label-online">'+obj.WorkerMaxmem+'</span>');
-	$("#tb10").html('DriverHost:&nbsp;<span class=\"label label-online\">'+obj.DriverHost+'</span>');		
-	
-	let tbstr = '';
-	//console.log(obj);
-	$.each(obj.executors, function(i, field){
-		
-		let str = '';
-		if(field.isActive){
-			str = "<span class=\"glyphicon glyphicon-ok-circle\" style=\"color:green\"></span>";
-		}else{
-			str = "<span class=\"glyphicon glyphicon-remove-circle\" style=\"color:red\"></span>";
-		}
-		//console.log(field.memoryUsed*100/1073741824);
-		tbstr+= '<tr style="height:0px;border:none !important;padding:0 0 0 0 !important;border:0px !important;line-height: 1.37 !important;"><td>'
-			 +field.hostPort+'</td><td>'+str+'</td><td>'+field.rddBlocks
-			 +'</td><td><div class="progress" style="margin-bottom:0px;border-radius: 0px !important;height: 17px !important;"><div class="progress-bar progress-success"style="width:'
-			 +field.memoryUsed+';"></div></div></td></tr>'
-		
-	});	
-	$('#thead').nextAll().remove();
-	$("#node_info").append(tbstr);
-};
-//关闭连接
-monitorSocket.onclose = function () {
-	console.log('monitorSocket close');
-	console.info("轮询结束");
-
-};
-
-document.getElementById('sendBtn').onclick = function () {
-	$("#sendBtn").addClass("disabled");
-	$("#sendBtn").text("Running");
-	let select3 = $('#select3').val();
-	let pzxD = $('#pzxD').val();
-	
-	
-
-	stdoutSocket.send(select3+','+pzxD);
-	monitorSocket.send("111");
-
-	//canvasSocket.send("simple5.txt_of_@_without_200.json,1,196");
-	//canvasSocket.send("Vote.txt_of_@_without_800.json,760,800");
-};
+		//canvasSocket.send("simple5.txt_of_@_without_200.json,1,196");
+		//canvasSocket.send("Vote.txt_of_@_without_800.json,760,800");
+	};
 
 
 
@@ -1106,53 +1110,55 @@ document.getElementById('sendBtn').onclick = function () {
 
 
 
-/////////////////////////////////////////////////////////////////////////////////
-$('#select3').on('changed.bs.select', function (e) {
-console.log('22');
+	/////////////////////////////////////////////////////////////////////////////////
+	$('#select3').on('changed.bs.select', function (e) {
+	console.log('22');
 
-	var select3 = $('#select3').val();
-	console.log(select3);
-	if(select3=="Simple5")
-		select3 = "simple5.txt_of_476_without_800.json";
-		//select3 = "data200/simple5.txt_of_1_without_200.json";
-	if(select3=="Vote")      
-		select3 = "Vote.txt_of_800_without_800.json";
-		//select3 = "data200/simple5.txt_of_100_without_200.json";
-	if(select3=="Wiki-Vote")     
-		select3 = "Wiki-Vote.txt_of_780_without_800.json";
-		//select3 = "data200/simple5.txt_of_200_without_200.json";
-	$.ajax({
-		type: "GET", 
-		//url: "Wiki-Vote.txt_of_780_without_800.json", 
-		url: select3,
-		//url: "simple5.txt_of_800_without_800.json", 
-		async: false,
-		dataType: "json", 
-		success: function(data){ 
-			boo = true;
-			len = data.links.length;
-			dataset = data;
-			
-		}
+		let select3 = $('#select3').val();
+		console.log(select3);
+		if(select3 === "Simple5")
+			select3 = "simple5.txt_of_476_without_800.json";
+			//select3 = "data200/simple5.txt_of_1_without_200.json";
+		if(select3 === "Vote")
+			select3 = "Vote.txt_of_800_without_800.json";
+			//select3 = "data200/simple5.txt_of_100_without_200.json";
+		if(select3 === "Wiki-Vote")
+			select3 = "Wiki-Vote.txt_of_780_without_800.json";
+			//select3 = "data200/simple5.txt_of_200_without_200.json";
+		$.ajax({
+			type: "GET",
+			//url: "Wiki-Vote.txt_of_780_without_800.json",
+			url: select3,
+			//url: "simple5.txt_of_800_without_800.json",
+			async: false,
+			dataType: "json",
+			success: function(data){
+				boo = true;
+				len = data.links.length;
+				dataset = data;
+
+			}
+		});
+
+		//let oldarr = environment.data("GrpLocate").split(",");
+		//console.log("select...");
+		//console.log(oldarr);
+		//newset = trans(dataset,400,400,1);
+		dataset = createImg(950,700,dataset,ZOOM_OUT*environment.data("GrpZoomOut"), true); //初始
+		//drawLeft();
 	});
-	
-	//let oldarr = $("#environment").data("GrpLocate").split(",");
-	//console.log("select...");
-	//console.log(oldarr);
-	//newset = trans(dataset,400,400,1);
-	dataset = createImg(950,700,dataset,ZOOM_OUT*$("#environment").data("GrpZoomOut"), true); //初始
-	//drawLeft();
-});
 
-///////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////
 
 
 
-	//console.log($("#environment").data("LineWidth"));
+	//console.log(environment.data("LineWidth"));
 
-	//$("#cp2").css("background-color","#3a87ad");	
-	$('#cp1').colorpicker({format:'hex'});
+	//$("#cp2").css("background-color","#3a87ad");
+	let cp1 = $('#cp1'), cp2 = $('#cp2'), cp3 = $('#cp3'), cp4 = $('#cp4');
+
+    cp1.colorpicker({format:'hex'});
 	(function ($) {
 		$.fn.watch = function (callback) {
 			return this.each(function () {
@@ -1160,8 +1166,8 @@ console.log('22');
 				$.data(this, 'originVal', $(this).val());
 				//event  
 				$(this).on('keyup paste', function () {
-					var originVal = $.data(this, 'originVal');
-					var currentVal = $(this).val();
+					let originVal = $.data(this, 'originVal');
+                    let currentVal = $(this).val();
 
 					if (originVal !== currentVal) {
 						$.data(this, 'originVal', $(this).val());
@@ -1172,12 +1178,12 @@ console.log('22');
 			});
 		}
 	})(jQuery);
-	$("#cp1").watch(function(value) {  
-		$("#cp1").css("color",value);	
+    cp1.watch(function(value) {
+        cp1.css("color",value);
 	 
-	}); 
-	
-	$('#cp2').colorpicker({format:'hex'});
+	});
+
+    cp2.colorpicker({format:'hex'});
 	(function ($) {
 		$.fn.watch = function (callback) {
 			return this.each(function () {
@@ -1185,8 +1191,8 @@ console.log('22');
 				$.data(this, 'originVal', $(this).val());
 				//event  
 				$(this).on('keyup paste', function () {
-					var originVal = $.data(this, 'originVal');
-					var currentVal = $(this).val();
+                    let originVal = $.data(this, 'originVal');
+                    let currentVal = $(this).val();
 
 					if (originVal !== currentVal) {
 						$.data(this, 'originVal', $(this).val());
@@ -1196,12 +1202,12 @@ console.log('22');
 			});
 		}
 	})(jQuery);
-	$("#cp2").watch(function(value) {  
+    cp2.watch(function(value) {
 		//console.log(value);
-		$("#cp2").css("color",value);	
-	}); 
-	
-	$('#cp3').colorpicker({format:'hex'});
+        cp2.css("color",value);
+	});
+
+    cp3.colorpicker({format:'hex'});
 	(function ($) {
 		$.fn.watch = function (callback) {
 			return this.each(function () {
@@ -1209,8 +1215,8 @@ console.log('22');
 				$.data(this, 'originVal', $(this).val());
 				//event  
 				$(this).on('keyup paste', function () {
-					var originVal = $.data(this, 'originVal');
-					var currentVal = $(this).val();
+					let originVal = $.data(this, 'originVal');
+					let currentVal = $(this).val();
 
 					if (originVal !== currentVal) {
 						$.data(this, 'originVal', $(this).val());
@@ -1220,15 +1226,15 @@ console.log('22');
 			});
 		}
 	})(jQuery);
-	$("#cp3").watch(function(value) {  
+    cp3.watch(function(value) {
 		//console.log(value);
-		$("#cp3").css("color",value);	
-	}); 
+        cp3.css("color",value);
+	});
 
-	$('#cp4').colorpicker({format:'hex'});
-	$("#cp4").bind('input propertychange',function() {  
-		console.log($("#cp4").val());
-		$("#cp4").css("color",$("#cp4").val());	
+    cp4.colorpicker({format:'hex'});
+    cp4.bind('input propertychange',function() {
+		//console.log(cp4.val());
+        cp4.css("color",cp4.val());
 	}); 
 	
 	function update_CONST_CANVAS(id,latest){
@@ -1236,80 +1242,80 @@ console.log('22');
 		let older;
 		if(id=="#cp1"){
 		 
-			older = $("#environment").data("LineColor");
+			older = environment.data("LineColor");
 			if(latest!=older){
 				isRun = true;
-				$("#environment").data("LineColor",latest);   
+				environment.data("LineColor",latest);   
 			}
 		}else if(id=="#cp3"){
-			older = $("#environment").data("PointColor");
+			older = environment.data("PointColor");
 			if(latest!=older){
 				isRun = true;
-				$("#environment").data("PointColor",latest);   
+				environment.data("PointColor",latest);   
 			}
 		}else if(id=="#cp2"){
-			older = $("#environment").data("GridColor");
+			older = environment.data("GridColor");
 			if(latest!=older){
 				isRun = true;
-				$("#environment").data("GridColor",latest);   
+				environment.data("GridColor",latest);   
 			}
 		}else if(id=="#cp4"){
-			older = $("#environment").data("BkgdColor");
+			older = environment.data("BkgdColor");
 			if(latest!=older){
 				isRun = true;
-				$("#environment").data("BkgdColor",latest);   
+				environment.data("BkgdColor",latest);   
 			}
 		}else{
 			 
 			latest = parseFloat(latest).toFixed(1);
 			switch(id){
 				//case "#cp5": 
-				//	older = $("#environment").data("GrpZoomOut");
+				//	older = environment.data("GrpZoomOut");
 				//	if(latest!=older){
 				//		isRun = true;
-				//		$("#environment").data("GrpZoomOut",latest);   
+				//		environment.data("GrpZoomOut",latest);   
 				//	}
 				//	break;
 				case "#cp6": 
-					older = $("#environment").data("LineWidth");
+					older = environment.data("LineWidth");
 					if(latest!=older){
 						isRun = true;
-						$("#environment").data("LineWidth",latest);   
+						environment.data("LineWidth",latest);   
 					}
 					break;
 				case "#cp7": 
-					older = $("#environment").data("PointSize");
+					older = environment.data("PointSize");
 					if(latest!=older){
 						isRun = true;
-						$("#environment").data("PointSize",latest);   
+						environment.data("PointSize",latest);   
 					}
 					break;
 				case "#cp8": 
-					older = $("#environment").data("GridZoom");
+					older = environment.data("GridZoom");
 					if(latest!=older){
 						isRun = true;
-						$("#environment").data("GridZoom",latest);   
+						environment.data("GridZoom",latest);   
 					}
 					break;
 				case "#cp9": 
-					older = $("#environment").data("GridWidth");
+					older = environment.data("GridWidth");
 					if(latest!=older){
 						isRun = true;
-						$("#environment").data("GridWidth",latest);   
+						environment.data("GridWidth",latest);   
 					}
 					break;
 				case "#cp1": 
-					older = $("#environment").data("LineColor");
+					older = environment.data("LineColor");
 					if(latest!=older){
 						isRun = true;
-						$("#environment").data("LineColor",latest);   
+						environment.data("LineColor",latest);   
 					}
 					break;
 				case "#cp3": 
-					older = $("#environment").data("PointColor");
+					older = environment.data("PointColor");
 					if(latest!=older){
 						isRun = true;
-						$("#environment").data("PointColor",latest);   
+						environment.data("PointColor",latest);   
 					}
 					break;
 			}

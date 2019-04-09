@@ -1,0 +1,105 @@
+<html>
+	<head>
+	
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+<script>AV.initialize("OtzzvTKenyUTQOJVcKtSWsWY-gzGzoHsz", "g10t0VpFOFD5b6YCXoA1d6Tw");</script>
+<script>
+function showTime(tar,sp,cnt) {
+var Counter = AV.Object.extend("Counter");
+	var query = new AV.Query(Counter);
+	$(tar).each(function(index, item) {
+		var url = $(this).attr("id");
+		var texts = $(this).parent().find(sp).eq(cnt);
+		//console.log(texts);
+		//alert($(this).attr("id"));
+		var url = $(this).attr("id");
+		setTimeout(function(){ 
+			alert(url);
+			query.equalTo("url", url);
+			query.find({
+				success: function(results) {
+					if (results.length == 0) {
+						//var content = '没查到 ' + $(document.getElementById(url)).text();
+						//console.log(texts);
+						texts.text("1"); //初始是 1
+						return;
+					}
+					for (var i = 0; i < results.length; i++) {
+						var object = results[i];
+						//var content = object.get('time') + ' ' + $(document.getElementById(url)).text();
+						 
+						texts.text(object.get('time'));
+					}
+				},
+				error: function(object, error) {
+					console.log("Error: " + error.code + " " + error.message);
+				}
+			});
+		},1000*index);
+	});
+}
+
+function addCount(url,title,texts) {
+	var Counter = AV.Object.extend("Counter");
+	//url = $(".leancloud_visitors").attr('id').trim();
+	//title = $(".leancloud_visitors").attr('data-flag-title').trim();
+	var query = new AV.Query(Counter);
+	query.equalTo("url", url);
+	query.find({
+		success: function(results) {
+			if (results.length > 0) {
+				var counter = results[0];
+				counter.fetchWhenSave(true);
+				counter.increment("time");
+				counter.save(null, {
+					success: function(counter) {
+						//var content =  counter.get('time') + ' ' + $(document.getElementById(url)).text();
+						texts.text(counter.get('time'));
+					},
+					error: function(counter, error) {
+						console.log('Failed to save Visitor num, with error message: ' + error.message);
+					}
+				});
+			} else {
+				var newcounter = new Counter();
+				newcounter.set("title", title);
+				newcounter.set("url", url);
+				newcounter.set("time", 1); //初值为 1
+				newcounter.save(null, {
+					success: function(newcounter) {
+						console.log("newcounter.get('time')="+newcounter.get('time'));
+						//var content = newcounter.get('time') + ' ' + $(document.getElementById(url)).text();
+						texts.text(counter.get('time')+1);
+					},
+					error: function(newcounter, error) {
+						console.log('Failed to create');
+					}
+				});
+			}
+		},
+		error: function(error) {
+			console.log('Error:' + error.code + " " + error.message);
+		}
+	});
+}
+$(function() {
+	showTime('a.count','span',1);
+	$('a.count').click(function(){
+		
+		//addCount($(this).attr("id"),$(this).attr("id").trim(),$(this).parent().find("span").eq(1));
+		//showTime(Counter,$(this).attr("id").trim());
+	});
+
+	
+}); 
+</script>
+	</head>
+	<body>
+<span class="hang"><i class="icon icon-file" style="color:#777"></i>     <a class='count' id='1000'  href='http://ozmhkse3b.bkt.clouddn.com/paper/kt/Hadoop 平台的海量数据并行随机抽样.pdf'																																															>Hadoop平台的海量数据并行随机抽样</a><span>下载次数：<span></span>次</span></span>																													
+<span class="hang"><i class="icon icon-file" style="color:#777"></i>     <a class='count' id='1001'  href='http://ozmhkse3b.bkt.clouddn.com/paper/kt/图结构数据的可视化分析系统的设计与实现_孙伟伟.caj'																																												>图结构数据的可视化分析系统的设计与实现孙伟伟</a><span>下载次数：<span></span>次</span></span>																																
+ 
+	</body>
+</html>
+
+

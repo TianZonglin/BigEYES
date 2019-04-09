@@ -1,0 +1,13 @@
+Starting up http-server, serving ./
+Available on:
+  http://172.28.114.107:8888
+  http://118.202.40.187:8888
+  http://192.168.230.1:8888
+  http://192.168.146.1:8888
+  http://127.0.0.1:8888
+Hit CTRL-C to stop the server
+events.js:183
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: EPERM: operation not permitted, read

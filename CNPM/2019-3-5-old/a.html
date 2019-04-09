@@ -1,0 +1,55 @@
+
+<!doctype html>
+<html>
+
+<head>
+<!-- 存储服务 -->
+
+	<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://www.whereareyou.site/js/av-min.js" charset="utf-8" type="text/javascript"></script>
+    <script src="https://www.whereareyou.site/js/valine-min.js" charset="utf-8" type="text/javascript"></script>
+</head>
+<body>
+https://www.whereareyou.site
+http://www.whereareyou.site
+https://whereareyou.site
+http://whereareyou.site
+http://localhost:4000
+http://localhost:8888
+<div id="allinshow">
+
+</div>
+</body>
+
+<script>
+ 
+AV.init({
+	appId:'WbLE88qfAcz4hSI5GsQFRlzW-gzGzoHsz', 
+	appKey:'ycqjmtEfUxuxD3IY97oRkrdO'
+});
+console.log(window.AV);
+var query = new AV.Query("Comment");
+query.descending("createdAt");//升序
+query.find().then(function(data){
+  //查询的结果数据 data
+  //将data转成json格式
+ var jsondata = JSON.parse(JSON.stringify(data));
+
+var base = 'www.whereareyou.site';
+for(var p in data){//遍历json数组时，这么写p为索引，0,1
+	if(data[p].attributes.nick!="Administrator"){
+		console.log(data[p].attributes);
+		$('#allinshow').append('<p><a href='+data[p].attributes.link+'>'+data[p].attributes.nick+"</a>&emsp;"+data[p].attributes.createdAt+"<br>"+data[p].attributes.comment+" <a href="+data[p].attributes.url.replace(" ", "%20")+"> 更多</a></p>");
+	}
+}
+
+ 
+
+},function(err) {
+  //错误信息 err
+  console.log('err');
+});
+ 
+</script>
+
+</html>

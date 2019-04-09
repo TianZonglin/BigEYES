@@ -1,0 +1,248 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+	<meta http-equiv="pragma" content="no-cache">
+	<meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
+	<meta http-equiv="expires" content="Wed, 26 Feb 1997 08:21:57 GMT">
+    <meta name="viewport" content="width=device-width">
+	<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+	<script src="http://d3js.org/d3.v3.min.js"></script>
+	  <!--
+
+	  					初始化 Node 完成后，npm http-server --save
+	  					在本目录打开 CMD 输入 $ http-server -p 8888
+	  					打开浏览器，输入 http://localhost:8888/view.html
+
+	  -->
+	<style>
+
+		body{
+			background-color:black;
+		}
+		svg{
+			margin:50px;
+			border:2px #cccccc;
+			background-color:white;
+		}
+ 
+		.links line {
+		  stroke: #999;
+		  stroke-opacity: 300;
+		}
+
+		.nodes circle {
+		  stroke: #fff;
+		  stroke-width: 20px;
+		}
+		.axis path,
+		.axis line{
+			fill: none;
+			stroke: black;
+			shape-rendering: crispEdges;
+		}
+
+		.axis text {
+			font-family: sans-serif;
+			font-size: 11px;
+		}
+	</style> 
+	</head>
+	<body>
+		<h1>div0</h1><div id="div0"></div>
+		<div id="div1"><h1>div1</h1></div>
+		<div id="div2"><h1>div2</h1></div>
+		<div id="div3"><h1>div3</h1></div>
+		<div id="div4"><h1>div4</h1></div>
+		<div id="div5"><h1>div5</h1></div>
+		<div id="div6"><h1>div6</h1></div>
+		<div id="div7"><h1>div7</h1></div>
+		<div id="div8"><h1>div8</h1></div>
+		<div id="div9"><h1>div9</h1></div>
+		<div id="div10"><h1>div10</h1></div>
+		<div id="div11"><h1>div11</h1></div>
+		<div id="div12"><h1>div12</h1></div>
+		<div id="div13"><h1>div13</h1></div>
+		<div id="div14"><h1>div14</h1></div>
+		<div id="div15"><h1>div15</h1></div>
+		<div id="div16"><h1>div16</h1></div>
+		<div id="div17"><h1>div17</h1></div>
+		<div id="div18"><h1>div18</h1></div>
+		<div id="div19"><h1>div19</h1></div>
+		<div id="div20"><h1>div20</h1></div>
+		<div id="div21"><h1>div21</h1></div>
+		<div id="div22"><h1>div22</h1></div>
+		<div id="div23"><h1>div23</h1></div>
+		<div id="div24"><h1>div24</h1></div>
+		<div id="div25"><h1>div25</h1></div>
+		<div id="div26"><h1>div26</h1></div>
+		<div id="div27"><h1>div27</h1></div>
+		<div id="div28"><h1>div28</h1></div>
+		<div id="div29"><h1>div29</h1></div>
+		<div id="div30"><h1>div30</h1></div>
+
+
+
+
+
+
+
+
+
+
+		</div>
+
+
+
+
+	</body>
+
+    <script>
+      //draw("simple5.txt_random_without_800.json",30);
+      //var filename = [];
+	  //for(var i = 1;i <= 1; i ++ ){
+      //    filename.push("Wiki-Vote.txt_of_"+(i+199)+"_without_200.json");
+	  //}
+      //draw("Wiki-Vote.txt_of_800_without_800.json",1);
+      //draw("Wiki-Vote.txt_of_200_without_200.json",1);
+      draw("simple5.txt_OOPS_without_20.json",1);
+	  draw("simple5.txt_OOPS_without_30.json",2);
+      //for(var i = 0; i < filename.length; i++){
+
+      //    draw(filename[i],i);
+		//	console.log(i);
+      //}
+
+
+      function draw(filename,index) {
+
+          $.getJSON(filename+"?random="+new Date().getTime(), "", function(json) {
+              // svg 的大小
+              var svgWidth = 1000;
+              var svgHight = 1000;
+
+
+              // 数据点
+ 
+			// 创建SVG  
+			var svg = d3.select('#div'+index)
+			  .append('svg')  
+				.attr('width', svgWidth)  
+				.attr('height', svgHight);  
+		  
+			// 设置标题  
+			svg.append('text')  
+			  .attr('x', svgWidth / 2 - 120)  
+			  .attr('y', 30)  
+			  .attr('class', 'title')  
+			  .text('这是一个用d3画的简略坐标轴');  
+		  
+			// 创建比例尺  
+			var xScale = d3.scale.linear()  
+			  .domain([-5000,5000]).range([0,1000]);
+		  
+			var yScale = d3.scale.linear()  
+			  .domain([-5000,5000]).range([0,1000]);
+
+		  
+			// 设置散点的坐标, 半径  
+			svg.selectAll('circle')  
+				.data(json.nodes)  
+			  .enter()  
+			  .append('circle')  
+				.attr('cx', function(d) {  
+				  return xScale(d.cx);  
+				})  
+				.attr('cy', function(d) {  
+				  return yScale(d.cy);  
+				})  
+				 
+				.attr("fill","#6495ed")
+				.attr("origin", function(d) {  
+					return d.cx+","+d.cy;
+				})
+				.attr('r', function(d) {
+				    return 0.8;
+				  /*if(d.value === 0||d.value/2===0)return 2;//rScale(d.cy);
+				  else return d.value/2;*/
+				}); 
+
+
+
+			svg.selectAll('line')
+				.data(json.links)
+				.enter()
+				.append('line')
+					.attr('x1',function(d){
+						 
+						return xScale(d.x1);
+					})
+					.attr('y1',function(d){
+						return yScale(d.y1);
+					})
+					.attr('x2',function(d){
+						return xScale(d.x2);
+					})
+					.attr('y2',function(d){
+						return yScale(d.y2);
+					})
+					.attr("stroke","gray")
+					.attr('stroke-width', function() {
+						return 0.02;
+					});
+			 
+			//// 设置文本  
+			//svg.selectAll('text')  
+			//	.data(json.nodes)  
+			//  .enter()  
+			//  .append('text')  
+			//	.text(function(d) {  
+			//	  return '(' + d.cx + ', ' + d.cy + ')';  
+			//	})  
+			//	.attr('x', function(d) {  
+		    //
+			//	  // 设置偏移量，让文本位于上方  
+			//	  return xScale(d.cx) - 20;  
+			//	})  
+			//	.attr('y', function(d) {  
+			//	  return yScale(d.cy) - 10;  
+			//	})  
+			//	.attr('font-family', 'Microsoft YaHei')  
+			//	.attr('font-size', '12px')  
+			//	.attr('fill', '#9400D3');  
+		    //
+			// 设置精度和样式  
+			var formatPrecision = d3.format('');  
+		  
+			// 定义X轴  
+			var xAxis = d3.svg.axis()  
+			  .scale(xScale)
+			  .ticks(11)  // 粗略的设置刻度线的数量，包括原点
+			  .orient('bottom')
+			  .tickFormat(formatPrecision); // 设置刻度格式
+		  
+			// 定义Y轴  
+			var yAxis = d3.svg.axis()  
+			  .scale(yScale)  
+			  .orient('left')  
+			  .ticks(11)  
+			  .tickFormat(formatPrecision);
+
+			// 创建X轴, svg中： g元素是一个分组元素  
+			svg.append('g')  
+			  .attr('class', 'axis')
+			  .attr("transform","translate(0,"+0.5*svgHight+")")	// 平移到水平中间
+			  .call(xAxis);
+
+			// 创建Y轴  
+			svg.append('g')  
+			  .attr('class', 'axis')
+			  .attr("transform","translate("+0.5*svgWidth+",0)")	// 平移到竖直中间
+			  .call(yAxis);  
+
+			})
+		}
+	</script>  
+
+
+</html>

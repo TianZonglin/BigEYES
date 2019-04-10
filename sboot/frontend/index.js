@@ -212,7 +212,7 @@ $(function(){
 		// e.preventDefault();
 	// }, { passive: false });  //passive 参数不能省略，用来兼容ios和android
 
-	// 旧版本的方法，chrome73内已失效
+	// 旧版本的方法，chrome73内已失效，为了兼容electron 谷保存下面
 	//let p_Cvs = $("#canvas");
 	//p_Cvs.mouseover(function(){
 	//    $(document).bind('mousewheel', function(event, delta, ) {return false;});
@@ -221,42 +221,79 @@ $(function(){
 	//    $(document).unbind('mousewheel');
 	//});
 
-	// 焦点进入时禁止全局滚动
-	$("#canvas").mouseover(function(){
-		 $(document.body).css({
-		   "overflow-x":"hidden",
-		   "overflow-y":"hidden"
-		 });
-	}).mouseout(function(){
-		 $(document.body).css({
-		   "overflow-x":"auto",
-		   "overflow-y":"auto"
-		 });
-	});
+	//// 焦点进入时禁止全局滚动
+    //p_Cvs.mouseover(function(){
+	//	 $(document.body).css({
+	//	   "overflow-x":"hidden",
+	//	   "overflow-y":"hidden"
+	//	 });
+	//});
+    //p_Cvs.mouseout(function(){
+	//	 $(document.body).css({
+	//	   "overflow-x":"auto",
+	//	   "overflow-y":"auto"
+	//	 });
+	//});
+    //缩放  老版本的缩放和 滚动屏蔽
+    //let old = 1;
+    //canvas.onmousewheel = function(ev){
+    //    let e = ev||event;
+    //    //console.log(e.wheelDelta/1200);
+    //    let r = 1 + e.wheelDelta/1200;
+    //    old  = old * r;
+    //    //console.log(r);
+    //    if(r>0){
+    //        $("#cp5").val(r);
+    //        //const d = ( environment.data("GrpZoomOut") *r ).toFixed(5);
+    //        environment.data("GrpZoomOut",old);
+    //        dataset = createImg(0,0,dataset,r,false);
+    //        //old = r;
+    //        // function inner() {
+    //        // return newset;
+    //        // }
+    //        // getInnerVariable = inner;
+    //    }
+    //}
+    let old = 1;
+	// 兼容更好且 无滚动条宽度变化的方案（非隐藏滚动条，是直接屏蔽事件）
+    let firefox = navigator.userAgent.indexOf('Firefox') !== -1;
+    function MouseWheel(e) {console.log("******");
+        ///对img按下鼠标滚路，阻止视窗滚动
+        e = e || window.event;
+        if (e.stopPropagation) {console.log('stopPropagation');
+            let r = 1 + e.wheelDelta/1200;
+            old  = old * r;
+            if(r>0){
+                $("#cp5").val(r);
+                //const d = ( environment.data("GrpZoomOut") *r ).toFixed(5);
+                environment.data("GrpZoomOut",old);
+                dataset = createImg(0,0,dataset,r,false);
 
-	//缩放
-	let old = 1;
-	canvas.onmousewheel = function(ev){
-        let e = ev||event;
-		//console.log(e.wheelDelta/1200);
-        let r = 1 + e.wheelDelta/1200;
-		old  = old * r;
-		//console.log(r);
+            }
+        	e.stopPropagation();
+        }
+        else e.cancelBubble = true;
+        if (e.preventDefault){console.log('preventDefault');
+            //console.log(e.wheelDelta/1200);
+            let r = 1 + e.wheelDelta/1200;
+            old  = old * r;
+            if(r>0){
+                $("#cp5").val(r);
+                //const d = ( environment.data("GrpZoomOut") *r ).toFixed(5);
+                environment.data("GrpZoomOut",old);
+                dataset = createImg(0,0,dataset,r,false);  ////////// 问题：缩小会失真，使徒行节点边少，放大不会； 柱状图目前未关联
 
-		if(r>0){
-			$("#cp5").val(r);
-			//const d = ( environment.data("GrpZoomOut") *r ).toFixed(5);
-			environment.data("GrpZoomOut",old);
-			dataset = createImg(0,0,dataset,r,false);
+            }
+        	e.preventDefault();
+        }
+        else e.returnValue = false;
+    }
+    window.onload = function () {
+        let ccvs = document.getElementById('canvas');
+        firefox ? ccvs.addEventListener('DOMMouseScroll', MouseWheel, false) : (ccvs.onmousewheel = MouseWheel);
+    }
 
-			//old = r;
-			// function inner() {
-				// return newset;
-			// }
-			// getInnerVariable = inner;
-		}
 
-	}
 
 	// var preventScroll = function(dom){
         // if(dom.jquery){

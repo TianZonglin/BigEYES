@@ -159,7 +159,7 @@ $(function(){
 			//ctx.strokeStyle = environment.data("PointColor"); /////////////////// xx
 			let rsize = environment.data("PointSize"); /////////////////// xx
 			let pcolor = environment.data("PointColor"); /////////////////// xx
-			if(environment.data("PointSize") !== 0 ){
+			if(parseFloat(environment.data("PointSize")) !== 0 ){
 				//console.log("R = "+rsize+", CL = "+pcolor);
 				if(rsize){
 

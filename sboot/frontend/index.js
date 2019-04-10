@@ -65,7 +65,9 @@ $(function(){
 		ctx.lineWidth = environment.data("GridWidth"); /////////////////// xx
 		ctx.strokeStyle = environment.data("GridColor"); /////////////////// xx;
 
-		if(environment.data("GridWidth") !== 0){
+
+		if(parseFloat(environment.data("GridWidth")) !== 0){
+            //alert(environment.data("GridWidth"));
 		    for (let i = stepxy; i < canvasxy; i += stepxy) {
 		        ctx.beginPath();
 		        ctx.moveTo(i, 0);
@@ -122,7 +124,7 @@ $(function(){
 			//let xyValue = CVS_WIDTH;
 			drawGrid(20*GridZoom, CVS_WIDTH);
 
-			if(environment.data("LineWidth") !== 0 ){
+			if(parseFloat(environment.data("LineWidth")) !== 0 ){
 				ctx.beginPath(); //优化
 
 				for(let i = 0; i < lset.length; i++){

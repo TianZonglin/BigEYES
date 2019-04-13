@@ -15,7 +15,19 @@
 //
 //
 //
+// 4-12 ShippableVertexPartitionOps: Joining two VertexPartitions with different indexes is slow.
+//      ShippableVertexPartitionOps: Diffing two VertexPartitions with different indexes is slow.
 //
-
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 

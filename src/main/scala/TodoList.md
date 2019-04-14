@@ -29,7 +29,7 @@ https://stackoverflow.com/questions/24877970/defaultminpartitions-in-textfile
 spark_fixed
 https://github.com/mesos/spark/pull/718
 
-spark job task stage 关系
+spark job task stage 's RELATIONSHIP
 https://www.cnblogs.com/wzj4858/p/8204411.html
 
 

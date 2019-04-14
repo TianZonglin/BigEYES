@@ -68,7 +68,7 @@ object NormalVersion {
     def loadEdges(fn: String): Graph[Any, String] = {
       val s: String = "1.0"                                 // 【附加的顶点信息】
       val edges: RDD[Edge[String]] =
-        sc.textFile(fn, 8)                                     // 【注意第二个参数：minPartitions = 8】 [stage: ... (7 + 1) / 8]
+        sc.textFile(fn, minPartitions = 8)                                     // 【注意第二个参数：minPartitions = 8】 [stage: ... (7 + 1) / 8]
           .filter(l => ! l.startsWith("#") )
           //.sample(withReplacement = false, 1, salt)
           .map {

@@ -66,31 +66,36 @@ object NormalVersion {
     }
 
     def loadEdges(fn: String): Graph[Any, String] = {
-      val s: String = "1.0"                                 // 【附加的顶点信息】
+      val s: String = "1.0"                    // 【附加的顶点信息】
       val edges: RDD[Edge[String]] =
-        sc.textFile(fn, minPartitions = 8)                                     // 【注意第二个参数：minPartitions = 8】 [stage: ... (7 + 1) / 8]
-          .filter(l => ! l.startsWith("#") )
+        sc.textFile(fn, minPartitions = 8)     // 【注意第二个参数：minPartitions = 8】 [stage: ... (7 + 1) / 8]
+          .filter(l => ! l.startsWith("#") )                                                                            //转换算子,过滤，根据里面的规则返回(true的)一个过滤过后的rdd
           //.sample(withReplacement = false, 1, salt)
-          .map {
+          .map {                                                                                                        //map,转换算子,对RDD中的每一个元素经过func函数转换后形成一个新的RDD
             line =>
               val fields = line.split(tab)
               Edge(fields(0).toLong, fields(1).toLong, s)
           }
-      val graph: Graph[Any, String] = Graph.fromEdges(edges, "defaultProperty")
+      val graph: Graph[Any, String] = Graph.fromEdges(edges, "defaultProperty")                                         //StorageLevel.MEMORY_ONLY
       graph
 
     }
 
+
+
+    /**
+      * 主控调用，Once
+    * */
     def convert(g: Graph[Any, String])
     : Graph[(String, Double, Double, (Double, Double, Double, Double)), Double] = {
 
       val transformedShuffledNodes: RDD[(VertexId, (String, Double, Double, (Double, Double, Double, Double)))] =
-        g.vertices.map {
+        g.vertices.map {                                                                                                //map,转换算子,对RDD中的每一个元素经过func函数转换后形成一个新的RDD
           v =>
             (v._1, (v._1.toString, ran, ran, (0.0, 0.0, 0.0, 0.0)))
         }
 
-      val transformedEdges: RDD[Edge[Double]] = g.edges.map(e => Edge(e.srcId, e.dstId, e.attr.toDouble))
+      val transformedEdges: RDD[Edge[Double]] = g.edges.map(e => Edge(e.srcId, e.dstId, e.attr.toDouble))               //map,转换算子,对RDD中的每一个元素经过func函数转换后形成一个新的RDD
 
       val graphN = Graph(transformedShuffledNodes, transformedEdges, defaultNode)
       //graphN.vertices.foreach(println)
@@ -136,29 +141,25 @@ object NormalVersion {
 
     }
 
+    //函数内调用，数值计算
     def printToFile(f: java.io.File)(op: java.io.PrintWriter => Unit) {
-
       val p = new java.io.PrintWriter(f)
-
       try {
-
         op(p)
-
       } finally {
-
         p.close()
-
       }
-
     }
 
+    //大的For循环内调用，数值计算，once
     def cool(iteration: Int): Unit = {
 
       temperature = (1.0 - (iteration.toDouble / iterations)) * 0.1 * math.sqrt(area)
 
     }
 
-    def dumpWithLayout(g: Graph[(String, Double, Double, (Double, Double, Double, Double)), Double],
+    //取回保存成文件，集群上暂不做处理，Twice
+    def dumpToJSON(g: Graph[(String, Double, Double, (Double, Double, Double, Double)), Double],
                        fn: String,
                        isFirst: Boolean)
     : Unit = {
@@ -167,15 +168,14 @@ object NormalVersion {
           if(isFirst) fn+s"_without_$iterations.json"
           else fn+s"__without__$iterations.json"
         }
-
         printToFile(new File(furl)) {
           p => {
             p.println("""{"nodes": [""")
-            g.vertices.collect.foreach(
+            g.vertices.collect.foreach(                                                                                 //Collect,执行算子, 一个RDD转换成数组。根据一个偏函数返回一个符合偏函数的结果集RDD。即将RDD转换成数组
               x => p.println(s"""{"weight": "0","name": "o","value": "${x._2._4._3/10f}","cx":"${x._2._2}","cy": "${x._2._3}"}, """)
             )
             p.println("""{"weight": "0","name": "o","value": "0","cx":"0","cy": "0"}],    "links": [""")
-            g.triplets.collect.foreach(
+            g.triplets.collect.foreach(                                                                                 //Collect,执行算子, 一个RDD转换成数组。根据一个偏函数返回一个符合偏函数的结果集RDD。即将RDD转换成数组
               x => p.println(s"""{"value": "0","x1": "${x.srcAttr._2}","y1": "${x.srcAttr._3}","x2": "${x.dstAttr._2}","y2": "${x.dstAttr._3}"},""")
             )
             p.println("""{"value": "0","x1": "0","y1": "0","x2": "0","y2": "0"}]}""")
@@ -186,14 +186,14 @@ object NormalVersion {
 
 
     /***
-      * 计算斥力
+      * 计算斥力，主控调用，Once
       */
     def calcRepulsion(array: Array[(VertexId, (String, Double, Double, (Double, Double, Double, Double)))],
                        g: Graph[(String, Double, Double, (Double, Double, Double, Double)), Double])
     : Graph[(String, Double, Double, (Double, Double, Double, Double)), Double] = {
       g.cache()
       val setC: VertexRDD[(String, Double, Double, (Double,Double,Double,Double))]
-      = g.vertices.mapValues(
+      = g.vertices.mapValues(                                                                                           //mapValues,转换算子,类似于map算子，只不过此算子针对[K,V]值中的V值进行map。
          v => {
            val v1 = (v._2,v._3)
            var bx = 0D
@@ -206,8 +206,8 @@ object NormalVersion {
              val dist = math.sqrt(xDist * xDist + yDist * yDist)
              if (dist > 0) {
                val repulsiveF = k * k / dist
-               // Force de répulsion
-               bx += xDist / dist * repulsiveF // on l'applique...
+               // Force répulsion
+               bx += xDist / dist * repulsiveF
                by += yDist / dist * repulsiveF
                //println(s"$yDist / $dist * $repulsiveF")
              }
@@ -222,16 +222,20 @@ object NormalVersion {
       graphN
     }
 
+
+    /***
+      * 计算吸引力，主控调用，Once
+      */
     def calcAttraction(g: Graph[(String, Double, Double, (Double, Double, Double, Double)), Double])
     : Graph[(String, Double, Double, (Double, Double, Double, Double)), Double] = {
 
-      g.cache()
+      g.cache()                                                                                                         //cache(),控制操作,当第一次遇到Action算子时才会触发持久化操作。Cache()是persis的一种特殊情况，将RDD持久化到内存中
       g.checkpoint()
 
-      val attr1: VertexRDD[(Double, Double)] = g.aggregateMessages[(Double, Double)](
-
+      val attr1: VertexRDD[(Double, Double)] = g.aggregateMessages[(Double, Double)](                                   //aggregate,执行算子,根据初始化值进行对rdd种的元素进行聚合，结束之后每个分区会有一个结果，后面会根据这个分区结果再进行一次聚合
         sendMsg = {
           triplet => {
+
             val Source = triplet.srcAttr
             val Target = triplet.dstAttr
             val xDist = Source._2 - Target._2
@@ -255,7 +259,7 @@ object NormalVersion {
         }
       )
 
-      val after1 = g.joinVertices(attr1)(
+      val after1 = g.joinVertices(attr1)(                                                                               //join,转换算子,类似于SQL中的内关联join，只返回两个RDD根据K可以关联上的结果
         (_, a, b) => {
 
           (a._1, a._2, a._3, (a._4._1 + b._1, a._4._2 + b._2, a._4._3, a._4._4))
@@ -306,10 +310,10 @@ object NormalVersion {
 
       Pregel
 
-      g.cache()
+      g.cache()                                                                                                         ////cache(),控制操作,当第一次遇到Action算子时才会触发持久化操作。Cache()是persis的一种特殊情况，将RDD持久化到内存中
       iterations = ctime
 
-      println("> count:"+g.vertices.count)
+      println("> count:"+g.vertices.count)                                                                              //Count,执行算子,返回RDD中的元素数量
       //g.vertices.take(2).foreach(println)
 
       println("> Start the Layout iteration: n=" + iterations + " (nr of iterations)." )
@@ -323,7 +327,7 @@ object NormalVersion {
         // 大数据级别时不要collect操作，采用抽样 //
         // 大数据级别时不要collect操作，采用度高节点（重要节点） //
 
-        val sim = gs.vertices.collect()
+        val sim = gs.vertices.collect()                                                                                 //Collect,执行算子, 一个RDD转换成数组。根据一个偏函数返回一个符合偏函数的结果集RDD。即将RDD转换成数组
 
         val gRep = calcRepulsion( sim, gs )
 
@@ -334,7 +338,7 @@ object NormalVersion {
         gBB.cache().checkpoint()
 
         //var cnt = 0
-        val vNewPositions = gBB.vertices.mapValues(
+        val vNewPositions = gBB.vertices.mapValues(                                                                     //mapValues,转换算子,类似于map算子，只不过此算子针对[K,V]值中的V值进行map
 
           (_, a) => {
 
@@ -372,7 +376,7 @@ object NormalVersion {
         //
         // 可以每次迭代都保存布局结果
         if(!REMOTE_JOB){
-          dumpWithLayout(gs, output+"_of_"+iteration, diet)
+          dumpToJSON(gs, output+"_of_"+iteration, diet)
         }
         cool(iteration)
       }
@@ -439,12 +443,12 @@ object NormalVersion {
 
       // 图顶点绑定自定义信息 //
 
-      val cGraphS = convert( graphS ).persist()
+      val cGraphS = convert( graphS ).persist()                                                                         //persist(),控制操作,persis(level:StorageLevel)可以传入缓存级别，默认是MEMORY_ONLY，此时同cache()操作
 
       // 部分变量载入图后计算 //
 
-      sizeOfGraph = cGraphS.vertices.count()
-      val sizeEdg = cGraphS.edges.count()
+      sizeOfGraph = cGraphS.vertices.count()                                                                            //Count,执行算子,返回RDD中的元素数量
+      val sizeEdg = cGraphS.edges.count()                                                                               //Count,执行算子,返回RDD中的元素数量
 
       k = math.sqrt(area * AREA_MULTIPLICATOR / (sizeOfGraph +1) )// 防止点为0
 
@@ -454,10 +458,10 @@ object NormalVersion {
       val end = layoutFDFR2(cGraphS, iterations ,diet = true )
       // 存文件
       if(REMOTE_JOB){
-        end.vertices.saveAsTextFile( output+"_WithoutSample_Vertices_rst")
+        end.vertices.saveAsTextFile( output+"_WithoutSample_Vertices_rst")                                              //saveAsTextFile，执行操作，存储操作,将RDD以文本文件的格式存储到文件系统中。
         end.edges.saveAsTextFile( output+"_WithoutSample_Edges_rst")
       }else{
-        dumpWithLayout(end, output+"_WithoutSample_end", isFirst = false)
+        dumpToJSON(end, output+"_WithoutSample_end", isFirst = false)
       }
 
 

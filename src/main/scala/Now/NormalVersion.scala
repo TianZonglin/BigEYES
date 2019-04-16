@@ -447,8 +447,9 @@ object NormalVersion {
 
       // 部分变量载入图后计算 //
 
-      sizeOfGraph = cGraphS.vertices.count()                                                                            //Count,执行算子,返回RDD中的元素数量
+      sizeOfGraph = cGraphS.vertices.count()//Count,执行算子,返回RDD中的元素数量
       val sizeEdg = cGraphS.edges.count()                                                                               //Count,执行算子,返回RDD中的元素数量
+
 
       k = math.sqrt(area * AREA_MULTIPLICATOR / (sizeOfGraph +1) )// 防止点为0
 

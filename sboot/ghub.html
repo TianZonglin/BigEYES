@@ -7,11 +7,12 @@
 </div>
 </center>
 <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.22.1/moment-with-locales.min.js"></script>
 <script>
 
 
 (function($) {
-	alert(1);
+	
 	var map = {}; // for github
 	var github = window.atob(($("#activeness-graph").attr("github")));
 	var gk = window.atob($("#activeness-graph").attr("coding"));
@@ -63,13 +64,14 @@
     };
 
     var generateGraph = function(data) {
+	
         var i, x, cellColor, dayNode, weekNode, weekNodes = [],cnt;
         cellColor = defineCellColor(data);
         for (i = 0; i < datalength- ( 7 * contract ) ; i++) {
 			
 			// coding + github
-			cnt = data[i+ ( 7 * contract ) ].count + map[data[i+ ( 7 * contract ) ].date];
-			
+			//cnt = data[i+ ( 7 * contract ) ].count + map[data[i+ ( 7 * contract ) ].date];
+			cnt = data[i+ ( 7 * contract )][1];
             if (i % 7 == 0) {
                 x =  (cellSize + cellBlank) * Math.round(i / 7);
                 weekNode = $('<g></g>').attr('transform', 'translate(' + x + ', 0)');
@@ -84,12 +86,12 @@
 				.attr('data-toggle','tooltip')
 				.attr('data-original-title','this is alert content')
 				.attr('data-count', cnt)
-                .attr('data-date', data[i+ ( 7 * contract ) ].date);
-			var txt = $('<title>热度:'+cnt +'&#10日期:'+ data[i+ ( 7 * contract ) ].date+'</title>');
+                .attr('data-date', data[i+ ( 7 * contract ) ][0]);
+			var txt = $('<title>热度:'+cnt +'&#10日期:'+ data[i+ ( 7 * contract ) ][0]+'</title>');
 			dayNode.append(txt);
 			
             weekNode.append(dayNode);
-		 
+		  
         }
         return weekNodes;
     };
@@ -97,7 +99,7 @@
     var generateScale = function(data) {
         var i, d, x, textNode, scales = [];
         for (i = 0; i < datalength- ( 7 * contract ) ; i += 7) {
-            d = moment(new Date(data[i+ ( 7 * contract ) ].date));
+            d = moment(new Date(data[i+ ( 7 * contract ) ][0]));
             if (i === 0) {
                 if (d.date() > d.endOf('month').date() - 14) {
                     continue;
@@ -130,12 +132,19 @@
         return scales;
     };
 
-    var mergeSvg = function(data) {
+    var mergeSvg = function(list) {
+		var data = [];
+		var lens = 0;
+		for (var key in list) {
+			data.push([key, list[key]]);
+			lens++;
+		}
+		datalength = lens;
         var canvas, svg, columns, element = $('#activeness-graph');
         columns = Math.floor((datalength- ( 7 * contract ) ) / 7) + ((datalength- ( 7 * contract ) ) % 7 === 0 ? 0 : 1);
-        
+        //console.log(datalength);
 
-		
+
 		canvas = $('<g></g>')
             .attr('transform', 'translate(13, 16)')
             .append(generateGraph(data))
@@ -153,30 +162,31 @@
 	
 	$('#activeness-graph').append('<img style="width:2em;height:2em;border:0px;box-shadow:0 1px 2px rgba(151, 151, 151, 0)" src="../feedek/loader.gif" />');
 
-	console.log('https://www.easy-mock.com/mock/5a5818e90e99d55b64ad9b5b/user/activeness/data/' + window.atob(gk));
-	console.log('https://github-contributions-api.now.sh/v1/'+window.atob(github));
-    $.get('https://www.easy-mock.com/mock/5a5818e90e99d55b64ad9b5b/user/activeness/data/' + window.atob(gk), function(result) {
+
+    //$.get('https://www.easy-mock.com/mock/5a5818e90e99d55b64ad9b5b/user/activeness/data/' + window.atob(gk), function(result) {
         
-		$.ajax('https://github-contributions-api.now.sh/v1/'+window.atob(github), {
-			dataType: 'json',
-			type: 'GET',
-			//async:false,	// necessary
-			crossDomain: true, // also work without this line
-			success: function(data) {
-				$.each(data.contributions, function(index, item){ 
-					map[item.date] = item.count;
-				});
-				if (result.code === 0) {
-					datalength = result.data.daily_activeness.length;
-					mergeSvg(result.data.daily_activeness);
-				}	
-			}
-		});
+	$.ajax('https://github-contributions-api.now.sh/v1/'+window.atob(github), {
+		dataType: 'json',
+		type: 'GET',
+		//async:false,	// necessary
+		crossDomain: true, // also work without this line
+		success: function(data) {
+		alert(1);
+			$.each(data.contributions, function(index, item){ 
+				map[item.date] = item.count;
+			});
+			//if (result.code === 0) {
+			
+			 mergeSvg(map);
+			 
+			//}	
+		}
+	});
 		
 		
 		
 
-    });
+    //});
 
 })(window.jQuery);
 

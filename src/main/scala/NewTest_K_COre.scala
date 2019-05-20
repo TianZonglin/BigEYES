@@ -186,8 +186,16 @@ object NewTest_K_COre {
 
    //twoJumpFirends.collect().foreach(println(_))
 
-   val G = KCore.run(cGraphS, 10, 1)
-    G.collect().foreach(println(_))
+
+   val G = KCore.run(cGraphS, 2, 1)//达到最大次数（对于无法保证收敛的算法）或无消息传递时结束
+
+   G.vertices.foreach(println)
+
+   // val G = KCore.run(cGraphS, 2, 10)
+
+   // val G = KCore.run(cGraphS, 2, 10)
+
+   // G.vertices.foreach(println)
 
 
 

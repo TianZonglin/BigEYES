@@ -44,6 +44,7 @@ object KCore {
     }
 
     def sendMessage(edge: EdgeTriplet[Int, ED]): Iterator[(VertexId, Int)] = {
+
       val lst = if (edge.srcAttr == 0) {
         List((edge.dstId, (1, edge.dstAttr)), (edge.srcId, (0, edge.srcAttr)))
       } else if (edge.dstAttr == 0) {
@@ -65,7 +66,7 @@ object KCore {
     kGraph.unpersist()
 
     pregelGraph.mapVertices[Boolean]((id: VertexId, d: Int) => d>0)
-    pregelGraph
+
   } // end of KCore
 
 }

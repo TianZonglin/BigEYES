@@ -36,36 +36,28 @@ object NewTest_K_COre {
       = ("o", 0.0, 0.0, (0.0, 0.0, 0.0, 0.0))
 
     def getConf: SparkConf = {
-
       if(REMOTE_JOB){
-
         new SparkConf()
           .setAppName("RemoteGraphX")
           .setMaster("spark://hadoop02:7077")
           .set("spark.cores.max", "20")
           //.setJars(List("I:\\IDEA_PROJ\\VISNWK\\out\\artifacts\\visnwk_build_jar\\visnwk-build.jar"))
       }else{
-
         new SparkConf()
           .setAppName("LocalGraphX")
           .setMaster("local")
       }
     }
-
     val sc = new SparkContext(getConf)
-
     sc.setCheckpointDir("checkpoint")
     // 必要，否则报：Checkpoint directory has not been set in the SparkContext
-
     def ran:Double = {
       val random = new scala.util.Random
       random.nextDouble * 1000  - 500
-
     }
 
     def loadEdges(fn: String): Graph[Any, String] = {
       val s: String = "1.0"
-
       val edges: RDD[Edge[String]] =
         sc.textFile(fn)
           .filter(l => ! l.startsWith("#") )
@@ -75,24 +67,18 @@ object NewTest_K_COre {
               val fields = line.split(tab)
               Edge(fields(0).toLong, fields(1).toLong, s)
           }
-
       val graph: Graph[Any, String] = Graph.fromEdges(edges, "defaultProperty")
-
       graph
-
     }
 
     def convert(g: Graph[Any, String])
     : Graph[(String, Double, Double, (Double, Double, Double, Double)), Double] = {
-
       val transformedShuffledNodes: RDD[(VertexId, (String, Double, Double, (Double, Double, Double, Double)))] =
         g.vertices.map {
           v =>
             (v._1, (v._1.toString, ran, ran, (0.0, 0.0, 0.0, 0.0)))
         }
-
       val transformedEdges: RDD[Edge[Double]] = g.edges.map(e => Edge(e.srcId, e.dstId, e.attr.toDouble))
-
       val graphN = Graph(transformedShuffledNodes, transformedEdges, defaultNode)
       //graphN.vertices.foreach(println)
       //dumpWithLayout(graphN, output+"_random", isFirst = true)
@@ -126,7 +112,7 @@ object NewTest_K_COre {
       iterations = args(1).toInt
     }else{
       // 本地项目相对路径
-      fname = "edges.txt"
+      fname = "Wiki-Vote.txt"
       input = "resources\\"+fname
       output = "output\\"+fname
       iterations = 200
@@ -186,10 +172,19 @@ object NewTest_K_COre {
 
    //twoJumpFirends.collect().foreach(println(_))
 
+    //twoJumpFirends.collect().foreach(println(_))
+    /////////////////val diameter = 7
+    /////////////////val counts = cGraphS.vertices.count()
+    /////////////////val theta = counts * 0.2
+    /////////////////val dufenbu = cGraphS.degrees
+    /////////////////dufenbu.
+    /////////////////println("MAX_ID："+dufenbu.max()._1)
+    /////////////////println("MAX_DGREE："+dufenbu.max()._2)
 
-   val G = KCore.run(cGraphS, 2, 1)//达到最大次数（对于无法保证收敛的算法）或无消息传递时结束
 
-   G.vertices.foreach(println)
+    val G = KCore.run(cGraphS, 2, 1)//达到最大次数（对于无法保证收敛的算法）或无消息传递时结束
+
+   //G.vertices.foreach(println)
 
    // val G = KCore.run(cGraphS, 2, 10)
 

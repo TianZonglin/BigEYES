@@ -26,10 +26,16 @@ object TEST {
     }
 
     val sc = new SparkContext(getConf)
-    val a = sc.parallelize(List((1111,4),(2222,4),(3333,5),(4444,5)))
+    val a = sc.parallelize(List((0,4),(2222,4),(3333,5),(4444,5),(4444,5),(4444,5)))
     a.collect.foreach(x=>(print(" "+x)))
-    val b = a.flatMap(x=>1 to x)
+    println
+    val b = a.reduce((x,a) => (x._1+1,a._2))
+    println(b)
 
+    //def degreeHistogram(net: Graph[Person, Link]): Array[(Int, Int)] =
+      //net.degrees.map(t => (t._2,t._1)).
+      //  groupByKey.map(t => (t._1,t._2.size)).
+      //  sortBy(_._1).collect()
 
 
     sc.stop()

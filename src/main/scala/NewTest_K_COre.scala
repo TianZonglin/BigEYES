@@ -112,7 +112,7 @@ object NewTest_K_COre {
       iterations = args(1).toInt
     }else{
       // 本地项目相对路径
-      fname = "Wiki-Vote.txt"
+      fname = "Vote.txt"
       input = "resources\\"+fname
       output = "output\\"+fname
       iterations = 200
@@ -124,7 +124,7 @@ object NewTest_K_COre {
 
 
 
-    cGraphS.degrees.collect.foreach(println(_))
+    //cGraphS.degrees.collect.foreach(println(_))
 
 
   //////////////////////////////////////////////////////////////// 二跳邻居
@@ -173,19 +173,38 @@ object NewTest_K_COre {
    //twoJumpFirends.collect().foreach(println(_))
 
     //twoJumpFirends.collect().foreach(println(_))
-    /////////////////val diameter = 7
-    /////////////////val counts = cGraphS.vertices.count()
-    /////////////////val theta = counts * 0.2
-    /////////////////val dufenbu = cGraphS.degrees
-    /////////////////dufenbu.
-    /////////////////println("MAX_ID："+dufenbu.max()._1)
-    /////////////////println("MAX_DGREE："+dufenbu.max()._2)
+
+    val diameter = 7
+
+    val distribution = cGraphS.degrees.map(t => (t._2,t._1+"")).
+      reduceByKey(_+","+_).
+      sortBy(_._1,false).collect()
+
+    val counts = distribution.length
+
+    val theta = (counts * 0.2).toInt
+
+    val head_d = distribution.take(theta) //取前百分20
+
+    val head_nodes = head_d.reduce((a,b)=>(1,a._2+","+b._2))
+
+    //println("MAX_ID："+dufenbu.max()._1)
+
+    //println("MAX_DGREE："+dufenbu.max()._2)
+
+
+
+
 
 
     val G = KCore.run(cGraphS, 2, 1)//达到最大次数（对于无法保证收敛的算法）或无消息传递时结束
 
-   //G.vertices.foreach(println)
 
+
+    println("> DONE!")
+    println("> DONE!")
+    //head_nodes.foreach(println)
+    println(head_nodes)
    // val G = KCore.run(cGraphS, 2, 10)
 
    // val G = KCore.run(cGraphS, 2, 10)

@@ -179,6 +179,7 @@ object NewTest_K_COre {
     val distribution = cGraphS.degrees.map(t => (t._2, t._1 + "")).
       reduceByKey(_ + "," + _).
       sortBy(_._1, false).collect()
+
     val counts = distribution.length
     val theta = (counts * 0.2).toInt
     val head_d = distribution.take(theta) //取前百分20
@@ -200,15 +201,15 @@ object NewTest_K_COre {
       //TO DO
       //如何计算SHELL
     }
-    var i = 30
-    while (i < 100){
-      val testNUM = i
-      val G = KCore.run(cGraphS, testNUM, 1)
-      //达到最大次数（对于无法保证收敛的算法）或无消息传递时结束
-      val CoreYES = G.vertices.map(t => (t._2, t._1)).groupByKey.map(t => (t._1, t._2.size)).sortBy(_._1, false).take(1)(0)._2
-      println(s"$testNUM\t$CoreYES")
-      i += 5
-    }
+    ////var i = 0
+    ////while (i < 100){
+    ////  val testNUM = i
+    ////  val G = KCore.run(cGraphS, testNUM, 1)
+    ////  //达到最大次数（对于无法保证收敛的算法）或无消息传递时结束
+    ////  val CoreYES = G.vertices.map(t => (t._2, t._1)).groupByKey.map(t => (t._1, t._2.size)).sortBy(_._1, false).take(1)(0)._2
+    ////  println(s"$testNUM\t$CoreYES")
+    ////  i += 5
+    ////}
 
 
     println("> DONE!")
@@ -225,9 +226,19 @@ object NewTest_K_COre {
 
 
 
-
-
-
+/**
+    30	158
+    35	114
+    40	83
+    45	56
+    50	42
+    55	20
+    60	10
+    65	7
+    70	3
+    75	2
+    80	1
+*/
 
 
 

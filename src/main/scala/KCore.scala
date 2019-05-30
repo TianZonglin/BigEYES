@@ -46,6 +46,7 @@ object KCore {
     def sendMessage(edge: EdgeTriplet[Int, ED]): Iterator[(VertexId, Int)] = {
 
       val lst = if (edge.srcAttr == 0) {
+        
         List((edge.dstId, (1, edge.dstAttr)), (edge.srcId, (0, edge.srcAttr)))
       } else if (edge.dstAttr == 0) {
         List((edge.srcId, (1, edge.srcAttr)), (edge.dstId, (0, edge.dstAttr)))

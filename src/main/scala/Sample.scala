@@ -1,7 +1,7 @@
 import java.io._
 import java.text.SimpleDateFormat
 
-import breeze.numerics.pow
+import breeze.numerics.{pow, sqrt}
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.graphx._
 import org.apache.spark.rdd.RDD
@@ -23,6 +23,7 @@ object Sample {
     var input: String = ""                          // 输入文件路径
     var output: String = ""                         // 输出文件路径
     var tab: String = ""                            // 输入文件的文本分隔符
+    var wide: Double = 5000d                       // 输入文件的节点大小
     var sizeOfGraph: Long = 0                       // 输入文件的节点大小
     var temperature: Double = 0d                       // 模拟退火温度
     var area: Int = 0                                  // 布局大小，次方值
@@ -308,27 +309,56 @@ object Sample {
 
 
 
-  def layoutFDFR2( g: Graph[ (String, Double, Double, (Double,Double,Double,Double)), Double ],
+  def layoutFDFR1( g: Graph[ (String, Double, Double, (Double,Double,Double,Double)), Double ],
                    ctime: Int,
                    diet:Boolean)
   : Graph[ (String, Double, Double, (Double,Double,Double,Double)), Double ] = {
     val maxIterations = ctime
 
-    val kGraph = g
     val k =  math.sqrt(area / g.vertices.count())
 
-    def vprog(vid: VertexId, vd: Int, i: Int) = {
-      val ret = if ((vd - i) >= k) vd - i
-      else if (vd > 0) 0
-      else -1
+    def vprog(vid:VertexId,attr:(String, Double, Double, (Double,Double,Double,Double)),message:(Double,Double)) = {
 
-      ret
+      var dispX = message._1
+      var dispY = message._2
+      val disp = sqrt(dispX*dispX+dispY*dispY)
+      val temp = attr._2
+      if(disp > temp) {
+        if (dispX.isInfinity && dispY.isInfinity) {
+          dispX = 1.414D * temp
+          dispY = 1.414D * temp
+        }
+        else {
+          if (dispX.isInfinity)
+            dispX = temp
+          else
+            dispX = dispX / disp * temp
+          if (dispY.isInfinity)
+            dispY = temp
+          else
+            dispY = dispY / disp * temp
+        }
+      }
+      var newX = attr._2 + dispX
+      var newY = attr._3 + dispY
+
+      if(newX < 0) newX=0
+      if(newX > wide) newX = wide
+      if(newY < 0) newY = 0
+      if(newY > wide) newY = wide
+      //调试代码
+      if(newX.isNaN)
+        println("attr="+attr._2+"  dispx="+dispX+"  dispXX="+ message._1+"   disp"+disp)
+
+      //0.85是退火算法的冷却系数
+      (attr._1,newX,newY,(attr._4._1,attr._4._2,attr._4._3,temp*0.85F))
+
     }
 
     def sendMessage(e: EdgeTriplet[(String, Double, Double, (Double,Double,Double,Double)), Double]): Iterator[(VertexId, (Double,Double))] = {
       val xDist = e.srcAttr._2 - e.dstAttr._2
       val yDist = e.srcAttr._3 - e.dstAttr._3
-      val distance = math.sqrt(xDist * xDist + yDist * yDist)
+      val dist = math.sqrt(xDist * xDist + yDist * yDist)
 
       var attr = 0D
       var attr_X = 0D
@@ -336,46 +366,58 @@ object Sample {
 
 
       val lst = if (e.srcAttr._1.contains(e.dstId)) {
-        attr = pow(distance,2)/k
+        attr = pow(dist,2)/k
         //防止顶点重合
         if(e.srcAttr._2 == e.dstAttr._2 && e.srcAttr._3 == e.dstAttr._3) {
           attr_X = 0D
           attr_Y = 0D
         }
         else{
-          attr_X = (-1) * (e.srcAttr._2 - e.dstAttr._2) / (distance + 0.00001D) * attr
-          attr_Y = (-1) * (e.srcAttr._3 - e.dstAttr._3) / (distance + 0.00001D) * attr
+          attr_X = (-1) * (e.srcAttr._2 - e.dstAttr._2) / (dist + 0.00001D) * attr
+          attr_Y = (-1) * (e.srcAttr._3 - e.dstAttr._3) / (dist + 0.00001D) * attr
         }
 
         //计算关联紧密顶点间的斥力
-        val repl = pow(k,2)/distance
+        val repl = pow(k,2)/dist
         var repl_X = 0D
         var repl_Y = 0D
         //防止顶点重合
         if(e.srcAttr._2 == e.dstAttr._2 && e.srcAttr._3 == e.dstAttr._3) {
           if (e.srcId < e.dstId) {
-            repl_X=(e.srcAttr._2._1-e.dstAttr._2._1+0.00001D)/(distance+0.00001D)*repulsive
-            repl_Y=(e.srcAttr._2._2-e.dstAttr._2._2+0.00001D)/(distance+0.00001D)*repulsive
+            repl_X = (e.srcAttr._2 - e.dstAttr._2 + 0.00001D) / (dist + 0.00001D) * repl
+            repl_Y = (e.srcAttr._3 - e.dstAttr._3 + 0.00001D) / (dist + 0.00001D) * repl
           }
           else{
-            repl_X=(e.srcAttr._2._1-e.dstAttr._2._1-0.00001D)/(distance+0.00001D)*repulsive
-            repl_Y=(e.srcAttr._2._2-e.dstAttr._2._2-0.00001D)/(distance+0.00001D)*repulsive
+            repl_X = (e.srcAttr._2 - e.dstAttr._2 - 0.00001D) / (dist + 0.00001D) * repl
+            repl_Y = (e.srcAttr._3 - e.dstAttr._3 - 0.00001D) / (dist + 0.00001D) * repl
           }
         }
         else{
-          repl_X=(e.srcAttr._2._1-e.dstAttr._2._1)/distance*repulsive
-          repl_Y=(e.srcAttr._2._2-e.dstAttr._2._2)/distance*repulsive
+          repl_X = (e.srcAttr._2 - e.dstAttr._2) / dist * repl
+          repl_Y = (e.srcAttr._3 - e.dstAttr._3) / dist * repl
         }
 
+        //计算合力
+        val forceX = attr_X + repl_X
+        val forceY = attr_Y + repl_Y
+        //调试代码
+        /*        println("("+e.srcAttr._2._1+"-"+e.dstAttr._2._1+")/"+"("+distance+"+"+0.00001D+")*"+attract)
+                println(repulsive)
+                println(e.srcId+"$$"+e.dstId)
+                println("attractX="+attractX+"   repulsiveX"+repulsiveX)
+                println("attractY="+attractY+"   repulsiveY"+repulsiveY)*/
+        if(forceX.isNaN){
+          println( attr_X + "  :  "+repl_X)
+        }
+        if(attr_X.isNaN)
+          println((e.srcAttr._2 - e.dstAttr._3)+"/" + dist + "*" + attr )
+        if(repl_X.isNaN)
+          println((e.srcAttr._2 - e.dstAttr._3)+"/" + dist + "*" + repl )
+
+        List((e.srcId,(forceX,forceY)))
 
 
-
-
-
-
-
-
-        List((e.dstId, (1, e.dstAttr)), (e.srcId, (0, e.srcAttr)))
+        //List((e.dstId, (1, e.dstAttr)), (e.srcId, (0, e.srcAttr)))
       //} else if (edge.dstAttr == 0) {
       //  List((edge.srcId, (1, edge.srcAttr)), (edge.dstId, (0, edge.dstAttr)))
       }
@@ -386,109 +428,30 @@ object Sample {
 
       lst.iterator
 
-      val distant = dist(e.srcAttr._2,e.dstAttr._2)
-      var attract=0D
-      var attractX=0D
-      var attractY=0D
-      //只计算相邻节点间引力
-      if(e.srcAttr._1.contains(e.dstId)) {
-        attract = pow(distance,2)/k
-        //防止顶点重合
-        if(e.srcAttr._2._1==e.dstAttr._2._1&&e.srcAttr._2._2==e.dstAttr._2._2) {
-          attractX=0D
-          attractY=0D
-        }
-        else{
-          attractX=(-1)*(e.srcAttr._2._1-e.dstAttr._2._1)/(distance+0.00001D)*attract
-          attractY=(-1)*(e.srcAttr._2._2-e.dstAttr._2._2)/(distance+0.00001D)*attract
-        }
-      }
-      //计算关联紧密顶点间的斥力
-      val repulsive=repulsiveForce(distance)
-      var repulsiveX=0D
-      var repulsiveY=0D
-      //防止顶点重合
-      if(e.srcAttr._2._1==e.dstAttr._2._1&&e.srcAttr._2._2==e.dstAttr._2._2) {
-        if (e.srcId < e.dstId) {
-          repulsiveX=(e.srcAttr._2._1-e.dstAttr._2._1+0.00001D)/(distance+0.00001D)*repulsive
-          repulsiveY=(e.srcAttr._2._2-e.dstAttr._2._2+0.00001D)/(distance+0.00001D)*repulsive
-        }
-        else{
-          repulsiveX=(e.srcAttr._2._1-e.dstAttr._2._1-0.00001D)/(distance+0.00001D)*repulsive
-          repulsiveY=(e.srcAttr._2._2-e.dstAttr._2._2-0.00001D)/(distance+0.00001D)*repulsive
-        }
-      }
-      else{
-        repulsiveX=(e.srcAttr._2._1-e.dstAttr._2._1)/distance*repulsive
-        repulsiveY=(e.srcAttr._2._2-e.dstAttr._2._2)/distance*repulsive
-      }
-
-
-      //计算合力
-      val forceX = attractX + repulsiveX
-      val forceY = attractY + repulsiveY
-
-
-
-      //调试代码
-      /*        println("("+e.srcAttr._2._1+"-"+e.dstAttr._2._1+")/"+"("+distance+"+"+0.00001D+")*"+attract)
-              println(repulsive)
-              println(e.srcId+"$$"+e.dstId)
-              println("attractX="+attractX+"   repulsiveX"+repulsiveX)
-              println("attractY="+attractY+"   repulsiveY"+repulsiveY)*/
-      if(forceX.isNaN){
-        println( attractX + "  :  "+repulsiveX)
-      }
-      if(attractX.isNaN)
-        println((e.srcAttr._2._1-e.dstAttr._2._1)+"/"+distance+"*"+attract)
-      if(repulsiveX.isNaN)
-        println((e.srcAttr._2._1-e.dstAttr._2._1)+"/"+distance+"*"+repulsive)
-      (e.srcId,(forceX,forceY))
-      //(e.dstId,e.srcAttr._2)
-      Iterator((e.srcId,(forceX,forceY)))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     }
 
-    val initialMessage = 0
-    val pregelGraph = Pregel(kGraph, initialMessage,
-      maxIterations, EdgeDirection.Either)(
+
+    def mergeMessage(msg1:(Double,Double),msg2:(Double,Double)):(Double,Double)={
+      var x = msg1._1 + msg2._1
+      var y = msg1._2 + msg2._2
+      if((msg1._1.isPosInfinity&&msg2._1.isNegInfinity)||(msg1._1.isNegInfinity&&msg2._1.isPosInfinity))
+        x = math.random
+      if((msg1._2.isPosInfinity&&msg2._2.isNegInfinity)||(msg1._2.isNegInfinity&&msg2._2.isPosInfinity))
+        y = math.random
+      (x,y)
+    }
+
+
+    val initialMessage = (1D,1D)
+    val pregelGraph = Pregel(g, initialMessage, maxIterations, EdgeDirection.Either)(
       vprog = vprog,
       sendMsg = sendMessage,
-      mergeMsg = (a, b) => a + b)
-    kGraph.unpersist()
+      mergeMsg = mergeMessage
+    )
+    g.unpersist()
 
-    pregelGraph.mapVertices[Boolean]((id: VertexId, d: Int) => d > 0)
-
+    //pregelGraph.mapVertices[Boolean]((id: VertexId, d: Int) => d > 0)
+    pregelGraph
   }
 
 
@@ -582,7 +545,7 @@ object Sample {
     :Unit={
       g.cache()
       g.checkpoint()
-
+/*****/
       // 计算图的度分布，并排序
 
       val maxd = g.degrees.map( x => { (x._2,1) }
@@ -698,7 +661,7 @@ object Sample {
 
       // 用户设定，定义输入输出，分隔符，及迭代次数，注意路径  //
 
-      tab = "\t"
+      tab = " " /****** 一 定 要 设 置 ********/
 
       if(REMOTE_JOB){
 
@@ -767,10 +730,10 @@ object Sample {
 
       // 进入图数据的采样流程 //
 
-      wholeCompute(cGraphS)
+      //wholeCompute(cGraphS)
 
-      //val end = layoutFDFR2(cGraphS, iterations ,diet = true )
-
+      val end = layoutFDFR1(cGraphS, iterations ,diet = true )
+      dumpWithLayout(end, output+"_random", isFirst = true)
       println(s"> Area               : $area")
       println(s"> Spring constant    : $k")
       println("> Graph data and area were prepared sucessfully.")

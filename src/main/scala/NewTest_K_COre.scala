@@ -68,6 +68,7 @@ object NewTest_K_COre {
           line =>
             val fields = line.split(tab)
             Edge(fields(0).toLong, fields(1).toLong, s)
+
         }
       val graph: Graph[Any, String] = Graph.fromEdges(edges, "defaultProperty")
       graph
@@ -111,7 +112,7 @@ object NewTest_K_COre {
       iterations = args(1).toInt
     } else {
       // 本地项目相对路径
-      fname = "Vote.txt"
+      fname = "edges.txt"
       input = "resources\\" + fname
       output = "output\\" + fname
       iterations = 200
@@ -123,7 +124,7 @@ object NewTest_K_COre {
 
 
 
-    //cGraphS.degrees.collect.foreach(println(_))
+    cGraphS.triplets.foreach(println(_))
 
 
     //////////////////////////////////////////////////////////////// 二跳邻居
@@ -185,7 +186,7 @@ object NewTest_K_COre {
     val head_d = distribution.take(theta) //取前百分20
     val d_max = head_d.take(1)(0)._1 //最大出入度
     val head_nodes = head_d.reduce((a, b) => (1, a._2 + "," + b._2))._2.split(",")
-    println("> Get V_sup " + d_max)
+    println("> Get V_sup " + head_nodes.getClass.getTypeName)
     head_nodes.foreach(println)
     //打印抽取的节点
     //===================================================================
@@ -212,21 +213,39 @@ object NewTest_K_COre {
     ////}
 
 
-    println("> DONE!")
+    def getGviaNodes(g: Graph[Any, String])
+    : Graph[(String, Double, Double, (Double, Double, Double, Double)), Double] = {
+      val transformedShuffledNodes: RDD[(VertexId, (String, Double, Double, (Double, Double, Double, Double)))] =
+        g.vertices.map {
+          v =>
+            (v._1, (v._1.toString, ran, ran, (0.0, 0.0, 0.0, 0.0)))
+        }
+      val transformedEdges: RDD[Edge[Double]] = g.edges.map(e => Edge(e.srcId, e.dstId, e.attr.toDouble))
+      val graphN = Graph(transformedShuffledNodes, transformedEdges, defaultNode)
+      //graphN.vertices.foreach(println)
+      //dumpWithLayout(graphN, output+"_random", isFirst = true)
+      graphN
 
-    //println(head_nodes)
-    // val G = KCore.run(cGraphS, 2, 10)
-
-    // val G = KCore.run(cGraphS, 2, 10)
-
-    // G.vertices.foreach(println)
+    }
 
 
 
+
+
+
+    val G = KCore.run(cGraphS, 30, 1)
+    //达到最大次数（对于无法保证收敛的算法）或无消息传递时结束
+    //val CoreYES = G.vertices.map(t => (t._2, t._1))
+    val KC_RDD = G.vertices.filter(x => {x._2==true}).map(x => x._1)//.foreach(println)
+
+    println(s"> DONE!  ${KC_RDD.getClass.getTypeName}")
+
+    //head_nodes.map()
 
 
 
 /**
+  * 0 10 20 30 40 50
     30	158
     35	114
     40	83

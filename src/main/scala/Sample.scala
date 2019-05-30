@@ -1,6 +1,7 @@
 import java.io._
 import java.text.SimpleDateFormat
 
+import breeze.numerics.pow
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.graphx._
 import org.apache.spark.rdd.RDD
@@ -10,6 +11,8 @@ import org.apache.spark.{SparkConf, SparkContext}
 object Sample {
 
   Logger.getLogger("org").setLevel(Level.ERROR)
+
+
 
   def main(args: Array[String]) {
 
@@ -300,6 +303,199 @@ object Sample {
       after2
 
     }
+
+
+
+
+
+  def layoutFDFR2( g: Graph[ (String, Double, Double, (Double,Double,Double,Double)), Double ],
+                   ctime: Int,
+                   diet:Boolean)
+  : Graph[ (String, Double, Double, (Double,Double,Double,Double)), Double ] = {
+    val maxIterations = ctime
+
+    val kGraph = g
+    val k =  math.sqrt(area / g.vertices.count())
+
+    def vprog(vid: VertexId, vd: Int, i: Int) = {
+      val ret = if ((vd - i) >= k) vd - i
+      else if (vd > 0) 0
+      else -1
+
+      ret
+    }
+
+    def sendMessage(e: EdgeTriplet[(String, Double, Double, (Double,Double,Double,Double)), Double]): Iterator[(VertexId, (Double,Double))] = {
+      val xDist = e.srcAttr._2 - e.dstAttr._2
+      val yDist = e.srcAttr._3 - e.dstAttr._3
+      val distance = math.sqrt(xDist * xDist + yDist * yDist)
+
+      var attr = 0D
+      var attr_X = 0D
+      var attr_Y = 0D
+
+
+      val lst = if (e.srcAttr._1.contains(e.dstId)) {
+        attr = pow(distance,2)/k
+        //防止顶点重合
+        if(e.srcAttr._2 == e.dstAttr._2 && e.srcAttr._3 == e.dstAttr._3) {
+          attr_X = 0D
+          attr_Y = 0D
+        }
+        else{
+          attr_X = (-1) * (e.srcAttr._2 - e.dstAttr._2) / (distance + 0.00001D) * attr
+          attr_Y = (-1) * (e.srcAttr._3 - e.dstAttr._3) / (distance + 0.00001D) * attr
+        }
+
+        //计算关联紧密顶点间的斥力
+        val repl = pow(k,2)/distance
+        var repl_X = 0D
+        var repl_Y = 0D
+        //防止顶点重合
+        if(e.srcAttr._2 == e.dstAttr._2 && e.srcAttr._3 == e.dstAttr._3) {
+          if (e.srcId < e.dstId) {
+            repl_X=(e.srcAttr._2._1-e.dstAttr._2._1+0.00001D)/(distance+0.00001D)*repulsive
+            repl_Y=(e.srcAttr._2._2-e.dstAttr._2._2+0.00001D)/(distance+0.00001D)*repulsive
+          }
+          else{
+            repl_X=(e.srcAttr._2._1-e.dstAttr._2._1-0.00001D)/(distance+0.00001D)*repulsive
+            repl_Y=(e.srcAttr._2._2-e.dstAttr._2._2-0.00001D)/(distance+0.00001D)*repulsive
+          }
+        }
+        else{
+          repl_X=(e.srcAttr._2._1-e.dstAttr._2._1)/distance*repulsive
+          repl_Y=(e.srcAttr._2._2-e.dstAttr._2._2)/distance*repulsive
+        }
+
+
+
+
+
+
+
+
+
+        List((e.dstId, (1, e.dstAttr)), (e.srcId, (0, e.srcAttr)))
+      //} else if (edge.dstAttr == 0) {
+      //  List((edge.srcId, (1, edge.srcAttr)), (edge.dstId, (0, edge.dstAttr)))
+      }
+      else List.empty
+
+      // no need to send msg to nodes that have already been "removed"
+      // val lstFiltered = lst.filter(   _._2._2 >= 0).map(t => (t._1, t._2._1))
+
+      lst.iterator
+
+      val distant = dist(e.srcAttr._2,e.dstAttr._2)
+      var attract=0D
+      var attractX=0D
+      var attractY=0D
+      //只计算相邻节点间引力
+      if(e.srcAttr._1.contains(e.dstId)) {
+        attract = pow(distance,2)/k
+        //防止顶点重合
+        if(e.srcAttr._2._1==e.dstAttr._2._1&&e.srcAttr._2._2==e.dstAttr._2._2) {
+          attractX=0D
+          attractY=0D
+        }
+        else{
+          attractX=(-1)*(e.srcAttr._2._1-e.dstAttr._2._1)/(distance+0.00001D)*attract
+          attractY=(-1)*(e.srcAttr._2._2-e.dstAttr._2._2)/(distance+0.00001D)*attract
+        }
+      }
+      //计算关联紧密顶点间的斥力
+      val repulsive=repulsiveForce(distance)
+      var repulsiveX=0D
+      var repulsiveY=0D
+      //防止顶点重合
+      if(e.srcAttr._2._1==e.dstAttr._2._1&&e.srcAttr._2._2==e.dstAttr._2._2) {
+        if (e.srcId < e.dstId) {
+          repulsiveX=(e.srcAttr._2._1-e.dstAttr._2._1+0.00001D)/(distance+0.00001D)*repulsive
+          repulsiveY=(e.srcAttr._2._2-e.dstAttr._2._2+0.00001D)/(distance+0.00001D)*repulsive
+        }
+        else{
+          repulsiveX=(e.srcAttr._2._1-e.dstAttr._2._1-0.00001D)/(distance+0.00001D)*repulsive
+          repulsiveY=(e.srcAttr._2._2-e.dstAttr._2._2-0.00001D)/(distance+0.00001D)*repulsive
+        }
+      }
+      else{
+        repulsiveX=(e.srcAttr._2._1-e.dstAttr._2._1)/distance*repulsive
+        repulsiveY=(e.srcAttr._2._2-e.dstAttr._2._2)/distance*repulsive
+      }
+
+
+      //计算合力
+      val forceX = attractX + repulsiveX
+      val forceY = attractY + repulsiveY
+
+
+
+      //调试代码
+      /*        println("("+e.srcAttr._2._1+"-"+e.dstAttr._2._1+")/"+"("+distance+"+"+0.00001D+")*"+attract)
+              println(repulsive)
+              println(e.srcId+"$$"+e.dstId)
+              println("attractX="+attractX+"   repulsiveX"+repulsiveX)
+              println("attractY="+attractY+"   repulsiveY"+repulsiveY)*/
+      if(forceX.isNaN){
+        println( attractX + "  :  "+repulsiveX)
+      }
+      if(attractX.isNaN)
+        println((e.srcAttr._2._1-e.dstAttr._2._1)+"/"+distance+"*"+attract)
+      if(repulsiveX.isNaN)
+        println((e.srcAttr._2._1-e.dstAttr._2._1)+"/"+distance+"*"+repulsive)
+      (e.srcId,(forceX,forceY))
+      //(e.dstId,e.srcAttr._2)
+      Iterator((e.srcId,(forceX,forceY)))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    }
+
+    val initialMessage = 0
+    val pregelGraph = Pregel(kGraph, initialMessage,
+      maxIterations, EdgeDirection.Either)(
+      vprog = vprog,
+      sendMsg = sendMessage,
+      mergeMsg = (a, b) => a + b)
+    kGraph.unpersist()
+
+    pregelGraph.mapVertices[Boolean]((id: VertexId, d: Int) => d > 0)
+
+  }
+
+
+
+
+
+
 
     def layoutFDFR2( g: Graph[ (String, Double, Double, (Double,Double,Double,Double)), Double ],
                      ctime: Int,
@@ -600,5 +796,3 @@ object Sample {
   }
 
 }
-
-

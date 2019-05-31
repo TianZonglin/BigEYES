@@ -342,7 +342,7 @@ object Sample {
       var newX = attr._2 + dispX
       var newY = attr._3 + dispY
 
-      if(newX < 0) newX=0
+      if(newX < 0) newX = 0
       if(newX > wide) newX = wide
       if(newY < 0) newY = 0
       if(newY > wide) newY = wide
@@ -365,7 +365,7 @@ object Sample {
       var attr_Y = 0D
 
 
-      val lst = if (e.srcAttr._4._3 == 0) {
+      val lst = if (e.srcAttr._1.contains(e.dstId)) {
         attr = pow(dist,2)/k
         //防止顶点重合
         if(e.srcAttr._2 == e.dstAttr._2 && e.srcAttr._3 == e.dstAttr._3) {
@@ -414,7 +414,7 @@ object Sample {
         if(repl_X.isNaN)
           println((e.srcAttr._2 - e.dstAttr._3)+"/" + dist + "*" + repl )
 
-        List((e.srcId,(forceX,forceY)),(attr._1,newX,newY,(attr._4._1,attr._4._2,attr._4._3,temp*0.85F)),(attr._1,newX,newY,(attr._4._1,attr._4._2,attr._4._3,temp*0.85F)))
+        List((e.srcId,(forceX,forceY)))
 
 
         //List((e.dstId, (1, e.dstAttr)), (e.srcId, (0, e.srcAttr)))
@@ -442,7 +442,7 @@ object Sample {
     }
 
 
-    val initialMessage = (1D,1D)
+    val initialMessage = (0D,0D)
     val pregelGraph = Pregel(g, initialMessage, maxIterations, EdgeDirection.Either)(
       vprog = vprog,
       sendMsg = sendMessage,

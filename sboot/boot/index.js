@@ -17,6 +17,14 @@ $(function(){
 	environment.data("GridColor","#ccc");
 	environment.data("BkgdColor","#ffffff");
 
+	//let root = 'ws://219.216.65.14';
+	let root = 'ws://localhost';
+	let canvaslink = root+':7001/';
+	let stdoutlink = root+':8001/';
+	let monitorlink = root+':10001/';
+
+
+
 	const canvas = document.getElementById("canvas");
     //const width = canvas.offsetWidth;
     //const height = canvas.offsetWidth;
@@ -875,7 +883,7 @@ $(function(){
 
 	let sendBtn = $("#sendBtn");
 	//建立连接
-	let stdoutSocket = new WebSocket('ws://219.216.65.14:8001/');
+	let stdoutSocket = new WebSocket(stdoutlink);
 	//开启连接
 	stdoutSocket.onopen = function () {
 		console.log('stdoutSocket open');
@@ -1000,7 +1008,7 @@ $(function(){
 	*/
 	//////////////////////////////////////////////////////////////////////////////////////////
 	//建立连接
-	let canvasSocket = new WebSocket('ws://219.216.65.14:7001/');
+	let canvasSocket = new WebSocket(canvaslink);
 	//开启连接
 	canvasSocket.onopen = function () {
 		console.log('canvasSocket open');
@@ -1030,7 +1038,7 @@ $(function(){
 
 	//////////////////////////////////////////////////////////////////////////////////////////
 	//建立连接
-	let monitorSocket = new WebSocket('ws://219.216.65.14:10001/');
+	let monitorSocket = new WebSocket(monitorlink);
 	//开启连接
 	monitorSocket.onopen = function () {
 		console.log('monitorSocket open');
@@ -1096,16 +1104,16 @@ $(function(){
 	console.log('22');
 
 		let select3 = $('#select3').val();
-		console.log(select3);
-		if(select3 === "Simple5")
-			select3 = "simple5.txt_of_476_without_800.json";
-			//select3 = "data200/simple5.txt_of_1_without_200.json";
-		if(select3 === "Vote")
-			select3 = "Vote.txt_of_800_without_800.json";
-			//select3 = "data200/simple5.txt_of_100_without_200.json";
-		if(select3 === "Wiki-Vote")
-			select3 = "Wiki-Vote.txt_of_780_without_800.json";
-			//select3 = "data200/simple5.txt_of_200_without_200.json";
+		//console.log(select3);
+		//if(select3 === "Simple5")
+		//	select3 = "simple5.txt_of_476_without_800.json";
+		//	//select3 = "data200/simple5.txt_of_1_without_200.json";
+		//if(select3 === "Vote")
+		//	select3 = "Vote.txt_of_800_without_800.json";
+		//	//select3 = "data200/simple5.txt_of_100_without_200.json";
+		//if(select3 === "Wiki-Vote")
+		//	select3 = "Wiki-Vote.txt_of_780_without_800.json";
+			 
 		$.ajax({
 			type: "GET",
 			//url: "Wiki-Vote.txt_of_780_without_800.json",
@@ -1501,6 +1509,35 @@ $(function(){
 		console.log(11111);
         cvs_ctmid.show();
 	});
+
+	////////////////////////////////////////////////////////////////////////////////////////// LEFT SELECT
+	$("#select3").on('loaded.bs.select',function(){
+		alert(1);
+
+		let str = "";
+		$.ajax({
+			type: "GET",
+			//url: "Wiki-Vote.txt_of_780_without_800.json",
+			url: "http://localhost:3000/getlist",
+			//url: "simple5.txt_of_800_without_800.json",
+			async: false,
+			dataType: "json",
+			success: function(data){
+				$.each(data, function(i, item){        
+				   str += "<option>"+item.filename+"</option>"
+				}); 
+				$("#select3").append($(str));
+				$("#select3").selectpicker("refresh");
+			}
+		});
+		
+		
+	});
+
+ 
+
+
+
 
 
 });

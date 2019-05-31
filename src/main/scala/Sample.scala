@@ -365,7 +365,7 @@ object Sample {
       var attr_Y = 0D
 
 
-      val lst = if (e.srcAttr._1.contains(e.dstId)) {
+      val lst = if (e.srcAttr._4._3 == 0) {
         attr = pow(dist,2)/k
         //防止顶点重合
         if(e.srcAttr._2 == e.dstAttr._2 && e.srcAttr._3 == e.dstAttr._3) {
@@ -414,7 +414,7 @@ object Sample {
         if(repl_X.isNaN)
           println((e.srcAttr._2 - e.dstAttr._3)+"/" + dist + "*" + repl )
 
-        List((e.srcId,(forceX,forceY)))
+        List((e.srcId,(forceX,forceY)),(attr._1,newX,newY,(attr._4._1,attr._4._2,attr._4._3,temp*0.85F)),(attr._1,newX,newY,(attr._4._1,attr._4._2,attr._4._3,temp*0.85F)))
 
 
         //List((e.dstId, (1, e.dstAttr)), (e.srcId, (0, e.srcAttr)))

@@ -18,10 +18,12 @@ $(function(){
 	environment.data("BkgdColor","#ffffff");
 
 	//let root = 'ws://219.216.65.14';
-	let root = 'ws://localhost';
-	let canvaslink = root+':7001/';
-	let stdoutlink = root+':8001/';
-	let monitorlink = root+':10001/';
+	let wsroot = 'ws://localhost';
+	//let httproot = 'ws://localhost';
+	let httproot = 'http://localhost';
+	let canvaslink = wsroot+':7001/';
+	let stdoutlink = wsroot+':8001/';
+	let monitorlink = wsroot+':10001/';
 
 
 
@@ -1115,10 +1117,11 @@ $(function(){
 		//	select3 = "Wiki-Vote.txt_of_780_without_800.json";
 			 
 		$.ajax({
-			type: "GET",
+			type: "POST",
 			//url: "Wiki-Vote.txt_of_780_without_800.json",
-			url: select3,
+			url: "http://localhost:3000/getjson",
 			//url: "simple5.txt_of_800_without_800.json",
+			data: select3,
 			async: false,
 			dataType: "json",
 			success: function(data){

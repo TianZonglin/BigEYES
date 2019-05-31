@@ -44,13 +44,7 @@ app.post('/fetch_layout_rst', function (req, res) {
 	// res.send(file)
 })
  
-// GET请求 直接浏览器访问 是 GET 方式
-app.get('/json', function (req, res) {
-	//console.log();
-	const file = fs.readFileSync("/usr/local/node-v10.9.0-linux-x64/ExpressWeb/Wiki-Vote.txt_of_780_without_800.json", "utf8");
- 
-	res.send(file)
-})
+
 
 
 // Scream server
@@ -249,8 +243,20 @@ var MonitorServer = ws.createServer(function (conn) {
 console.log('Monitor webSocket server listening on port 10001');
 
 
+// GET请求 直接浏览器访问 是 GET 方式
+app.post('/getjson', function (req, res) {
+	  req.setEncoding('utf8');
+	  res.setHeader('Access-Control-Allow-Origin','*')
+	//console.log();
+	req.on('data',function(data){
+		//const file = fs.readFileSync("/usr/local/node-v10.9.0-linux-x64/ExpressWeb/Wiki-Vote.txt_of_780_without_800.json", "utf8");
+		const file = fs.readFileSync("I:\\IDEA_PROJ\\Visualization\\output\\"+data, "utf8");
+		res.send(file);
+		//console.log("****************");
+		//console.log(data);
+	})
 
-
+})
  
  
 

@@ -7,7 +7,7 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
 
 
-object WithoutSample {
+object WithoutSampleNOW {
 
   Logger.getLogger("org").setLevel(Level.WARN)
 
@@ -403,11 +403,11 @@ object WithoutSample {
       }else{
 
         // 本地项目相对路径
-        fname = "edges.txt"
+        fname = "Vote.txt"
         input = "resources\\"+fname
         output = "output\\"+fname
 
-        iterations = 200
+        iterations = 500
 
       }
 

@@ -937,7 +937,7 @@ Pregel
 
       // 用户设定，定义输入输出，分隔符，及迭代次数，注意路径  //
 
-        tab = " "
+        tab = "\t"
 
       if(REMOTE_JOB){
 
@@ -951,11 +951,11 @@ Pregel
       }else{
 
         // 本地项目相对路径
-        fname = "simple5.txt"
+        fname = "simple55.txt"
         input = "resources\\"+fname
         output = "output\\"+fname
 
-        iterations = 5
+        iterations = 50
 
       }
 

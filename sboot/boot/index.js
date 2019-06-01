@@ -1033,10 +1033,14 @@ $(function(){
 	};
 	////发送信息
 	document.getElementById('testttt').onclick = function () {
-		canvasSocket.send("simple5.txt_of_@_without_200.json,1,196");
+		canvasSocket.send("demo1\\simple55.txt_of_@_without_500.json,1,500");
 		//canvasSocket.send("Vote.txt_of_@_without_800.json,760,800");
 	};
-
+	////发送信息
+	document.getElementById('testttt2').onclick = function () {
+		canvasSocket.send("demo2\\Vote.txt_of_@_without_500.json,1,500");
+		//canvasSocket.send("Vote.txt_of_@_without_800.json,760,800");
+	};
 
 	//////////////////////////////////////////////////////////////////////////////////////////
 	//建立连接

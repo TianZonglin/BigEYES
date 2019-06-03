@@ -428,6 +428,9 @@ object WithoutSampleNOW {
       dbi = 0.2               //默认 [ 度筛选 ] 比率
       sbi = 0.1               //默认 [ 采样比 ]
 
+
+
+
       // 计算得到，默认不调整 //
 
       temperature = 0.1 * math.sqrt(area)

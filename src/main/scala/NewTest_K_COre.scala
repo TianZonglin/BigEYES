@@ -1,5 +1,6 @@
 import java.text.SimpleDateFormat
 
+import TEST.Value_CC.countCC
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.graphx._
 import org.apache.spark.rdd.RDD
@@ -260,11 +261,12 @@ object NewTest_K_COre {
 */
 
 
+    val ccc = Graph(cGraphS.vertices.map(x=>{(x._1, (x._2._1).toInt)}), cGraphS.edges.mapValues(x=>(_,_,_)), (0,0))
 
+    val cc = countCC(ccc)
 
-
-
-
+    println("The global clustering coefficient of this graph is " + cc._2)
+    println("The average clustering coefficient of this graph is " + cc._3)
 
 
     sizeOfGraph = cGraphS.vertices.count()

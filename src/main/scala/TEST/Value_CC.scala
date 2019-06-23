@@ -4,6 +4,9 @@ import TEST.Staff_CC._
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.graphx.{Graph, GraphLoader, _}
 import org.apache.spark.{SparkConf, SparkContext}
+
+
+
 /**
   * @version
   *     2.5
@@ -14,6 +17,8 @@ import org.apache.spark.{SparkConf, SparkContext}
   * */
 
 object Value_CC{
+
+  type Distance = Double
   /**
     * main function, change the csv file path and the csv file
     *
@@ -43,6 +48,19 @@ object Value_CC{
 
     println("The global clustering coefficient of this graph is " + cc._2)
     println("The average clustering coefficient of this graph is " + cc._3)
+
+
+
+
+    // Specify the target size for the underlying clustering algorithm
+    // DiameterApproximation.run(g, target=5000)
+
+    // Control the number of active nodes/edges in each step
+    // DiameterApproximation.run(g, delta=0.5)
+
+    // Both parameters can be specified simultaneously
+    // DiameterApproximation.run(g, target=5000, delta=0.5)
+
   }
 
   /**

@@ -1,5 +1,7 @@
+import java.io.File
 import java.text.SimpleDateFormat
 
+import TEST.Staff_D.DiameterApproximation
 import TEST.Value_CC.countCC
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.graphx._
@@ -113,7 +115,7 @@ object NewTest_K_COre {
       iterations = args(1).toInt
     } else {
       // 本地项目相对路径
-      fname = "edges.txt"
+      fname = "simple55.txt"
       input = "resources\\" + fname
       output = "output\\" + fname
       iterations = 200
@@ -127,55 +129,6 @@ object NewTest_K_COre {
 
     cGraphS.triplets.foreach(println(_))
 
-
-    //////////////////////////////////////////////////////////////// 二跳邻居
-
-
-    //type VMap=Map[VertexId,Int]
-
-    ///**
-    //  * 节点数据的更新 就是集合的union
-    //  */
-    //def vprog(vid:VertexId,vdata:VMap,message:VMap)
-    //:Map[VertexId,Int]=addMaps(vdata,message)
-
-    ///**
-    //  * 发送消息
-    //  */
-    //def sendMsg(e:EdgeTriplet[VMap, _])={
-
-    //  //取两个集合的差集  然后将生命值减1
-    //  val srcMap=(e.dstAttr.keySet -- e.srcAttr.keySet).map { k => k->(e.dstAttr(k)-1) }.toMap
-    //  val dstMap=(e.srcAttr.keySet -- e.dstAttr.keySet).map { k => k->(e.srcAttr(k)-1) }.toMap
-
-    //  if(srcMap.size==0 && dstMap.size==0)
-    //    Iterator.empty
-    //  else
-    //    Iterator((e.dstId,dstMap),(e.srcId,srcMap))
-    //}
-
-    ///**
-    //  * 消息的合并
-    //  */
-    //def addMaps(spmap1: VMap, spmap2: VMap): VMap =
-    //  (spmap1.keySet ++ spmap2.keySet).map {
-    //    k => k -> math.min(spmap1.getOrElse(k, Int.MaxValue), spmap2.getOrElse(k, Int.MaxValue))
-    //  }.toMap
-
-
-    //val two=2  //这里是二跳邻居 所以只需要定义为2即可
-    //val newG=cGraphS.mapVertices((vid,_)=>Map[VertexId,Int](vid->two))
-    //  .pregel(Map[VertexId,Int](), two, EdgeDirection.Out)(vprog, sendMsg, addMaps)
-    ////newG.vertices.collect().foreach(println(_))
-    ////过滤得到二跳邻居 就是value=0 的顶点
-    //val twoJumpFirends=newG.vertices
-    //  .mapValues(_.filter(_._2==0).keys)
-
-    //twoJumpFirends.collect().foreach(println(_))
-
-    //twoJumpFirends.collect().foreach(println(_))
-
-
     //===================================================================
     //获取超级节点
     val distribution = cGraphS.degrees.map(t => (t._2, t._1 + "")).
@@ -185,6 +138,8 @@ object NewTest_K_COre {
     val counts = distribution.length
     val theta = (counts * 0.2).toInt
     val head_d = distribution.take(theta) //取前百分20
+    println(head_d.length)
+
     val d_max = head_d.take(1)(0)._1 //最大出入度
     val head_nodes = head_d.reduce((a, b) => (1, a._2 + "," + b._2))._2.split(",")
     println("> Get V_sup " + head_nodes.getClass.getTypeName)
@@ -261,12 +216,29 @@ object NewTest_K_COre {
 */
 
 
-    val ccc = Graph(cGraphS.vertices.map(x=>{(x._1, (x._2._1).toInt)}), cGraphS.edges.mapValues(x=>(_,_,_)), (0,0))
 
-    val cc = countCC(ccc)
 
-    println("The global clustering coefficient of this graph is " + cc._2)
-    println("The average clustering coefficient of this graph is " + cc._3)
+    val paths: String = "I:\\IDEA_PROJ\\Visualization\\src\\main\\scala\\temp.csv"
+    printToFile(new File(paths)) {
+      p => {
+        cGraphS.edges.collect.foreach(
+          x => {
+            print("*")
+            p.println(s"${x.srcId} ${x.dstId} 1")
+          }
+        )
+      }
+        p.flush()
+        p.close()
+    }
+    val graphtemp = GraphLoader.edgeListFile(sc, paths, numEdgePartitions = 8)
+    val cc = countCC(graphtemp)
+    println("实验 | global-cc is " + cc._2)
+    println("实验 | average-cc is " + cc._3)
+
+    val dd = DiameterApproximation.run(cGraphS)
+    println("实验 | graph-diameter is " + dd)
+
 
 
     sizeOfGraph = cGraphS.vertices.count()

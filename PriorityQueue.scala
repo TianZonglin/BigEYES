@@ -15,7 +15,7 @@
  *
  */
 
-package TEST.Staff_D
+package it.unipd.dei.graphx.diameter
 
 import scala.annotation.tailrec
 
@@ -27,7 +27,7 @@ import scala.annotation.tailrec
  *
  * @param maxSize the maximum size
  */
-
+private[diameter]
 class PriorityQueue(val maxSize: Int) {
 
   val heap = Array.fill[Int](maxSize + 1)(-1)

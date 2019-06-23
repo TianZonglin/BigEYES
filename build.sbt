@@ -11,4 +11,4 @@ libraryDependencies += "org.apache.spark" %% "spark-graphx" % "2.2.0"
 
 
 
-libraryDependencies += "it.unipd.dei" %% "graphx-diameter" % "0.1.0"
+//libraryDependencies += "it.unipd.dei" %% "graphx-diameter" % "0.1.0"

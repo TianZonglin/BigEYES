@@ -15,13 +15,13 @@
  *
  */
 
-package TEST
+package it.unipd.dei.graphx
 
 /**
  * This package provides functions to approximate the diameter of large graphs.
- * The main entry point to the library is the [[TEST.Staff_D.DiameterApproximation]] object
+ * The main entry point to the library is the [[DiameterApproximation]] object
  */
-package object Staff_D {
+package object diameter {
 
   /**
    * Alias for distances.

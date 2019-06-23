@@ -15,7 +15,7 @@
  *
  */
 
-package TEST.Staff_D
+package it.unipd.dei.graphx.diameter
 
 import org.apache.spark.graphx.{Graph, TripletFields, VertexId}
 import org.apache.spark.util.LongAccumulator
@@ -27,7 +27,7 @@ import scala.util.Random
 /**
  * The clustering algorithm used to compute the diameter approximation.
  */
-
+private[diameter]
 object Clustering {
 
   private val log = LoggerFactory.getLogger(this.getClass)
@@ -222,7 +222,7 @@ object Clustering {
 
 }
 
-
+private[diameter]
 case class ClusteringMessage(
                               center: VertexId,
                               phaseDistance: Distance,
@@ -232,7 +232,7 @@ case class ClusteringMessage(
 
 }
 
-
+private[diameter]
 object ClusteringMessage {
 
   def apply(v: ClusteringInfo, edgeWeight: Distance): ClusteringMessage =
@@ -247,7 +247,7 @@ object ClusteringMessage {
 /**
  * Contains various information about the role of the vertex in the clustering.
  */
-
+private[diameter]
 case class ClusteringInfo(
                            center: VertexId,
                            phaseDistance: Distance,
@@ -281,7 +281,7 @@ case class ClusteringInfo(
 
 }
 
-
+private[diameter]
 object ClusteringInfo {
 
   def apply(): ClusteringInfo = new ClusteringInfo(

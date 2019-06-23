@@ -15,7 +15,7 @@
  *
  */
 
-package TEST.Staff_D
+package it.unipd.dei.graphx.diameter
 
 import org.apache.spark.SparkContext
 import org.apache.spark.graphx.{Graph, VertexId}
@@ -25,7 +25,7 @@ import scala.collection.mutable.ArrayBuffer
 /**
  * An implementation of Dijkstra's Single Source Shortest Path algorithm.
  */
-
+private[diameter]
 object Dijkstra {
 
   def distributedApsp(sc: SparkContext, graph: LocalGraph): Array[Array[Distance]] = {
@@ -82,7 +82,7 @@ object Dijkstra {
  * and so is the garbage collection of these objects. This leads to better
  * performance.
  */
-
+private[diameter]
 class LocalGraph(
                   val adjacency: Array[Array[Int]],
                   val weights: Array[Array[Distance]],
@@ -93,7 +93,7 @@ class LocalGraph(
 
 }
 
-
+private[diameter]
 class LocalGraphBuilder(
                          val adjacency: Array[ArrayBuffer[Int]],
                          val weights: Array[ArrayBuffer[Distance]],
@@ -120,7 +120,7 @@ class LocalGraphBuilder(
     )
 }
 
-
+private[diameter]
 object LocalGraphBuilder {
 
   def apply(n: Int): LocalGraphBuilder =
@@ -132,7 +132,7 @@ object LocalGraphBuilder {
 
 }
 
-
+private[diameter]
 object LocalGraph {
 
   def fromGraph(graph: Graph[ClusteringInfo, Distance]): LocalGraph = {

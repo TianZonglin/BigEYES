@@ -15,7 +15,7 @@
  *
  */
 
-package TEST.Staff_D
+package it.unipd.dei.graphx.diameter
 
 import org.apache.spark.graphx.Graph
 import org.slf4j.LoggerFactory

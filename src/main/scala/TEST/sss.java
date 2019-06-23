@@ -1,0 +1,120 @@
+package TEST;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.stream.Stream;
+
+
+public class DRunner {
+    public static void main(String[] args) {
+
+        // Iterating through all input files
+        for (String arg : args) {
+            System.out.println("For Graph In File: " + arg);
+
+            boolean[][] adjMat = parseAdjMat(arg);
+            int distance = findDistance(adjMat);
+            System.out.println("Max Diameter Found: " + distance);
+        }
+    }
+
+    private static final int inf = 99999;
+
+    public static int findDistance(boolean[][] adjMat) {
+        int[][] dist = new int[adjMat.length][adjMat.length];
+
+        for (int i = 0; i < dist.length; i++) {
+            for (int j = 0; j < dist.length; j++) {
+                if (i == j) {
+                    dist[i][j] = 0;
+                } else if (adjMat[i][j]) {
+                    dist[i][j] = 1;
+                }
+                else{
+                    dist[i][j] = inf;
+                }
+            }
+        }
+
+
+
+        // Floyd Warshall Algorithm to generate shortest paths between all nodes
+        // Reference: https://www.geeksforgeeks.org/dynamic-programming-set-16-floyd-warshall-algorithm/
+
+        for (int k = 0; k < adjMat.length; k++) {
+            for (int i = 0; i < adjMat.length; i++) {
+                for (int j = 0; j < adjMat.length; j++) {
+                    if (dist[i][k] + dist[k][j] < dist[i][j]) {
+                        dist[i][j] = dist[i][k] + dist[k][j];
+                    }
+                }
+            }
+        }
+
+
+        int max = 0;
+        //Search distances to find the max/diameter
+
+        for (int i = 0; i < dist.length; i++) {
+            // Note that this second loop can be optimized and initalized with j = i+1, since the matrix is symetric
+            // But for generality to all future graphs (not just undirected ones), it's left to search the entire matrix
+            for (int j = 0; j < dist.length; j++) {
+                // If ANY distance is of length inf, then there must be a disconnected component
+                if (dist[i][j] == inf) {
+                    return Integer.MAX_VALUE;
+                }
+                else if (dist[i][j] > max) {
+                    max = dist[i][j];
+                }
+            }
+        }
+        return max;
+    }
+
+
+    public static boolean[][] parseAdjMat(String fileName) {
+
+        // Contains all edges
+        ArrayList<String[]> parsedInputs = new ArrayList<>();
+
+        // Contains names mapped to index ids
+        HashMap<String, Integer> bijection = new HashMap<>();
+
+        boolean[][] matrix = null;
+
+        Path path = Paths.get(fileName);
+        try {
+            Stream<String> lines = Files.lines(path);
+            // Regex handles hyphens and 3 different types of dashes
+            lines.map(line -> line.replaceAll("\\s", "").split("(-)|(–)|(—)|(―)"))
+                    .filter(strarr -> !strarr[0].trim().isEmpty() && strarr.length == 2)
+                    .forEach(strarr -> {
+                                parsedInputs.add(strarr);
+                                for (String node : strarr) {
+                                    if (!bijection.containsKey(node))
+                                        bijection.put(node, bijection.size());
+                                }
+                            }
+                    );
+            lines.close();
+
+            matrix = new boolean[bijection.size()][bijection.size()];
+            for (String[] strarr : parsedInputs) {
+                // If nodes are different, then add their edge in graph matrix
+                if( !strarr[0].equals(strarr[1]) ) {
+                    matrix[bijection.get(strarr[0])][bijection.get(strarr[1])] = true;
+                    matrix[bijection.get(strarr[1])][bijection.get(strarr[0])] = true;
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return matrix;
+    }
+
+}

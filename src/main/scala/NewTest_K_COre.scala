@@ -11,9 +11,53 @@ import org.apache.spark.{SparkConf, SparkContext}
 
 object NewTest_K_COre {
 
-  Logger.getLogger("org").setLevel(Level.INFO)
+  Logger.getLogger("org").setLevel(Level.ERROR)
   def main(args: Array[String]): Unit = {
-    mainF(Array("5","Email-Enron.txt"))
+
+    //mainF(Array("9","Email-Enron.txt","\t"))
+    //mainF(Array("8","Email-Enron.txt","\t"))
+    //mainF(Array("7","Email-Enron.txt","\t"))
+    //mainF(Array("14","wiki-Vote.txt","\t"))
+    //mainF(Array("13","wiki-Vote.txt","\t"))
+    //mainF(Array("12","wiki-Vote.txt","\t"))
+    //mainF(Array("11","wiki-Vote.txt","\t"))
+    //mainF(Array("14","Email-Enron.txt","\t"))
+    //mainF(Array("13","Email-Enron.txt","\t"))
+    //mainF(Array("12","Email-Enron.txt","\t"))
+    //mainF(Array("11","Email-Enron.txt","\t"))
+
+
+    mainF(Array("11","Gowalla_edges.txt","\t"))
+    mainF(Array("10","Gowalla_edges.txt","\t"))
+    mainF(Array("9", "Gowalla_edges.txt","\t"))
+    mainF(Array("8", "Gowalla_edges.txt","\t"))
+    mainF(Array("7", "Gowalla_edges.txt","\t"))
+    mainF(Array("6", "Gowalla_edges.txt","\t"))
+    mainF(Array("5", "Gowalla_edges.txt","\t"))
+    mainF(Array("4", "Gowalla_edges.txt","\t"))
+    mainF(Array("3", "Gowalla_edges.txt","\t"))
+    mainF(Array("2", "Gowalla_edges.txt","\t"))
+
+
+
+
+
+    //mainF(Array("6","soc-Epinions1.txt","\t"))
+    //mainF(Array("5","soc-Epinions1.txt","\t"))
+    //mainF(Array("4","soc-Epinions1.txt","\t"))
+    //mainF(Array("3","soc-Epinions1.txt","\t"))
+    //mainF(Array("2","soc-Epinions1.txt","\t"))
+    //mainF(Array("10","wiki-Vote.txt","\t"))
+    //mainF(Array("5","wiki-Vote.txt","\t"))
+    //mainF(Array("4","wiki-Vote.txt","\t"))
+    //mainF(Array("3","wiki-Vote.txt","\t"))
+    //mainF(Array("2","wiki-Vote.txt","\t"))
+    //mainF(Array("10","Email-Enron.txt","\t"))
+    //mainF(Array("5","Email-Enron.txt","\t"))
+    //mainF(Array("4","Email-Enron.txt","\t"))
+    //mainF(Array("3","Email-Enron.txt","\t"))
+    //mainF(Array("2","Email-Enron.txt","\t"))
+
   }
 
   def mainF(args: Array[String]) {
@@ -109,7 +153,7 @@ object NewTest_K_COre {
     def date: String
     = new SimpleDateFormat("MM-dd_HH-mm_").format(System.currentTimeMillis())
     // 用户设定，定义输入输出，分隔符，及迭代次数，注意路径  //
-    tab = "\t"
+    tab = args(2)
 
     val DDDD = Integer.parseInt(args(0))
     //val ptab = "60%"
@@ -349,7 +393,7 @@ object NewTest_K_COre {
     println("> DONE!")
 
     val out = new FileWriter("I:\\IDEA_PROJ\\Visualization\\src\\main\\scala\\11111111111.csv", true)
-    out.write(s"${System.currentTimeMillis()}, $fname, ${((KC_arrs++head_nodes).distinct.length.toDouble/sizeEdg).toInt+"%"}, kc=$DDDD \t\t\t\t\t\t" +
+    out.write(s"${System.currentTimeMillis()}, $fname, ${((KC_arrs++head_nodes).distinct.length.toDouble/sizeOfGraph*100).toInt+"%"}, kc=$DDDD \t\t\t\t\t\t" +
       s"${SMd.formatted("%.3f")}, SMt, ${(Vcc._2/0.017).formatted("%.3f")}, ${(Vcc._3/0.4024).formatted("%.3f")}, ${(Vav/20.0).formatted("%.3f")}\n")
     out.close()
     sc.stop()

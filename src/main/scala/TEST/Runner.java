@@ -1,4 +1,7 @@
+
 package TEST;
+
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -8,17 +11,17 @@ import java.util.HashMap;
 import java.util.stream.Stream;
 
 
-public class DRunner {
+public class Runner {
     public static void main(String[] args) {
 
         // Iterating through all input files
-        for (String arg : args) {
-            System.out.println("For Graph In File: " + arg);
 
-            boolean[][] adjMat = parseAdjMat(arg);
+
+
+            boolean[][] adjMat = parseAdjMat("I:\\IDEA_PROJ\\Visualization\\resources\\edges.txt","\t");
             int distance = findDistance(adjMat);
             System.out.println("Max Diameter Found: " + distance);
-        }
+
     }
 
     private static final int inf = 99999;
@@ -75,7 +78,7 @@ public class DRunner {
     }
 
 
-    public static boolean[][] parseAdjMat(String fileName) {
+    public static boolean[][] parseAdjMat(String fileName, String tab) {
 
         // Contains all edges
         ArrayList<String[]> parsedInputs = new ArrayList<>();
@@ -89,7 +92,7 @@ public class DRunner {
         try {
             Stream<String> lines = Files.lines(path);
             // Regex handles hyphens and 3 different types of dashes
-            lines.map(line -> line.replaceAll("\\s", "").split("(-)|(–)|(—)|(―)"))
+            lines.map(line -> line.split(tab))
                     .filter(strarr -> !strarr[0].trim().isEmpty() && strarr.length == 2)
                     .forEach(strarr -> {
                                 parsedInputs.add(strarr);

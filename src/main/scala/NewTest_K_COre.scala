@@ -1,7 +1,7 @@
 import java.io.File
 import java.text.SimpleDateFormat
 
-import TEST.Staff_D.DiameterApproximation
+import TEST.Runner
 import TEST.Value_CC.countCC
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.graphx._
@@ -115,7 +115,7 @@ object NewTest_K_COre {
       iterations = args(1).toInt
     } else {
       // 本地项目相对路径
-      fname = "simple55.txt"
+      fname = "edges.txt"
       input = "resources\\" + fname
       output = "output\\" + fname
       iterations = 200
@@ -136,7 +136,7 @@ object NewTest_K_COre {
       sortBy(_._1, false).collect()
 
     val counts = distribution.length
-    val theta = (counts * 0.2).toInt
+    val theta = (counts * 0.5).toInt
     val head_d = distribution.take(theta) //取前百分20
     println(head_d.length)
 
@@ -224,7 +224,7 @@ object NewTest_K_COre {
         cGraphS.edges.collect.foreach(
           x => {
             print("*")
-            p.println(s"${x.srcId} ${x.dstId} 1")
+            p.println(s"${x.srcId} ${x.dstId}")
           }
         )
       }
@@ -236,7 +236,8 @@ object NewTest_K_COre {
     println("实验 | global-cc is " + cc._2)
     println("实验 | average-cc is " + cc._3)
 
-    val dd = DiameterApproximation.run(cGraphS)
+    val adjMat = Runner.parseAdjMat(paths," ")  //tab需要和temp.csv一致
+    val dd = Runner.findDistance(adjMat)
     println("实验 | graph-diameter is " + dd)
 
 

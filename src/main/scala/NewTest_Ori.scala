@@ -9,7 +9,7 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
 
 
-object NewTest_K_COre {
+object NewTest_Ori {
 
   Logger.getLogger("org").setLevel(Level.WARN)
 
@@ -109,117 +109,19 @@ object NewTest_K_COre {
     tab = "\t"
 
     // 本地项目相对路径
-    fname = "Email-Enron.txt"
+    fname = "edges.txt"
     input = "resources\\" + fname
     output = "output\\" + fname
-    iterations = 200
 
 
     val graphS = loadEdges(input)
-    val origin_graphS = graphS
     val cGraphS = convert(graphS).persist()
-
-
-
-
-    //cGraphS.triplets.foreach(println(_))
-
-    //===================================================================
-    //获取超级节点
-    val distribution = cGraphS.degrees.map(t => (t._2, t._1 + "")).
-      reduceByKey(_ + "," + _).
-      sortBy(_._1, false).collect()
-
-    val counts = distribution.length
-    val theta = (counts * 0.5).toInt
-    val head_d = distribution.take(theta) //取前百分20
-    println("补充的分类个数："+head_d.length)
-
-    val d_max = head_d.take(1)(0)._1 //最大出入度
-    val head_nodes = head_d.reduce((a, b) => (1, a._2 + "," + b._2))._2.split(",")
-    //println("> Get V_sup " + head_nodes.getClass.getTypeName)
-    println("这些分类的总体个数："+head_nodes.length)
-    //打印抽取的节点
-    println(s">度分布添加- DONE!")
-    //===================================================================
-    //Core分层
-    val diameter = 7
-    val level = (diameter / 2).toInt
-    val span = (d_max / level).toInt
-    println(s"counts:${head_nodes.length},theta:$theta,d_max:$d_max,diameter:$diameter,level:$level,span:$span")
-    var index = d_max
-    while (index > 0) {
-      index = index - span
-      //println(index) //各层的指定Core的K值
-      //TO DO
-      //如何计算SHELL
-    }
-    ////var i = 0
-    ////while (i < 100){
-    ////  val testNUM = i
-    ////  val G = KCore.run(cGraphS, testNUM, 1)
-    ////  //达到最大次数（对于无法保证收敛的算法）或无消息传递时结束
-    ////  val CoreYES = G.vertices.map(t => (t._2, t._1)).groupByKey.map(t => (t._1, t._2.size)).sortBy(_._1, false).take(1)(0)._2
-    ////  println(s"$testNUM\t$CoreYES")
-    ////  i += 5
-    ////}
-
-
-    def getGbyNode(g: Graph[(String, Double, Double, (Double, Double, Double, Int)), Double], layer: Array[String])
-    : Graph[(String, Double, Double, (Double, Double, Double, Int)), Double] = {
-
-
-      val gbd = g.vertices.mapValues((_,x)=>{
-        if(layer.contains(x._1)){
-
-          (x._1,x._2,x._3,(x._4._1,x._4._2,x._4._3,1))
-        }else{
-          (x._1,x._2,x._3,(x._4._1,x._4._2,x._4._3,0))
-        }
-      })
-
-      Graph(gbd, g.edges, defaultNode)
-
-    }
-
-    val G = KCore.run(cGraphS, 30, 1)
-    // 10 11924   30 3300  100  680
-    //达到最大次数（对于无法保证收敛的算法）或无消息传递时结束
-    //val CoreYES = G.vertices.map(t => (t._2, t._1))
-    val KC_RDD_cGraphS = G.vertices.filter(x => {x._2==true}).map(x => x._1)//.foreach(println)
-
-
-
-    //KC_RDD.foreach(println)
-    val KC_arrs  = KC_RDD_cGraphS.map(x=>x.toString).collect()
-    val KC_Dgree_cGraphS = getGbyNode(cGraphS, (KC_arrs++head_nodes).distinct)
-
-    //KC_Dgree_cGraphS.triplets.foreach(println(_))
-    println("K核包含的点数："+KC_arrs.length)
-    println("K核+D筛包含的点数："+(KC_arrs++head_nodes).distinct.length)
-
-/**
-  * 0 10 20 30 40 50
-    30	158
-    35	114
-    40	83
-    45	56
-    50	42
-    55	20
-    60	10
-    65	7
-    70	3
-    75	2
-    80	1
-*/
-
-
 
 
     val paths: String = "I:\\IDEA_PROJ\\Visualization\\src\\main\\scala\\temp.csv"
     printToFile(new File(paths)) {
       p => {
-        KC_Dgree_cGraphS.triplets.collect.foreach(
+        cGraphS.triplets.collect.foreach(
           x => {
             print("*")
             if(x.srcAttr._4._4 == 1 && x.dstAttr._4._4 == 1){
@@ -238,11 +140,7 @@ object NewTest_K_COre {
     val graphtemp = GraphLoader.edgeListFile(sc, paths, numEdgePartitions = 8)
     val Vcc = countCC(graphtemp)
 
-    //println("实际边总数："+graphtemp.edges.count())
 
-
-
-    //println("实验 | average-cc is " + Vcc._3)
 
     val adjMat = Runner.parseAdjMat(paths," ")  //tab需要和temp.csv一致
     val dd = Runner.findDistance(adjMat)

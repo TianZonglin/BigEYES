@@ -234,11 +234,11 @@ object NewTest_K_COre {
             print("*")
             if(x.srcAttr._4._4 == 1 && x.dstAttr._4._4 == 1){
               p.println(s"${x.srcId} ${x.dstId}")
-            }else if(x.srcAttr._4._4 == 1){
-              p.println(s"${x.srcId} ${x.srcId}")
-            }else if(x.dstAttr._4._4 == 1){
-              p.println(s"${x.dstId} ${x.dstId}")
-            }
+            }//else if(x.srcAttr._4._4 == 1){
+             // p.println(s"${x.srcId} ${x.srcId}")
+            //}else if(x.dstAttr._4._4 == 1){
+            //  p.println(s"${x.dstId} ${x.dstId}")
+            //}
           }
         )
       }
@@ -254,16 +254,71 @@ object NewTest_K_COre {
       reduceByKey(_ + "," + _).
       sortBy(_._1, false).collect()
     val dfb_qx = distribution_qx.map(t => (t._1, t._2.split(",").length))
-    val px = dfb_px.toMap
 
-    val SMd = dfb_qx.map( t =>{
-      val v = px.get(t._1).get
-      if(v.isNaN)
-        0
-      else
-        v * Math.log( v / t._2)
-    }).reduce(_+_)
-    println("==================================: "+SMd)
+    val cpx = dfb_px.length //da
+    val cqx = dfb_qx.length //xiao
+
+    val reflect = cpx.toDouble/cqx
+    val tem_qx = dfb_qx
+    //var SMd = 0
+    //var indexs = 0
+    //for(indexs <- 0 to dfb_qx.length-1){
+    //  val ind = Math.floor(indexs * reflect).toInt
+    //  val vp = dfb_px(ind)._2
+    //  val vq = dfb_qx(indexs)._2
+    //  println(s"${ind}----${indexs}------${dfb_qx.length}")
+    //  SMd = SMd + vp * Math.log( vp / vq).toInt
+    //}
+
+    var SMd = 0
+    var indexs = 0
+    for(indexs <- 0 to dfb_qx.length-1){
+      val ind = Math.floor(indexs * reflect).toInt
+      val vp = dfb_px(ind)._2
+      val vq = dfb_qx(indexs)._2
+      println(s"${ind}----${indexs}------${dfb_qx.length}")
+      SMd = SMd + (vp - vq)
+    }
+    SMd = SMd/dfb_qx.length
+
+    //===================================================================
+    //SMt
+    var a = 0
+    var b = 0
+    var c = 0
+    var d = 0
+    val rddmapS = graphtemp.edges.map(x=>{
+      (x.srcId+""+x.dstId, 1)
+    }).collect()
+    val rddmapG = cGraphS.edges.map(x=>{
+      (x.srcId+""+x.dstId, 1)
+    }).collect()
+
+    val mapS = rddmapS.toMap
+    var it = 0
+    for(it <- 0 to rddmapG.length-1){
+      val o1 = rddmapG(it)._2
+      var o2:Int = 0
+      try {
+        o2 = mapS(rddmapG(it)._1)
+        if(o1 == 1 && o2 == 1){ a = a + 1 }
+        else if(o1 == 1 && o2 == 0){ b = b + 1}
+        else if(o1 == 0 && o2 == 1){ c = c + 1}
+        else if(o1 == 0 && o2 == 0){ d = d + 1}
+
+
+
+
+
+      } catch {
+        case ex: Exception => {
+          ex.printStackTrace() // 打印到标准err
+          System.err.println("ZZZZZZZZZZZZZZZz")  // 打印到标
+        }
+      }
+    }
+
+
 
     //===================================================================
     //vcc
@@ -278,7 +333,7 @@ object NewTest_K_COre {
     //===================================================================
     //endprint
     val out = new FileWriter("I:\\IDEA_PROJ\\Visualization\\src\\main\\scala\\11111111111.csv", true)
-    out.write(s"SMd,SMt,${(Vcc._2/0.017).formatted("%.3f")},${(Vcc._3/0.4024).formatted("%.3f")},${(Vav/20.0).formatted("%.3f")}\n")
+    out.write(s"${SMd},SMt,${(Vcc._2/0.017).formatted("%.3f")},${(Vcc._3/0.4024).formatted("%.3f")},${(Vav/20.0).formatted("%.3f")}\n")
     out.close()
     sizeOfGraph = cGraphS.vertices.count()
     val sizeEdg = cGraphS.edges.count()

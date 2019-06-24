@@ -141,6 +141,16 @@ object NewTest_K_COre {
     println("这些分类的总体个数："+head_nodes.length)
     //打印抽取的节点
     println(s">度分布添加- DONE!")
+
+    //===================================================================
+    //度分布SMd
+    val distribution2 = cGraphS.degrees.map(t => (t._2, t._1 + "")).
+      reduceByKey(_ + "," + _).
+      sortBy(_._1, false).collect()
+
+    val dfb_px = distribution2.map(t => (t._1, t._2.split(",").length))
+    //dfb.foreach(println)
+
     //===================================================================
     //Core分层
     val diameter = 7
@@ -235,30 +245,45 @@ object NewTest_K_COre {
         p.flush()
         p.close()
     }
+
     val graphtemp = GraphLoader.edgeListFile(sc, paths, numEdgePartitions = 8)
+
+    //===================================================================
+    //度分布SMd
+    val distribution_qx = graphtemp.degrees.map(t => (t._2, t._1 + "")).
+      reduceByKey(_ + "," + _).
+      sortBy(_._1, false).collect()
+    val dfb_qx = distribution_qx.map(t => (t._1, t._2.split(",").length))
+    val px = dfb_px.toMap
+
+    val SMd = dfb_qx.map( t =>{
+      val v = px.get(t._1).get
+      if(v.isNaN)
+        0
+      else
+        v * Math.log( v / t._2)
+    }).reduce(_+_)
+    println("==================================: "+SMd)
+
+    //===================================================================
+    //vcc
     val Vcc = countCC(graphtemp)
 
-    //println("实际边总数："+graphtemp.edges.count())
+    //===================================================================
+    //av
+    val sumDegree = graphtemp.degrees.map(t => t._2).reduce((a,b)=>(a+b))
+    val sumGraph = graphtemp.vertices.count()
+    val Vav = (sumDegree.toDouble/sumGraph)
 
-
-
-    //println("实验 | average-cc is " + Vcc._3)
-
-    val adjMat = Runner.parseAdjMat(paths," ")  //tab需要和temp.csv一致
-    val dd = Runner.findDistance(adjMat)
-
-
-
+    //===================================================================
+    //endprint
+    val out = new FileWriter("I:\\IDEA_PROJ\\Visualization\\src\\main\\scala\\11111111111.csv", true)
+    out.write(s"SMd,SMt,${(Vcc._2/0.017).formatted("%.3f")},${(Vcc._3/0.4024).formatted("%.3f")},${(Vav/20.0).formatted("%.3f")}\n")
+    out.close()
     sizeOfGraph = cGraphS.vertices.count()
     val sizeEdg = cGraphS.edges.count()
     println(s"> Size of the graph  : $sizeOfGraph  nodes, $sizeEdg edges.")
     println("> DONE!")
-
-
-    val out = new FileWriter("I:\\IDEA_PROJ\\Visualization\\src\\main\\scala\\11111111111.csv", true)
-
-    out.write(s"SMd,SMt,${(Vcc._2).formatted("%.4f")},${(Vcc._3).formatted("%.4f")},Vav,${dd}")
-    out.close()
     sc.stop()
   }
 

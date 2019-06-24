@@ -109,28 +109,44 @@ object NewTest_Ori {
     tab = "\t"
 
     // 本地项目相对路径
-    fname = "edges.txt"
+    fname = "Email-Enron.txt"
     input = "resources\\" + fname
     output = "output\\" + fname
 
 
     val graphS = loadEdges(input)
     val cGraphS = convert(graphS).persist()
+    //cGraphS.triplets.foreach(println)
 
 
+
+
+    ////===================================================================
+    ////度分布SMd
+    //val distribution2 = cGraphS.degrees.map(t => (t._2, t._1 + "")).
+    //  reduceByKey(_ + "," + _).
+    //  sortBy(_._1, false).collect()
+//
+    //val dfb = distribution2.map(t => (t._1, t._2.split(",").length))
+    //dfb.foreach(println)
+
+
+
+    //===================================================================
+    //av
+    val sumDegree = cGraphS.degrees.map(t => t._2).reduce((a,b)=>(a+b))
+    val sumGraph = cGraphS.vertices.count()
+    val Vav = (sumDegree.toDouble/sumGraph).formatted("%.1f")
+
+    //===================================================================
+    //cc
     val paths: String = "I:\\IDEA_PROJ\\Visualization\\src\\main\\scala\\temp.csv"
     printToFile(new File(paths)) {
       p => {
         cGraphS.triplets.collect.foreach(
           x => {
             print("*")
-            if(x.srcAttr._4._4 == 1 && x.dstAttr._4._4 == 1){
-              p.println(s"${x.srcId} ${x.dstId}")
-            }else if(x.srcAttr._4._4 == 1){
-              p.println(s"${x.srcId} ${x.srcId}")
-            }else if(x.dstAttr._4._4 == 1){
-              p.println(s"${x.dstId} ${x.dstId}")
-            }
+            p.println(s"${x.srcId} ${x.dstId}")
           }
         )
       }
@@ -142,20 +158,18 @@ object NewTest_Ori {
 
 
 
-    val adjMat = Runner.parseAdjMat(paths," ")  //tab需要和temp.csv一致
-    val dd = Runner.findDistance(adjMat)
 
-
-
+    //===================================================================
     sizeOfGraph = cGraphS.vertices.count()
     val sizeEdg = cGraphS.edges.count()
     println(s"> Size of the graph  : $sizeOfGraph  nodes, $sizeEdg edges.")
     println("> DONE!")
 
+    cGraphS.unpersist()
 
     val out = new FileWriter("I:\\IDEA_PROJ\\Visualization\\src\\main\\scala\\11111111111.csv", true)
 
-    out.write(s"SMd,SMt,${(Vcc._2).formatted("%.4f")},${(Vcc._3).formatted("%.4f")},Vav,${dd}")
+    out.write(s"SMd,SMt,${(Vcc._2).formatted("%.4f")},${(Vcc._3).formatted("%.4f")},${Vav}\n")
     out.close()
     sc.stop()
   }

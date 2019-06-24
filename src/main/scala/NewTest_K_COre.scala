@@ -11,9 +11,12 @@ import org.apache.spark.{SparkConf, SparkContext}
 
 object NewTest_K_COre {
 
-  Logger.getLogger("org").setLevel(Level.WARN)
+  Logger.getLogger("org").setLevel(Level.INFO)
+  def main(args: Array[String]): Unit = {
+    mainF(Array("5","Email-Enron.txt"))
+  }
 
-  def main(args: Array[String]) {
+  def mainF(args: Array[String]) {
 
     val REMOTE_JOB: Boolean = false // 是否提交到集群运行
     var dbi: Double = 0d // 度筛选比率
@@ -108,8 +111,12 @@ object NewTest_K_COre {
     // 用户设定，定义输入输出，分隔符，及迭代次数，注意路径  //
     tab = "\t"
 
-    // 本地项目相对路径
-    fname = "Email-Enron.txt"
+    val DDDD = Integer.parseInt(args(0))
+    //val ptab = "60%"
+    // email: 10-11000-0.3  5-22000-0.6  10-11000-0.3
+    fname = args(1)
+
+
     input = "resources\\" + fname
     output = "output\\" + fname
     iterations = 200
@@ -192,7 +199,9 @@ object NewTest_K_COre {
 
     }
 
-    val G = KCore.run(cGraphS, 30, 1)
+
+
+    val G = KCore.run(cGraphS, DDDD, 1)
     // 10 11924   30 3300  100  680
     //达到最大次数（对于无法保证收敛的算法）或无消息传递时结束
     //val CoreYES = G.vertices.map(t => (t._2, t._1))
@@ -205,6 +214,7 @@ object NewTest_K_COre {
     val KC_Dgree_cGraphS = getGbyNode(cGraphS, (KC_arrs++head_nodes).distinct)
 
     //KC_Dgree_cGraphS.triplets.foreach(println(_))
+    println("D筛包含的点数："+head_nodes.length)
     println("K核包含的点数："+KC_arrs.length)
     println("K核+D筛包含的点数："+(KC_arrs++head_nodes).distinct.length)
 
@@ -270,16 +280,16 @@ object NewTest_K_COre {
     //  SMd = SMd + vp * Math.log( vp / vq).toInt
     //}
 
-    var SMd = 0
+    var SMd = 0.0
     var indexs = 0
     for(indexs <- 0 to dfb_qx.length-1){
       val ind = Math.floor(indexs * reflect).toInt
       val vp = dfb_px(ind)._2
       val vq = dfb_qx(indexs)._2
-      println(s"${ind}----${indexs}------${dfb_qx.length}")
+      //println(s"${ind}----${indexs}------${dfb_qx.length}")
       SMd = SMd + (vp - vq)
     }
-    SMd = SMd/dfb_qx.length
+    SMd = (SMd/dfb_qx.length)
 
     //===================================================================
     //SMt
@@ -287,12 +297,18 @@ object NewTest_K_COre {
     var b = 0
     var c = 0
     var d = 0
+/*
+    var
+
     val rddmapS = graphtemp.edges.map(x=>{
       (x.srcId+""+x.dstId, 1)
     }).collect()
     val rddmapG = cGraphS.edges.map(x=>{
       (x.srcId+""+x.dstId, 1)
     }).collect()
+
+    graphtemp.
+
 
     val mapS = rddmapS.toMap
     var it = 0
@@ -305,20 +321,15 @@ object NewTest_K_COre {
         else if(o1 == 1 && o2 == 0){ b = b + 1}
         else if(o1 == 0 && o2 == 1){ c = c + 1}
         else if(o1 == 0 && o2 == 0){ d = d + 1}
-
-
-
-
-
       } catch {
         case ex: Exception => {
-          ex.printStackTrace() // 打印到标准err
           System.err.println("ZZZZZZZZZZZZZZZz")  // 打印到标
+
         }
       }
     }
-
-
+    val phi = (a*d-b*c)/(Math.sqrt((a + b)*(c + d)*(a + c)*(b + d)))
+    printf("==========================================phi: "+phi)        */
 
     //===================================================================
     //vcc
@@ -332,13 +343,15 @@ object NewTest_K_COre {
 
     //===================================================================
     //endprint
-    val out = new FileWriter("I:\\IDEA_PROJ\\Visualization\\src\\main\\scala\\11111111111.csv", true)
-    out.write(s"${SMd},SMt,${(Vcc._2/0.017).formatted("%.3f")},${(Vcc._3/0.4024).formatted("%.3f")},${(Vav/20.0).formatted("%.3f")}\n")
-    out.close()
     sizeOfGraph = cGraphS.vertices.count()
     val sizeEdg = cGraphS.edges.count()
     println(s"> Size of the graph  : $sizeOfGraph  nodes, $sizeEdg edges.")
     println("> DONE!")
+
+    val out = new FileWriter("I:\\IDEA_PROJ\\Visualization\\src\\main\\scala\\11111111111.csv", true)
+    out.write(s"${System.currentTimeMillis()}, $fname, ${((KC_arrs++head_nodes).distinct.length.toDouble/sizeEdg).toInt+"%"}, kc=$DDDD \t\t\t\t\t\t" +
+      s"${SMd.formatted("%.3f")}, SMt, ${(Vcc._2/0.017).formatted("%.3f")}, ${(Vcc._3/0.4024).formatted("%.3f")}, ${(Vav/20.0).formatted("%.3f")}\n")
+    out.close()
     sc.stop()
   }
 

@@ -1,4 +1,4 @@
-import java.io.File
+import java.io.{File, PrintWriter}
 import java.text.SimpleDateFormat
 
 import TEST.Runner
@@ -127,7 +127,7 @@ object NewTest_K_COre {
 
 
 
-    cGraphS.triplets.foreach(println(_))
+    //cGraphS.triplets.foreach(println(_))
 
     //===================================================================
     //获取超级节点
@@ -138,12 +138,12 @@ object NewTest_K_COre {
     val counts = distribution.length
     val theta = (counts * 0.5).toInt
     val head_d = distribution.take(theta) //取前百分20
-    println(head_d.length)
+    println("补充的分类个数："+head_d.length)
 
     val d_max = head_d.take(1)(0)._1 //最大出入度
     val head_nodes = head_d.reduce((a, b) => (1, a._2 + "," + b._2))._2.split(",")
-    println("> Get V_sup " + head_nodes.getClass.getTypeName)
-    head_nodes.foreach(println)
+    //println("> Get V_sup " + head_nodes.getClass.getTypeName)
+    println("这些分类的总体个数："+head_nodes.length)
     //打印抽取的节点
     //===================================================================
     //Core分层
@@ -184,18 +184,14 @@ object NewTest_K_COre {
 
     }
 
-
-
-
-
-
-    val G = KCore.run(cGraphS, 30, 1)
+    val G = KCore.run(cGraphS, 1, 1)
     //达到最大次数（对于无法保证收敛的算法）或无消息传递时结束
     //val CoreYES = G.vertices.map(t => (t._2, t._1))
     val KC_RDD = G.vertices.filter(x => {x._2==true}).map(x => x._1)//.foreach(println)
 
-    println(s"> DONE!  ${KC_RDD.getClass.getTypeName}")
+    println(s">度分布添加- DONE!")
 
+    G.triplets.foreach(println)
     //head_nodes.map()
 
 
@@ -232,13 +228,17 @@ object NewTest_K_COre {
         p.close()
     }
     val graphtemp = GraphLoader.edgeListFile(sc, paths, numEdgePartitions = 8)
-    val cc = countCC(graphtemp)
-    println("实验 | global-cc is " + cc._2)
-    println("实验 | average-cc is " + cc._3)
+    val Vcc = countCC(graphtemp)
+    val Vtr = graphtemp.triangleCount()
+
+
+
+
+
+    //println("实验 | average-cc is " + Vcc._3)
 
     val adjMat = Runner.parseAdjMat(paths," ")  //tab需要和temp.csv一致
     val dd = Runner.findDistance(adjMat)
-    println("实验 | graph-diameter is " + dd)
 
 
 
@@ -247,8 +247,11 @@ object NewTest_K_COre {
     println(s"> Size of the graph  : $sizeOfGraph  nodes, $sizeEdg edges.")
     println("> DONE!")
 
-    sc.stop()
 
+    val out = new PrintWriter("I:\\IDEA_PROJ\\Visualization\\src\\main\\scala\\11111111111.csv")
+    out.println(s"SMd,SMt,${(Vcc._3).formatted("%.4f")},Vtr,Vav,${dd}")
+    out.close()
+    sc.stop()
   }
 
 }

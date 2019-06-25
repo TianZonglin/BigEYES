@@ -2,7 +2,6 @@ import java.text.SimpleDateFormat
 
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.graphx._
-import org.apache.spark.ml.linalg.Matrices
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
 
@@ -115,8 +114,12 @@ object eeeee {
     val graphS = loadEdges(input)
     val cGraphS = convert(graphS).persist()
 
-    val mx = Matrices.dense(99999, 99999, Array(1, 2, 3, 4, 5, 6))
-
+    for(i<-0 to 50000){
+      for(j<-0 to 50000){
+        println(i+"_"+j)
+      }
+    }
+    print("Done")
 
 
     cGraphS.unpersist()

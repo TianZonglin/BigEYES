@@ -27,16 +27,11 @@ object NewTest_K_COre {
     //mainF(Array("11","Email-Enron.txt","\t"))
 
 
-    mainF(Array("11","Gowalla_edges.txt","\t"))
-    mainF(Array("10","Gowalla_edges.txt","\t"))
-    mainF(Array("9", "Gowalla_edges.txt","\t"))
-    mainF(Array("8", "Gowalla_edges.txt","\t"))
-    mainF(Array("7", "Gowalla_edges.txt","\t"))
-    mainF(Array("6", "Gowalla_edges.txt","\t"))
-    mainF(Array("5", "Gowalla_edges.txt","\t"))
-    mainF(Array("4", "Gowalla_edges.txt","\t"))
-    mainF(Array("3", "Gowalla_edges.txt","\t"))
-    mainF(Array("2", "Gowalla_edges.txt","\t"))
+
+    mainF(Array("33","wiki-Vote.txt","\t"))
+    mainF(Array("34", "wiki-Vote.txt","\t"))
+    mainF(Array("35", "wiki-Vote.txt","\t"))
+
 
 
 
@@ -393,7 +388,7 @@ object NewTest_K_COre {
     println("> DONE!")
 
     val out = new FileWriter("I:\\IDEA_PROJ\\Visualization\\src\\main\\scala\\11111111111.csv", true)
-    out.write(s"${System.currentTimeMillis()}, $fname, ${((KC_arrs++head_nodes).distinct.length.toDouble/sizeOfGraph*100).toInt+"%"}, kc=$DDDD \t\t\t\t\t\t" +
+    out.write(s"${System.currentTimeMillis()}, $fname, ${((KC_arrs++head_nodes).distinct.length.toDouble/sizeOfGraph*100).toInt+"%"}, kc=$DDDD ,,,," +
       s"${SMd.formatted("%.3f")}, SMt, ${(Vcc._2/0.017).formatted("%.3f")}, ${(Vcc._3/0.4024).formatted("%.3f")}, ${(Vav/20.0).formatted("%.3f")}\n")
     out.close()
     sc.stop()

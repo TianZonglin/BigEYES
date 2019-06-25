@@ -7,32 +7,11 @@ import org.apache.spark.graphx._
 
 /** KCore algorithm. */
 object KCore {
-  /**
-    * Compute the KCore membership of each vertex and return a graph with the vertex
-    * value containing a boolean that is true if this vertex belongs to the KCore of
-    * the original graph.
-    *
-    * General idea:
-    * 1. each node starts with his initial degree
-    * 2. if his current degree is less than K than:
-    *   2a. he changes its degree to 0
-    *   2b. he sends a message to his neighbours to reduce 1 from their degree
-    *   2c. he sends a message to himself to be marked as "removed" - degree = -1
-    *
-    *
-    * @tparam VD the vertex attribute type (discarded in the computation)
-    * @tparam ED the edge attribute type (preserved in the computation)
-    * @param graph the graph for which to compute the KCore
-    * @param k the k of the KCore algorithm
-    * @param maxIterations the maximum number of iterations to run for
-    * @return a graph with vertex attributes containing a boolean that
-    *         represents if this vertex belongs to the KCore
-    */
+
   def run[VD: ClassTag, ED: ClassTag](graph: Graph[VD, ED],
                                       k: Int,
                                       maxIterations: Int = Int.MaxValue): Graph[Boolean, ED] = {
-    require(maxIterations > 0, s"Maximum of iterations must be greater than 0," +
-      s" but got ${maxIterations}")
+    require(maxIterations > 0, s"> 0," )
 
     val kGraph = Graph[Int, ED](graph.degrees, graph.edges)
     def vprog(vid: VertexId, vd: Int, i: Int) = {

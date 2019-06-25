@@ -1,6 +1,6 @@
 import org.apache.spark.graphx._
 
-object RW {
+object RN_RE_RW {
   def sampling(graph: Graph[Int, Int], method: String, ratio: Float): Graph[Int, Int] = {
     method match {
       case "random" =>
@@ -130,69 +130,6 @@ object RW {
 
         graph.subgraph(vpred = vertexPred)
 
-      case "MHRW" =>
-        // weighted random sampling
-        val rand = scala.util.Random
-        val degreeInfo = graph.degrees
-
-        //is it possible to remain order of ele? in array? or to sort VertexId?
-        def MHRWSampling(id: VertexId, array: Array[VertexId]): VertexId = { //Option[VertexId]
-          val dx = array.length
-          if (dx == 0) {
-            id
-          }
-          else {
-            //val dx = array.length //degree of this vertex
-            //val dyDic = degreeInfo.filter{case (id, deg) => array.contains(id)}
-
-            val tProb = array.map {
-              //transition probability //Array[(Long, Double)]
-              case id =>
-                //val dy = dyDic.filter{case (id2,deg) => id2==id}.map{case (id2,deg) => deg}.collect()(0)
-                val dy = degreeInfo.filter { case (id2, deg) => id2 == id }.map { case (id2, deg) => deg }.collect()(0)
-                if (dy == 0) {
-                  (id, 1.0 / dx)
-                }
-                else {
-                  (id, Math.min(1.0 / dx, 1.0 / dy))
-                }
-            }.sortWith(_._1 < _._1)
-            val cumSum = tProb.scanLeft(0.0)(_ + _._2).tail
-            val thres = rand.nextFloat()
-            val sampleIndex = cumSum.filter(_ < thres).length
-            if (tProb.length <= sampleIndex) {
-              id
-            }
-            else {
-              val sampleId = tProb(sampleIndex)._1
-              sampleId
-            }
-          }
-        }
-
-        val neighbors = graph.collectNeighborIds(EdgeDirection.Either)
-        val initial = neighbors.sample(false, ratio / 10)
-        var sampledId = initial.map { case (id, array) => id }.collect()
-        //val initial = neighbors.sample(false,ratio/10).collect()
-        //val sampledId = initial.map{case(id,array) => id}
-        //here(in next), if I do not use collect after initial, error..
-        var next = initial.collect().map { case (id, array) => MHRWSampling(id, array) }
-        //var next = initial.map{case(id,array) => MHRWSampling(id,array)}
-
-        sampledId = sampledId ++ next
-        var nextNB = neighbors.filter { case (id, array) => if (next.contains(id)) true else false }
-
-        //for (a <- 3 to 10){
-        next = nextNB.collect().map { case (id, array) => MHRWSampling(id, array) }
-        sampledId = sampledId ++ next
-        //	nextNB = neighbors.filter{case (id,array) => if (next.contains(id)) true else false}
-        //}
-
-        def vertexPred(id: VertexId, attr: Int): Boolean = {
-          sampledId.contains(Option(id))
-        }
-
-        graph.subgraph(vpred = vertexPred)
       case _ =>
         throw new IllegalArgumentException("Invalid Sampling Method")
     }

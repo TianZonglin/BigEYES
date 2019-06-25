@@ -106,10 +106,10 @@ object NewTest_Ori {
     def date: String
     = new SimpleDateFormat("MM-dd_HH-mm_").format(System.currentTimeMillis())
     // 用户设定，定义输入输出，分隔符，及迭代次数，注意路径  //
-    tab = "\t"
+    tab = " "
 
     // 本地项目相对路径
-    fname = "Gowalla_edges.txt"
+    fname = "facebook_combined.txt"
     input = "resources\\" + fname
     output = "output\\" + fname
 

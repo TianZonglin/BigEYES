@@ -382,7 +382,7 @@ object NewTest_SS {
     println("> DONE!")
 
     val out = new FileWriter("I:\\IDEA_PROJ\\Visualization\\src\\main\\scala\\11111111111.csv", true)
-    out.write(s"${System.currentTimeMillis()}, $fname, ${((SS_arrs).distinct.length.toDouble/sizeOfGraph*100).toInt+"%"}, kc=$DDDD ,,,," +
+    out.write(s"SS, ${System.currentTimeMillis()}, $fname, ${((SS_arrs).distinct.length.toDouble/sizeOfGraph*100).toInt+"%"}, kc=$DDDD ,,,," +
       s"${SMd.formatted("%.3f")}, SMt, ${(Vcc._2/o(0)).formatted("%.3f")}, ${(Vcc._3/o(1)).formatted("%.3f")}, ${(Vav/o(2)).formatted("%.3f")}\n")
     out.close()
     sc.stop()

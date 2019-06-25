@@ -1,6 +1,7 @@
 import java.io.{File, FileWriter, PrintWriter}
 import java.text.SimpleDateFormat
 
+import NewTest_RN_RE_RW.mainF
 import TEST.Runner
 import TEST.Value_CC.countCC
 import org.apache.log4j.{Level, Logger}
@@ -18,37 +19,77 @@ object NewTest_K_COre {
     val tupleB = Array(0.0192,0.1489,29.1)//,wiki-Vote.txt
     val tupleC = Array(0.0049,0.3579,19.3)//,Gowalla_edges.txt
 
+    val tupleD = Array(0.0281,0.0887,43.7)//,ego-facebook.txt
 
 
-    mainF(tupleA, Array("15","Email-Enron.txt","\t"))
-    mainF(tupleA, Array("14","Email-Enron.txt","\t"))
-    mainF(tupleA, Array("13","Email-Enron.txt","\t"))
-    mainF(tupleA, Array("9", "Email-Enron.txt","\t"))
-    mainF(tupleA, Array("8", "Email-Enron.txt","\t"))
-    mainF(tupleA, Array("7", "Email-Enron.txt","\t"))
-    mainF(tupleA, Array("6", "Email-Enron.txt","\t"))
-    mainF(tupleA, Array("5", "Email-Enron.txt","\t"))
-    mainF(tupleA, Array("4", "Email-Enron.txt","\t"))
 
-    mainF(tupleB, Array("36","wiki-Vote.txt","\t"))
-    mainF(tupleB, Array("35","wiki-Vote.txt","\t"))
-    mainF(tupleB, Array("34","wiki-Vote.txt","\t"))
-    mainF(tupleB, Array("11","wiki-Vote.txt","\t"))
-    mainF(tupleB, Array("10","wiki-Vote.txt","\t"))
-    mainF(tupleB, Array("9","wiki-Vote.txt","\t"))
-    mainF(tupleB, Array("4", "wiki-Vote.txt","\t"))
-    mainF(tupleB, Array("3", "wiki-Vote.txt","\t"))
-    mainF(tupleB, Array("2", "wiki-Vote.txt","\t"))
+    NewTest_RN_RE_RW.mainF(tupleC, Array("0.6","Email-Enron.txt","\t","snowball"))
+    NewTest_RN_RE_RW.mainF(tupleC, Array("0.4","Email-Enron.txt","\t","snowball"))
+    NewTest_RN_RE_RW.mainF(tupleC, Array("0.2","Email-Enron.txt","\t","snowball"))
+    NewTest_RN_RE_RW.mainF(tupleA, Array("0.6", "Gowalla_edges.txt","\t","snowball"))
+    NewTest_RN_RE_RW.mainF(tupleA, Array("0.4", "Gowalla_edges.txt","\t","snowball"))
+    NewTest_RN_RE_RW.mainF(tupleA, Array("0.2", "Gowalla_edges.txt","\t","snowball"))
 
-    mainF(tupleC, Array("16","Gowalla_edges.txt","\t"))
-    mainF(tupleC, Array("15","Gowalla_edges.txt","\t"))
-    mainF(tupleC, Array("14","Gowalla_edges.txt","\t"))
-    mainF(tupleC, Array("9", "Gowalla_edges.txt","\t"))
-    mainF(tupleC, Array("8", "Gowalla_edges.txt","\t"))
-    mainF(tupleC, Array("7", "Gowalla_edges.txt","\t"))
-    mainF(tupleC, Array("6", "Gowalla_edges.txt","\t"))
-    mainF(tupleC, Array("5", "Gowalla_edges.txt","\t"))
-    mainF(tupleC, Array("4", "Gowalla_edges.txt","\t"))
+
+
+    NewTest_SS.mainF(tupleD, Array("18","facebook_combined.txt"," "))
+    NewTest_SS.mainF(tupleD, Array("17","facebook_combined.txt"," "))
+    NewTest_SS.mainF(tupleD, Array("16","facebook_combined.txt"," "))
+    NewTest_SS.mainF(tupleD, Array("33","facebook_combined.txt"," "))
+    NewTest_SS.mainF(tupleD, Array("32","facebook_combined.txt"," "))
+    NewTest_SS.mainF(tupleD, Array("31","facebook_combined.txt"," "))
+    NewTest_SS.mainF(tupleD, Array("65","facebook_combined.txt"," "))
+    NewTest_SS.mainF(tupleD, Array("64","facebook_combined.txt"," "))
+    NewTest_SS.mainF(tupleD, Array("63","facebook_combined.txt"," "))
+
+
+    mainF(tupleD, Array("51","facebook_combined.txt"," "))// 50
+    mainF(tupleD, Array("50","facebook_combined.txt"," "))
+    mainF(tupleD, Array("49","facebook_combined.txt"," "))
+
+    mainF(tupleD, Array("25","facebook_combined.txt"," "))// 50
+    mainF(tupleD, Array("26","facebook_combined.txt"," "))
+    mainF(tupleD, Array("27","facebook_combined.txt"," "))
+
+    mainF(tupleD, Array("17","facebook_combined.txt"," "))
+    mainF(tupleD, Array("16","facebook_combined.txt"," "))
+    mainF(tupleD, Array("15","facebook_combined.txt"," "))
+
+
+
+
+
+
+    //NewTest_RN_RE_RW.mainF(tupleD, Array("0.6","facebook_combined.txt"," ","random"))
+    //NewTest_RN_RE_RW.mainF(tupleD, Array("0.4","facebook_combined.txt"," ","random"))
+    //NewTest_RN_RE_RW.mainF(tupleD, Array("0.2","facebook_combined.txt"," ","random"))
+    //NewTest_RN_RE_RW.mainF(tupleD, Array("0.6","facebook_combined.txt"," ","randomEdge"))
+    //NewTest_RN_RE_RW.mainF(tupleD, Array("0.4","facebook_combined.txt"," ","randomEdge"))
+    //NewTest_RN_RE_RW.mainF(tupleD, Array("0.2","facebook_combined.txt"," ","randomEdge"))
+    //NewTest_RN_RE_RW.mainF(tupleD, Array("0.6","facebook_combined.txt"," ","snowball"))
+    //NewTest_RN_RE_RW.mainF(tupleD, Array("0.4","facebook_combined.txt"," ","snowball"))
+    //NewTest_RN_RE_RW.mainF(tupleD, Array("0.2","facebook_combined.txt"," ","snowball"))
+
+
+    //mainF(tupleB, Array("36","wiki-Vote.txt","\t"))
+    //mainF(tupleB, Array("35","wiki-Vote.txt","\t"))
+    //mainF(tupleB, Array("34","wiki-Vote.txt","\t"))
+    //mainF(tupleB, Array("11","wiki-Vote.txt","\t"))
+    //mainF(tupleB, Array("10","wiki-Vote.txt","\t"))
+    //mainF(tupleB, Array("9","wiki-Vote.txt","\t"))
+    //mainF(tupleB, Array("4", "wiki-Vote.txt","\t"))
+    //mainF(tupleB, Array("3", "wiki-Vote.txt","\t"))
+    //mainF(tupleB, Array("2", "wiki-Vote.txt","\t"))
+//
+    //mainF(tupleC, Array("16","Gowalla_edges.txt","\t"))
+    //mainF(tupleC, Array("15","Gowalla_edges.txt","\t"))
+    //mainF(tupleC, Array("14","Gowalla_edges.txt","\t"))
+    //mainF(tupleC, Array("9", "Gowalla_edges.txt","\t"))
+    //mainF(tupleC, Array("8", "Gowalla_edges.txt","\t"))
+    //mainF(tupleC, Array("7", "Gowalla_edges.txt","\t"))
+    //mainF(tupleC, Array("6", "Gowalla_edges.txt","\t"))
+    //mainF(tupleC, Array("5", "Gowalla_edges.txt","\t"))
+    //mainF(tupleC, Array("4", "Gowalla_edges.txt","\t"))
 
 
     //mainF(Array("6","soc-Epinions1.txt","\t"))
@@ -271,7 +312,7 @@ object NewTest_K_COre {
     println("K核包含的点数："+KC_arrs.length)
     println("K核+D筛包含的点数："+(KC_arrs++head_nodes).distinct.length)
 
-    
+
 
 /**
   * 0 10 20 30 40 50
@@ -404,7 +445,7 @@ object NewTest_K_COre {
     println("> DONE!")
 
     val out = new FileWriter("I:\\IDEA_PROJ\\Visualization\\src\\main\\scala\\11111111111.csv", true)
-    out.write(s"${System.currentTimeMillis()}, $fname, ${((KC_arrs++head_nodes).distinct.length.toDouble/sizeOfGraph*100).toInt+"%"}, kc=$DDDD ,,,," +
+    out.write(s"KSS, ${System.currentTimeMillis()}, $fname, ${((KC_arrs++head_nodes).distinct.length.toDouble/sizeOfGraph*100).toInt+"%"}, kc=$DDDD ,,,," +
       s"${SMd.formatted("%.3f")}, SMt, ${(Vcc._2/o(0)).formatted("%.3f")}, ${(Vcc._3/o(1)).formatted("%.3f")}, ${(Vav/o(2)).formatted("%.3f")}\n")
     out.close()
     sc.stop()

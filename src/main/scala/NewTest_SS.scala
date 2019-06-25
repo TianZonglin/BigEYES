@@ -51,28 +51,21 @@ object NewTest_SS {
     //mainF(tupleA, Array("2", "Email-Enron.txt","\t"))
 
 
-    mainF(tupleA, Array("10", "Gowalla_edges.txt","\t"))
-    mainF(tupleA, Array("9", "Gowalla_edges.txt","\t"))
-    mainF(tupleA, Array("8", "Gowalla_edges.txt","\t"))
-    mainF(tupleA, Array("7", "Gowalla_edges.txt","\t"))
-    mainF(tupleA, Array("6", "Gowalla_edges.txt","\t"))
-    mainF(tupleA, Array("5", "Gowalla_edges.txt","\t"))
-    mainF(tupleA, Array("4", "Gowalla_edges.txt","\t"))
-    mainF(tupleA, Array("3", "Gowalla_edges.txt","\t"))
-    mainF(tupleA, Array("2", "Gowalla_edges.txt","\t"))
+    //mainF(tupleA, Array("10", "Gowalla_edges.txt","\t"))
+    //mainF(tupleA, Array("9", "Gowalla_edges.txt","\t"))
+    //mainF(tupleA, Array("8", "Gowalla_edges.txt","\t"))
+    //mainF(tupleA, Array("7", "Gowalla_edges.txt","\t"))
+    //mainF(tupleA, Array("6", "Gowalla_edges.txt","\t"))
+    //mainF(tupleA, Array("5", "Gowalla_edges.txt","\t"))
+    //mainF(tupleA, Array("4", "Gowalla_edges.txt","\t"))
+    //mainF(tupleA, Array("3", "Gowalla_edges.txt","\t"))
+    //mainF(tupleA, Array("2", "Gowalla_edges.txt","\t"))
 
-    mainF(tupleB, Array("30", "wiki-Vote.txt","\t"))
-    mainF(tupleB, Array("28", "wiki-Vote.txt","\t"))
-    mainF(tupleB, Array("25", "wiki-Vote.txt","\t"))
-    mainF(tupleB, Array("21", "wiki-Vote.txt","\t"))
-    mainF(tupleB, Array("15", "wiki-Vote.txt","\t"))
-    mainF(tupleB, Array("14", "wiki-Vote.txt","\t"))
-    mainF(tupleB, Array("13", "wiki-Vote.txt","\t"))
-    mainF(tupleB, Array("7", "wiki-Vote.txt","\t"))
-    mainF(tupleB, Array("6", "wiki-Vote.txt","\t"))
-    mainF(tupleB, Array("5", "wiki-Vote.txt","\t"))
-    mainF(tupleB, Array("4", "wiki-Vote.txt","\t"))
-    mainF(tupleB, Array("3", "wiki-Vote.txt","\t"))
+    mainF(tupleB, Array("36", "wiki-Vote.txt","\t"))
+    mainF(tupleB, Array("35", "wiki-Vote.txt","\t"))
+    mainF(tupleB, Array("34", "wiki-Vote.txt","\t"))
+    mainF(tupleB, Array("2", "wiki-Vote.txt","\t"))
+
 
   }
 

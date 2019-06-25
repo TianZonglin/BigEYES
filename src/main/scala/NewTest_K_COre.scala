@@ -271,6 +271,8 @@ object NewTest_K_COre {
     println("K核包含的点数："+KC_arrs.length)
     println("K核+D筛包含的点数："+(KC_arrs++head_nodes).distinct.length)
 
+    
+
 /**
   * 0 10 20 30 40 50
     30	158

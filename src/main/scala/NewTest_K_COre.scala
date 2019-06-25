@@ -23,12 +23,10 @@ object NewTest_K_COre {
 
 
 
-    NewTest_RN_RE_RW.mainF(tupleC, Array("0.6","Email-Enron.txt","\t","snowball"))
-    NewTest_RN_RE_RW.mainF(tupleC, Array("0.4","Email-Enron.txt","\t","snowball"))
-    NewTest_RN_RE_RW.mainF(tupleC, Array("0.2","Email-Enron.txt","\t","snowball"))
-    NewTest_RN_RE_RW.mainF(tupleA, Array("0.6", "Gowalla_edges.txt","\t","snowball"))
-    NewTest_RN_RE_RW.mainF(tupleA, Array("0.4", "Gowalla_edges.txt","\t","snowball"))
-    NewTest_RN_RE_RW.mainF(tupleA, Array("0.2", "Gowalla_edges.txt","\t","snowball"))
+   //NewTest_RN_RE_RW.mainF(tupleC, Array("0.6","Email-Enron.txt","\t","snowball"))
+   //NewTest_RN_RE_RW.mainF(tupleC, Array("0.4","Email-Enron.txt","\t","snowball"))
+   //NewTest_RN_RE_RW.mainF(tupleC, Array("0.2","Email-Enron.txt","\t","snowball"))
+
 
 
 
@@ -55,7 +53,9 @@ object NewTest_K_COre {
     mainF(tupleD, Array("16","facebook_combined.txt"," "))
     mainF(tupleD, Array("15","facebook_combined.txt"," "))
 
-
+    NewTest_RN_RE_RW.mainF(tupleA, Array("0.6", "Gowalla_edges.txt","\t","snowball"))
+    NewTest_RN_RE_RW.mainF(tupleA, Array("0.4", "Gowalla_edges.txt","\t","snowball"))
+    NewTest_RN_RE_RW.mainF(tupleA, Array("0.2", "Gowalla_edges.txt","\t","snowball"))
 
 
 

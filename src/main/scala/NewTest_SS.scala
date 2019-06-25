@@ -14,49 +14,69 @@ object NewTest_SS {
   Logger.getLogger("org").setLevel(Level.ERROR)
   def main(args: Array[String]): Unit = {
 
-    //mainF(Array("9","Email-Enron.txt","\t"))
-    //mainF(Array("8","Email-Enron.txt","\t"))
-    //mainF(Array("7","Email-Enron.txt","\t"))
-    //mainF(Array("14","wiki-Vote.txt","\t"))
-    //mainF(Array("13","wiki-Vote.txt","\t"))
-    //mainF(Array("12","wiki-Vote.txt","\t"))
-    //mainF(Array("11","wiki-Vote.txt","\t"))
-    //mainF(Array("14","Email-Enron.txt","\t"))
-    //mainF(Array("13","Email-Enron.txt","\t"))
-    //mainF(Array("12","Email-Enron.txt","\t"))
-    //mainF(Array("11","Email-Enron.txt","\t"))
+    val tupleA = Array(0.0107,0.4024,20.0)//,Email-Enron.txt
+   val tupleB = Array(0.0192,0.1489,29.1)//,wiki-Vote.txt
+   val tupleC = Array(0.0049,0.3579,19.3)//,Gowalla_edges.txt
 
 
+   //mainF(tupleA, Array("16","Gowalla_edges.txt","\t"))
+   //mainF(tupleA, Array("15","Gowalla_edges.txt","\t"))
+   //mainF(tupleA, Array("14","Gowalla_edges.txt","\t"))
+   //mainF(tupleA, Array("9", "Gowalla_edges.txt","\t"))
+   //mainF(tupleA, Array("8", "Gowalla_edges.txt","\t"))
+   //mainF(tupleA, Array("7", "Gowalla_edges.txt","\t"))
+   //mainF(tupleA, Array("6", "Gowalla_edges.txt","\t"))
+   //mainF(tupleA, Array("5", "Gowalla_edges.txt","\t"))
+   //mainF(tupleA, Array("4", "Gowalla_edges.txt","\t"))
 
-    mainF(Array("33","wiki-Vote.txt","\t"))
-    mainF(Array("34", "wiki-Vote.txt","\t"))
-    mainF(Array("35", "wiki-Vote.txt","\t"))
+   //mainF(tupleB, Array("36","wiki-Vote.txt","\t"))
+   //mainF(tupleB, Array("35","wiki-Vote.txt","\t"))
+   //mainF(tupleB, Array("34","wiki-Vote.txt","\t"))
+   //mainF(tupleB, Array("11","wiki-Vote.txt","\t"))
+   //mainF(tupleB, Array("10","wiki-Vote.txt","\t"))
+   //mainF(tupleB, Array("9","wiki-Vote.txt","\t"))
+   //mainF(tupleB, Array("4", "wiki-Vote.txt","\t"))
+   //mainF(tupleB, Array("3", "wiki-Vote.txt","\t"))
+   //mainF(tupleB, Array("2", "wiki-Vote.txt","\t"))
+
+   //mainF(tupleC, Array("15","Email-Enron.txt","\t"))
+   //mainF(tupleC, Array("14","Email-Enron.txt","\t"))
+   //mainF(tupleC, Array("13","Email-Enron.txt","\t"))
+   //mainF(tupleC, Array("9", "Email-Enron.txt","\t"))
+   //mainF(tupleC, Array("8", "Email-Enron.txt","\t"))
+   //mainF(tupleC, Array("7", "Email-Enron.txt","\t"))
+   //mainF(tupleC, Array("6", "Email-Enron.txt","\t"))
+   //mainF(tupleC, Array("5", "Email-Enron.txt","\t"))
+
+    //mainF(tupleA, Array("2", "Email-Enron.txt","\t"))
 
 
+    mainF(tupleA, Array("10", "Gowalla_edges.txt","\t"))
+    mainF(tupleA, Array("9", "Gowalla_edges.txt","\t"))
+    mainF(tupleA, Array("8", "Gowalla_edges.txt","\t"))
+    mainF(tupleA, Array("7", "Gowalla_edges.txt","\t"))
+    mainF(tupleA, Array("6", "Gowalla_edges.txt","\t"))
+    mainF(tupleA, Array("5", "Gowalla_edges.txt","\t"))
+    mainF(tupleA, Array("4", "Gowalla_edges.txt","\t"))
+    mainF(tupleA, Array("3", "Gowalla_edges.txt","\t"))
+    mainF(tupleA, Array("2", "Gowalla_edges.txt","\t"))
 
-
-
-
-    //mainF(Array("6","soc-Epinions1.txt","\t"))
-    //mainF(Array("5","soc-Epinions1.txt","\t"))
-    //mainF(Array("4","soc-Epinions1.txt","\t"))
-    //mainF(Array("3","soc-Epinions1.txt","\t"))
-    //mainF(Array("2","soc-Epinions1.txt","\t"))
-    //mainF(Array("10","wiki-Vote.txt","\t"))
-    //mainF(Array("5","wiki-Vote.txt","\t"))
-    //mainF(Array("4","wiki-Vote.txt","\t"))
-    //mainF(Array("3","wiki-Vote.txt","\t"))
-    //mainF(Array("2","wiki-Vote.txt","\t"))
-    //mainF(Array("10","Email-Enron.txt","\t"))
-    //mainF(Array("5","Email-Enron.txt","\t"))
-    //mainF(Array("4","Email-Enron.txt","\t"))
-    //mainF(Array("3","Email-Enron.txt","\t"))
-    //mainF(Array("2","Email-Enron.txt","\t"))
+    mainF(tupleB, Array("30", "wiki-Vote.txt","\t"))
+    mainF(tupleB, Array("28", "wiki-Vote.txt","\t"))
+    mainF(tupleB, Array("25", "wiki-Vote.txt","\t"))
+    mainF(tupleB, Array("21", "wiki-Vote.txt","\t"))
+    mainF(tupleB, Array("15", "wiki-Vote.txt","\t"))
+    mainF(tupleB, Array("14", "wiki-Vote.txt","\t"))
+    mainF(tupleB, Array("13", "wiki-Vote.txt","\t"))
+    mainF(tupleB, Array("7", "wiki-Vote.txt","\t"))
+    mainF(tupleB, Array("6", "wiki-Vote.txt","\t"))
+    mainF(tupleB, Array("5", "wiki-Vote.txt","\t"))
+    mainF(tupleB, Array("4", "wiki-Vote.txt","\t"))
+    mainF(tupleB, Array("3", "wiki-Vote.txt","\t"))
 
   }
 
-  def mainF(args: Array[String]) {
-
+  def mainF(o: Array[Double], args: Array[String]) {
     val REMOTE_JOB: Boolean = false // 是否提交到集群运行
     var dbi: Double = 0d // 度筛选比率
     var sbi: Double = 0d // 图节点采样比率
@@ -197,28 +217,7 @@ object NewTest_SS {
     val dfb_px = distribution2.map(t => (t._1, t._2.split(",").length))
     //dfb.foreach(println)
 
-    //===================================================================
-    //Core分层
-    val diameter = 7
-    val level = (diameter / 2).toInt
-    val span = (d_max / level).toInt
-    println(s"counts:${head_nodes.length},theta:$theta,d_max:$d_max,diameter:$diameter,level:$level,span:$span")
-    var index = d_max
-    while (index > 0) {
-      index = index - span
-      //println(index) //各层的指定Core的K值
-      //TO DO
-      //如何计算SHELL
-    }
-    ////var i = 0
-    ////while (i < 100){
-    ////  val testNUM = i
-    ////  val G = KCore.run(cGraphS, testNUM, 1)
-    ////  //达到最大次数（对于无法保证收敛的算法）或无消息传递时结束
-    ////  val CoreYES = G.vertices.map(t => (t._2, t._1)).groupByKey.map(t => (t._1, t._2.size)).sortBy(_._1, false).take(1)(0)._2
-    ////  println(s"$testNUM\t$CoreYES")
-    ////  i += 5
-    ////}
+
 
 
     def getGbyNode(g: Graph[(String, Double, Double, (Double, Double, Double, Int)), Double], layer: Array[String])
@@ -246,18 +245,18 @@ object NewTest_SS {
     // 10 11924   30 3300  100  680
     //达到最大次数（对于无法保证收敛的算法）或无消息传递时结束
     //val CoreYES = G.vertices.map(t => (t._2, t._1))
-    val SS_RDD_cGraphS = G.vertices.filter(x => {x._2 > 10}).map(x => x._1)//.foreach(println)
+    val SS_RDD_cGraphS = G.vertices.filter(x => {x._2 > DDDD}).map(x => x._1)//.foreach(println)
 
 
 
     //KC_RDD.foreach(println)
-    val KC_arrs  = SS_RDD_cGraphS.map(x=>x.toString).collect()
-    val KC_Dgree_cGraphS = getGbyNode(cGraphS, (KC_arrs++head_nodes).distinct)
+    val SS_arrs  = SS_RDD_cGraphS.map(x=>x.toString).collect()
+    val SS_Dgree_cGraphS = getGbyNode(cGraphS, (SS_arrs).distinct)
 
     //KC_Dgree_cGraphS.triplets.foreach(println(_))
-    println("D筛包含的点数："+head_nodes.length)
-    println("K核包含的点数："+KC_arrs.length)
-    println("K核+D筛包含的点数："+(KC_arrs++head_nodes).distinct.length)
+    //println("D筛包含的点数："+head_nodes.length)
+    println("SS包含的点数："+SS_arrs.length)
+    //println("K核+D筛包含的点数："+(KC_arrs++head_nodes).distinct.length)
 
 /**
   * 0 10 20 30 40 50
@@ -280,7 +279,7 @@ object NewTest_SS {
     val paths: String = "I:\\IDEA_PROJ\\Visualization\\src\\main\\scala\\temp.csv"
     printToFile(new File(paths)) {
       p => {
-        KC_Dgree_cGraphS.triplets.collect.foreach(
+        SS_Dgree_cGraphS.triplets.collect.foreach(
           x => {
             print("*")
             if(x.srcAttr._4._4 == 1 && x.dstAttr._4._4 == 1){
@@ -390,12 +389,14 @@ object NewTest_SS {
     println("> DONE!")
 
     val out = new FileWriter("I:\\IDEA_PROJ\\Visualization\\src\\main\\scala\\11111111111.csv", true)
-    out.write(s"${System.currentTimeMillis()}, $fname, ${((KC_arrs++head_nodes).distinct.length.toDouble/sizeOfGraph*100).toInt+"%"}, kc=$DDDD ,,,," +
-      s"${SMd.formatted("%.3f")}, SMt, ${(Vcc._2/0.017).formatted("%.3f")}, ${(Vcc._3/0.4024).formatted("%.3f")}, ${(Vav/20.0).formatted("%.3f")}\n")
+    out.write(s"${System.currentTimeMillis()}, $fname, ${((SS_arrs).distinct.length.toDouble/sizeOfGraph*100).toInt+"%"}, kc=$DDDD ,,,," +
+      s"${SMd.formatted("%.3f")}, SMt, ${(Vcc._2/o(0)).formatted("%.3f")}, ${(Vcc._3/o(1)).formatted("%.3f")}, ${(Vav/o(2)).formatted("%.3f")}\n")
     out.close()
     sc.stop()
   }
 
 }
+
+
 
 

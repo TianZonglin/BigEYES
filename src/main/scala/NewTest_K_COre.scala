@@ -14,27 +14,41 @@ object NewTest_K_COre {
   Logger.getLogger("org").setLevel(Level.ERROR)
   def main(args: Array[String]): Unit = {
 
-    //mainF(Array("9","Email-Enron.txt","\t"))
-    //mainF(Array("8","Email-Enron.txt","\t"))
-    //mainF(Array("7","Email-Enron.txt","\t"))
-    //mainF(Array("14","wiki-Vote.txt","\t"))
-    //mainF(Array("13","wiki-Vote.txt","\t"))
-    //mainF(Array("12","wiki-Vote.txt","\t"))
-    //mainF(Array("11","wiki-Vote.txt","\t"))
-    //mainF(Array("14","Email-Enron.txt","\t"))
-    //mainF(Array("13","Email-Enron.txt","\t"))
-    //mainF(Array("12","Email-Enron.txt","\t"))
-    //mainF(Array("11","Email-Enron.txt","\t"))
+    val tupleA = Array(0.0107,0.4024,20.0)//,Email-Enron.txt
+    val tupleB = Array(0.0192,0.1489,29.1)//,wiki-Vote.txt
+    val tupleC = Array(0.0049,0.3579,19.3)//,Gowalla_edges.txt
 
 
 
-    mainF(Array("33","wiki-Vote.txt","\t"))
-    mainF(Array("34", "wiki-Vote.txt","\t"))
-    mainF(Array("35", "wiki-Vote.txt","\t"))
+    mainF(tupleA, Array("15","Email-Enron.txt","\t"))
+    mainF(tupleA, Array("14","Email-Enron.txt","\t"))
+    mainF(tupleA, Array("13","Email-Enron.txt","\t"))
+    mainF(tupleA, Array("9", "Email-Enron.txt","\t"))
+    mainF(tupleA, Array("8", "Email-Enron.txt","\t"))
+    mainF(tupleA, Array("7", "Email-Enron.txt","\t"))
+    mainF(tupleA, Array("6", "Email-Enron.txt","\t"))
+    mainF(tupleA, Array("5", "Email-Enron.txt","\t"))
+    mainF(tupleA, Array("4", "Email-Enron.txt","\t"))
 
+    mainF(tupleB, Array("36","wiki-Vote.txt","\t"))
+    mainF(tupleB, Array("35","wiki-Vote.txt","\t"))
+    mainF(tupleB, Array("34","wiki-Vote.txt","\t"))
+    mainF(tupleB, Array("11","wiki-Vote.txt","\t"))
+    mainF(tupleB, Array("10","wiki-Vote.txt","\t"))
+    mainF(tupleB, Array("9","wiki-Vote.txt","\t"))
+    mainF(tupleB, Array("4", "wiki-Vote.txt","\t"))
+    mainF(tupleB, Array("3", "wiki-Vote.txt","\t"))
+    mainF(tupleB, Array("2", "wiki-Vote.txt","\t"))
 
-
-
+    mainF(tupleC, Array("16","Gowalla_edges.txt","\t"))
+    mainF(tupleC, Array("15","Gowalla_edges.txt","\t"))
+    mainF(tupleC, Array("14","Gowalla_edges.txt","\t"))
+    mainF(tupleC, Array("9", "Gowalla_edges.txt","\t"))
+    mainF(tupleC, Array("8", "Gowalla_edges.txt","\t"))
+    mainF(tupleC, Array("7", "Gowalla_edges.txt","\t"))
+    mainF(tupleC, Array("6", "Gowalla_edges.txt","\t"))
+    mainF(tupleC, Array("5", "Gowalla_edges.txt","\t"))
+    mainF(tupleC, Array("4", "Gowalla_edges.txt","\t"))
 
 
     //mainF(Array("6","soc-Epinions1.txt","\t"))
@@ -55,7 +69,7 @@ object NewTest_K_COre {
 
   }
 
-  def mainF(args: Array[String]) {
+  def mainF(o: Array[Double], args: Array[String]) {
 
     val REMOTE_JOB: Boolean = false // 是否提交到集群运行
     var dbi: Double = 0d // 度筛选比率
@@ -389,7 +403,7 @@ object NewTest_K_COre {
 
     val out = new FileWriter("I:\\IDEA_PROJ\\Visualization\\src\\main\\scala\\11111111111.csv", true)
     out.write(s"${System.currentTimeMillis()}, $fname, ${((KC_arrs++head_nodes).distinct.length.toDouble/sizeOfGraph*100).toInt+"%"}, kc=$DDDD ,,,," +
-      s"${SMd.formatted("%.3f")}, SMt, ${(Vcc._2/0.017).formatted("%.3f")}, ${(Vcc._3/0.4024).formatted("%.3f")}, ${(Vav/20.0).formatted("%.3f")}\n")
+      s"${SMd.formatted("%.3f")}, SMt, ${(Vcc._2/o(0)).formatted("%.3f")}, ${(Vcc._3/o(1)).formatted("%.3f")}, ${(Vav/o(2)).formatted("%.3f")}\n")
     out.close()
     sc.stop()
   }

@@ -109,7 +109,7 @@ object NewTest_Ori {
     tab = "\t"
 
     // 本地项目相对路径
-    fname = "Email-Enron.txt"
+    fname = "Gowalla_edges.txt"
     input = "resources\\" + fname
     output = "output\\" + fname
 
@@ -168,9 +168,10 @@ object NewTest_Ori {
     cGraphS.unpersist()
 
     val out = new FileWriter("I:\\IDEA_PROJ\\Visualization\\src\\main\\scala\\11111111111.csv", true)
-
     out.write(s"SMd,SMt,${(Vcc._2).formatted("%.4f")},${(Vcc._3).formatted("%.4f")},${Vav}\n")
     out.close()
+
+
     sc.stop()
   }
 

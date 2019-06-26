@@ -30,32 +30,48 @@ object NewTest_K_COre {
 
 
 
-    NewTest_SS.mainF(tupleD, Array("18","facebook_combined.txt"," "))
-    NewTest_SS.mainF(tupleD, Array("17","facebook_combined.txt"," "))
-    NewTest_SS.mainF(tupleD, Array("16","facebook_combined.txt"," "))
-    NewTest_SS.mainF(tupleD, Array("33","facebook_combined.txt"," "))
-    NewTest_SS.mainF(tupleD, Array("32","facebook_combined.txt"," "))
-    NewTest_SS.mainF(tupleD, Array("31","facebook_combined.txt"," "))
-    NewTest_SS.mainF(tupleD, Array("65","facebook_combined.txt"," "))
-    NewTest_SS.mainF(tupleD, Array("64","facebook_combined.txt"," "))
-    NewTest_SS.mainF(tupleD, Array("63","facebook_combined.txt"," "))
+    NewTest_SS.mainF(tupleA, Array("10","Email-Enron.txt","\t"))
+    NewTest_SS.mainF(tupleA, Array("9","Email-Enron.txt","\t"))
+    NewTest_SS.mainF(tupleA, Array("8","Email-Enron.txt","\t"))
+    NewTest_SS.mainF(tupleA, Array("6","Email-Enron.txt","\t"))
+    NewTest_SS.mainF(tupleA, Array("5","Email-Enron.txt","\t"))
+    NewTest_SS.mainF(tupleA, Array("4","Email-Enron.txt","\t"))
+    NewTest_SS.mainF(tupleA, Array("3","Email-Enron.txt","\t"))
+    NewTest_SS.mainF(tupleA, Array("2","Email-Enron.txt","\t"))
 
 
-    mainF(tupleD, Array("51","facebook_combined.txt"," "))// 50
-    mainF(tupleD, Array("50","facebook_combined.txt"," "))
-    mainF(tupleD, Array("49","facebook_combined.txt"," "))
 
-    mainF(tupleD, Array("25","facebook_combined.txt"," "))// 50
-    mainF(tupleD, Array("26","facebook_combined.txt"," "))
-    mainF(tupleD, Array("27","facebook_combined.txt"," "))
 
-    mainF(tupleD, Array("17","facebook_combined.txt"," "))
-    mainF(tupleD, Array("16","facebook_combined.txt"," "))
-    mainF(tupleD, Array("15","facebook_combined.txt"," "))
 
-    NewTest_RN_RE_RW.mainF(tupleA, Array("0.6", "Gowalla_edges.txt","\t","snowball"))
-    NewTest_RN_RE_RW.mainF(tupleA, Array("0.4", "Gowalla_edges.txt","\t","snowball"))
-    NewTest_RN_RE_RW.mainF(tupleA, Array("0.2", "Gowalla_edges.txt","\t","snowball"))
+    NewTest_SS.mainF(tupleC, Array("18","facebook_combined.txt"," "))
+    NewTest_SS.mainF(tupleC, Array("17","facebook_combined.txt"," "))
+    NewTest_SS.mainF(tupleC, Array("16","facebook_combined.txt"," "))
+    NewTest_SS.mainF(tupleC, Array("33","facebook_combined.txt"," "))
+    NewTest_SS.mainF(tupleC, Array("32","facebook_combined.txt"," "))
+    NewTest_SS.mainF(tupleC, Array("31","facebook_combined.txt"," "))
+    NewTest_SS.mainF(tupleC, Array("65","facebook_combined.txt"," "))
+    NewTest_SS.mainF(tupleC, Array("64","facebook_combined.txt"," "))
+    NewTest_SS.mainF(tupleC, Array("63","facebook_combined.txt"," "))
+
+
+
+
+
+    //mainF(tupleD, Array("51","facebook_combined.txt"," "))// 50
+    //mainF(tupleD, Array("50","facebook_combined.txt"," "))
+    //mainF(tupleD, Array("49","facebook_combined.txt"," "))
+//
+    //mainF(tupleD, Array("25","facebook_combined.txt"," "))// 50
+    //mainF(tupleD, Array("26","facebook_combined.txt"," "))
+    //mainF(tupleD, Array("27","facebook_combined.txt"," "))
+//
+    //mainF(tupleD, Array("17","facebook_combined.txt"," "))
+    //mainF(tupleD, Array("16","facebook_combined.txt"," "))
+    //mainF(tupleD, Array("15","facebook_combined.txt"," "))
+//
+    //NewTest_RN_RE_RW.mainF(tupleA, Array("0.6", "Gowalla_edges.txt","\t","snowball"))
+    //NewTest_RN_RE_RW.mainF(tupleA, Array("0.4", "Gowalla_edges.txt","\t","snowball"))
+    //NewTest_RN_RE_RW.mainF(tupleA, Array("0.2", "Gowalla_edges.txt","\t","snowball"))
 
 
 

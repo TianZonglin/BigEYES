@@ -2,7 +2,6 @@ import java.text.SimpleDateFormat
 
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.graphx._
-import org.apache.spark.graphx.lib.SS
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
 
@@ -112,13 +111,56 @@ object eeeee {
     output = "output\\" + fname
 
 
-    val graphS = loadEdges(input)
-    val cGraphS = convert(graphS).persist()
+    val cGraphS = GraphLoader.edgeListFile(sc, input)
 
-    val SSG = SS.run(cGraphS,1)
 
-    val ret = SSG.mapVertices[Boolean]((id: VertexId, d: VertexId) => d>10)
-    println(ret.vertices.count())
+
+
+    //===================================================================
+    //SMt
+    var a = 0
+    var b = 0
+    var c = 0
+    var d = 0
+
+    var
+
+    val rddmapS = graphtemp.edges.map(x=>{
+      (x.srcId+""+x.dstId, 1)
+    }).collect()
+    val rddmapG = cGraphS.edges.map(x=>{
+      (x.srcId+""+x.dstId, 1)
+    }).collect()
+
+    graphtemp.
+
+
+    val mapS = rddmapS.toMap
+    var it = 0
+    for(it <- 0 to rddmapG.length-1){
+      val o1 = rddmapG(it)._2
+      var o2:Int = 0
+      try {
+        o2 = mapS(rddmapG(it)._1)
+        if(o1 == 1 && o2 == 1){ a = a + 1 }
+        else if(o1 == 1 && o2 == 0){ b = b + 1}
+        else if(o1 == 0 && o2 == 1){ c = c + 1}
+        else if(o1 == 0 && o2 == 0){ d = d + 1}
+      } catch {
+        case ex: Exception => {
+          System.err.println("ZZZZZZZZZZZZZZZz")  // 打印到标
+
+        }
+      }
+    }
+    val phi = (a*d-b*c)/(Math.sqrt((a + b)*(c + d)*(a + c)*(b + d)))
+    printf("==========================================phi: "+phi)
+
+
+
+
+
+
 
     cGraphS.unpersist()
 

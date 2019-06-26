@@ -251,6 +251,8 @@ app.post('/getjson', function (req, res) {
 	req.on('data',function(data){
 		//const file = fs.readFileSync("/usr/local/node-v10.9.0-linux-x64/ExpressWeb/Wiki-Vote.txt_of_780_without_800.json", "utf8");
 		const file = fs.readFileSync("I:\\IDEA_PROJ\\Visualization\\output\\"+data, "utf8");
+        console.log("****************");
+		console.log("发送该数据至页面："+data);
 		res.send(file);
 		//console.log("****************");
 		//console.log(data);

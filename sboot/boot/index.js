@@ -1107,9 +1107,6 @@ $(function(){
 
 	/////////////////////////////////////////////////////////////////////////////////
 	$('#select3').on('changed.bs.select', function (e) {
-	console.log('22');
-
-		let select3 = $('#select3').val();
 		//console.log(select3);
 		//if(select3 === "Simple5")
 		//	select3 = "simple5.txt_of_476_without_800.json";
@@ -1125,7 +1122,7 @@ $(function(){
 			//url: "Wiki-Vote.txt_of_780_without_800.json",
 			url: "http://localhost:3000/getjson",
 			//url: "simple5.txt_of_800_without_800.json",
-			data: select3,
+			data: $('#select3').val(),
 			async: false,
 			dataType: "json",
 			success: function(data){
@@ -1133,14 +1130,17 @@ $(function(){
 				len = data.links.length;
 				dataset = data;
 
+
 			}
 		});
-
+        alert(len);
+        console.log(dataset);
+        dataset = createImg(950,700,dataset,ZOOM_OUT*environment.data("GrpZoomOut"), true); //初始
 		//let oldarr = environment.data("GrpLocate").split(",");
 		//console.log("select...");
-		//console.log(oldarr);
+
 		//newset = trans(dataset,400,400,1);
-		dataset = createImg(950,700,dataset,ZOOM_OUT*environment.data("GrpZoomOut"), true); //初始
+
 		//drawLeft();
 	});
 
@@ -1519,7 +1519,7 @@ $(function(){
 
 	////////////////////////////////////////////////////////////////////////////////////////// LEFT SELECT
 	$("#select3").on('loaded.bs.select',function(){
-		alert(1);
+		///alert(1);
 
 		let str = "";
 		$.ajax({
@@ -1537,11 +1537,9 @@ $(function(){
 				$("#select3").selectpicker("refresh");
 			}
 		});
-		
-		
 	});
-
- 
+    //$("#select3").on
+    //dataset = createImg(950,700,dataset,ZOOM_OUT*environment.data("GrpZoomOut"), true); //初始
 
 
 

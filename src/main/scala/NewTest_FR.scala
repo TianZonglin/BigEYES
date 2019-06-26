@@ -20,13 +20,11 @@ object NewTest_FR {
   val GRAVTY = 3
   val SPEED = 20f              //等于1时无效，默认无效   = FR
   val SPEED_DIVISOR = 800f    //速度除数默认值   = FR
-
-
-
   val AREA = WIDTH * WIDTH
-
   val LIMITDIST = AREA / 10.0 * (SPEED / SPEED_DIVISOR)
-
+  var FILENAME = ""
+  var IN_URL = ""
+  var OUT_URL = ""
   //type A = (String, (Float, Float), Map[String, (Float, Float)], Float, Int)
 
   def main(args: Array[String]): Unit = {
@@ -56,34 +54,59 @@ object NewTest_FR {
       val random = new scala.util.Random
       random.nextFloat() * 1000  - 500
     }
-    val originGraph: Graph[Int, Int] = GraphLoader.edgeListFile(sc, "I:\\IDEA_PROJ\\Visualization\\resources\\facebook_combined.txt")
+    def date:String = new SimpleDateFormat("MM-dd_HH-mm_").format(System.currentTimeMillis())
+
+
+    FILENAME = "facebook_combined.txt"
+    val COUNT = 200
+    if(REMOTE_JOB){
+      // 集群HDFS绝对路径
+      //FILENAME = args(0)
+      IN_URL = "hdfs://219.216.65.14:9000/SNAP/DATASET/"+FILENAME
+      OUT_URL = "hdfs://219.216.65.14:9000/SNAP/OUTPUT/"+date+"dump_"+FILENAME+"_"+COUNT
+    }else{
+      // 本地项目相对路径
+      //FILENAME = "simple5.txt"
+      IN_URL = "resources\\"+FILENAME
+      OUT_URL = "output\\"+date+"dump_"+FILENAME+"_"+COUNT+".json"
+    }
+
+    val originGraph: Graph[Int, Int] = GraphLoader.edgeListFile(sc, IN_URL)
     // ---------------------
     val formatVertexRDD: RDD[(VertexId, (String, (Float, Float), (Float, Float), Float, Int))] =
-      originGraph.vertices.map {
-        v =>
-          (v._1, (v._1.toString, (ran, ran), (0f, 0f), 0f, 0))
-      }
+      originGraph.vertices.map { v =>(v._1, (v._1.toString, (ran, ran), (0f, 0f), 0f, 0))}
     val formatEdgeRDD = originGraph.edges.map(e => Edge(e.srcId, e.dstId, 0f))
     val structuredGraph = Graph(formatVertexRDD, formatEdgeRDD, ("X", (0f, 0f), (0f, 0f), 0f, 0))
     structuredGraph.triplets.take(10).foreach(println)
-
     structuredGraph.persist()
     // ---------------------
-    val sizeOfGraph = structuredGraph.vertices.count()
 
 
-    val gval = NewTest_Layout(structuredGraph, 10, false)
+    val gval = NewTest_Layout(structuredGraph, COUNT, false)
 
     gval.triplets.take(10).foreach(println)
 
 
 
 
-    //pregelGraph.triplets.take(10).foreach(println)
 
+
+
+
+
+
+
+
+
+    writeTo_JSON(gval, OUT_URL)
+    //pregelGraph.triplets.take(10).foreach(println)
     structuredGraph.unpersist()
 
   }
+
+
+
+
   def NewTest_Layout( g: Graph[(String, (Float, Float), (Float, Float), Float, Int), Float ],
                       iterations: Int,
                       diet:Boolean)
@@ -95,8 +118,7 @@ object NewTest_FR {
 
     //var temperature = 0.1 * math.sqrt(AREA) // current temperature
     val K  = Math.sqrt(WIDTH * WIDTH / (g.vertices.count() +1)).toFloat
-    for (iteration <- 1 to 100) {
-
+    for (iteration <- 1 to iterations) {
 
       gs.cache().checkpoint()
 
@@ -139,7 +161,7 @@ object NewTest_FR {
 
         }
       )
-
+      attr1.cache().checkpoint()
       //println("------------------------------------------------attr")
       //attr1.take(10).foreach(println)
       //println("------------------------------------------------attr")
@@ -150,7 +172,7 @@ object NewTest_FR {
 
         }
       )
-
+      after1.cache().checkpoint()
       val attr2: VertexRDD[(Float, Float)] = after1.aggregateMessages[(Float, Float)](
         sendMsg = {
           triplet => {
@@ -174,13 +196,13 @@ object NewTest_FR {
           (m1, m2) => ((m1._1 + m2._1).toFloat, (m1._2 + m2._2).toFloat)
         }
       )
-
+      attr2.cache().checkpoint()
       val after2 = after1.joinVertices(attr2)(
         (_, a, b) => {
           (a._1, a._2, (a._3._1 + b._1, a._3._2 + b._2), a._4, a._5)
         }
       )
-
+      after2.cache().checkpoint()
       //after2.triplets.take(10).foreach(println)
       //println("----------repulsive")
       //------------------------------------------------------ 斥 ------------------------------------------------------
@@ -211,8 +233,9 @@ object NewTest_FR {
           (locate._1, locate._2, (locate._3._1 + bx, locate._3._2 + by), locate._4, locate._5)
         }
       )
+      setC.cache().checkpoint()
       val graphN = Graph(setC, gs.edges)
-
+      graphN.cache().checkpoint()
 
       //graphN.triplets.take(10).foreach(println)
       //println("----------gravity")
@@ -253,7 +276,12 @@ object NewTest_FR {
       )
 
       gs = Graph(vNewPositions, gs.edges)
-      gs.cache().checkpoint()
+      attr1.unpersist()
+      attr2
+      after1
+      after2
+      setC
+      graphN
 
       println(s"> This iteration( $iteration ) of computing layout zb has finished ...")
 
@@ -271,25 +299,23 @@ object NewTest_FR {
 
 
 
-  def dumpWithLayout(g: Graph[(String, (Float, Float), (Float, Float), Float, Int), Float],
-                     fn: String,
-                     layers: Int)
+  def writeTo_JSON(g: Graph[(String, (Float, Float), (Float, Float), Float, Int), Float],
+                     fn: String)
   : Unit = {
 
-
-    printToFile(new File(fn)) {
-      p => {
-        p.println("""{"nodes": [""")
-        g.vertices.collect.foreach(
-          x => p.println(s"""{"weight": "0","name": "o","value": "${x._2._4._3/10f}","cx":"${x._2._2}","cy": "${x._2._3}"}, """)
-        )
-        p.println("""{"weight": "0","name": "o","value": "0","cx":"0","cy": "0"}],    "links": [""")
-        g.triplets.collect.foreach(
-          x => p.println(s"""{"value": "0","x1": "${x.srcAttr._2}","y1": "${x.srcAttr._3}","x2": "${x.dstAttr._2}","y2": "${x.dstAttr._3}"},""")
-        )
-        p.println("""{"value": "0","x1": "0","y1": "0","x2": "0","y2": "0"}]}""")
-      }
-    }
+    val p = new PrintWriter(fn)
+    p.println("""{"nodes": [""")
+    g.vertices.collect.foreach(
+      x => p.println(s"""{"weight": "0","name": "o","value": "1","cx":"${x._2._2._1}","cy": "${x._2._2._2}"}, """)
+    )
+    p.flush()
+    p.println("""{"weight": "0","name": "o","value": "0","cx":"0","cy": "0"}],    "links": [""")
+    g.triplets.collect.foreach(
+      x => p.println(s"""{"value": "0","x1": "${x.srcAttr._2._1}","y1": "${x.srcAttr._2._2}","x2": "${x.dstAttr._2._1}","y2": "${x.dstAttr._2._2}"},""")
+    )
+    p.println("""{"value": "0","x1": "0","y1": "0","x2": "0","y2": "0"}]}""")
+    p.flush()
+    p.close()
   }
 
   def mainOlder(args: Array[String]) {

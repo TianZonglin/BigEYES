@@ -122,39 +122,39 @@ object eeeee {
     var b = 0
     var c = 0
     var d = 0
+    /*
+        var
 
-    var
+        val rddmapS = graphtemp.edges.map(x=>{
+          (x.srcId+""+x.dstId, 1)
+        }).collect()
+        val rddmapG = cGraphS.edges.map(x=>{
+          (x.srcId+""+x.dstId, 1)
+        }).collect()
 
-    val rddmapS = graphtemp.edges.map(x=>{
-      (x.srcId+""+x.dstId, 1)
-    }).collect()
-    val rddmapG = cGraphS.edges.map(x=>{
-      (x.srcId+""+x.dstId, 1)
-    }).collect()
-
-    graphtemp.
+        graphtemp.
 
 
-    val mapS = rddmapS.toMap
-    var it = 0
-    for(it <- 0 to rddmapG.length-1){
-      val o1 = rddmapG(it)._2
-      var o2:Int = 0
-      try {
-        o2 = mapS(rddmapG(it)._1)
-        if(o1 == 1 && o2 == 1){ a = a + 1 }
-        else if(o1 == 1 && o2 == 0){ b = b + 1}
-        else if(o1 == 0 && o2 == 1){ c = c + 1}
-        else if(o1 == 0 && o2 == 0){ d = d + 1}
-      } catch {
-        case ex: Exception => {
-          System.err.println("ZZZZZZZZZZZZZZZz")  // 打印到标
+        val mapS = rddmapS.toMap
+        var it = 0
+        for(it <- 0 to rddmapG.length-1){
+          val o1 = rddmapG(it)._2
+          var o2:Int = 0
+          try {
+            o2 = mapS(rddmapG(it)._1)
+            if(o1 == 1 && o2 == 1){ a = a + 1 }
+            else if(o1 == 1 && o2 == 0){ b = b + 1}
+            else if(o1 == 0 && o2 == 1){ c = c + 1}
+            else if(o1 == 0 && o2 == 0){ d = d + 1}
+          } catch {
+            case ex: Exception => {
+              System.err.println("ZZZZZZZZZZZZZZZz")  // 打印到标
 
+            }
+          }
         }
-      }
-    }
-    val phi = (a*d-b*c)/(Math.sqrt((a + b)*(c + d)*(a + c)*(b + d)))
-    printf("==========================================phi: "+phi)
+        val phi = (a*d-b*c)/(Math.sqrt((a + b)*(c + d)*(a + c)*(b + d)))
+        printf("==========================================phi: "+phi)        */
 
 
 

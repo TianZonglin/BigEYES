@@ -22,6 +22,7 @@ object NewTest_FR {
 
 
     val REMOTE_JOB = false
+    val WIDTH = 0f
 
     // ---------------------
 
@@ -57,51 +58,97 @@ object NewTest_FR {
     val formatEdgeRDD = originGraph.edges.map(e => Edge(e.srcId, e.dstId, 0f))
     val structuredGraph = Graph(formatVertexRDD, formatEdgeRDD, ("X", (0f, 0f), (0f, 0f), 0f, 0))
     structuredGraph.triplets.take(10).foreach(println)
+
+    structuredGraph.persist()
     // ---------------------
+    val sizeOfGraph = structuredGraph.vertices.count()
+    val K = Math.sqrt(WIDTH * WIDTH / (sizeOfGraph +1)).toFloat
 
-    val a = structuredGraph.triplets
-    a
-    def vprog(vid: VertexId, vd: Int, i: Int) = {
-      val ret = if ((vd - i) >= k) vd - i
-      else if (vd > 0) 0
-      else -1
+    val repl_1_N = scala.collection.mutable.Map()
 
-      ret
+
+
+    def dist(loc1:(Float, Float), loc2:(Float, Float)):Float = {
+      val x = Math.pow((loc1._1 - loc2._1), 2)
+      val y = Math.pow((loc1._2 - loc2._2), 2)
+      Math.sqrt( x * x + y * y).toFloat
+    }
+
+
+    def vprog(vid: VertexId, vd: (String, (Float, Float), (Float, Float), Float, Int), msg: (Float, Float)) = {
+      if(msg._1 == 0 && msg._2 == 0 ){
+        vd
+      }else{
+        val distance = dist(vd._2, msg)
+        if( distance > 10){
+          (vd._1, (msg._1, msg._2), (vd._2._1, vd._2._2), vd._4, vd._5)
+        }else{
+          vd
+        }
+      }
     }
 
     def sendMessage(edge: EdgeTriplet[(String, (Float, Float), (Float, Float), Float, Int), Float]): Iterator[(VertexId, (Float, Float))] = {
 
-      val lst = if (edge.srcAttr == 0) {
+      if (edge.srcAttr._5 == 0 && edge.dstAttr._5 == 0) {
+        val src = edge.srcAttr
+        val dst = edge.dstAttr
+        val xDist = src._2._1 - dst._2._1
+        val yDist = src._2._2 - dst._2._2
+        val d2 = (xDist * xDist + yDist * yDist)
+        val d = Math.sqrt(d2)
+        val attr = d2 / K
+        val attrX = xDist / d * attr
+        val attrY = yDist / d * attr
 
-        List((edge.dstId, (1, edge.dstAttr)), (edge.srcId, (0, edge.srcAttr)))
-      } else if (edge.dstAttr == 0) {
-        List((edge.srcId, (1, edge.srcAttr)), (edge.dstId, (0, edge.dstAttr)))
-      } else List.empty
+        var replX = 0f
+        var replY = 0f
+        structuredGraph.vertices.foreach( x=>{
+          val v2 = x._2
+          val xDist = edge.srcAttr._2._1 - x._2._2._1
+          val yDist = edge.srcAttr._2._2 - x._2._2._2
 
-      // no need to send msg to nodes that have already been "removed"
-      val lstFiltered = lst.filter(_._2._2>=0).map(t => (t._1, t._2._1))
+          val dist = Math.sqrt(xDist * xDist + yDist * yDist).toFloat
+          if (dist > 0) {
+            val repl = K * K / dist
+            // Force de répulsion
+            replX += xDist / dist * repl // on l'applique...
+            replY += yDist / dist * repl
+            //println(s"$yDist / $dist * $repulsiveF")
+          }
 
-      lstFiltered.iterator
+        })
+
+        val forceX = attrX + replX
+        val forceY = attrY + replY
+
+        Iterator((edge.dstId, (forceX.toFloat,forceY.toFloat)))
+      }else
+        Iterator.empty
+
     }
 
 
     def mergeMsg(msg1:(Float, Float), msg2:(Float, Float)): (Float, Float) = {
-
-      (0f,0f)
+      if(msg1._1 == 0 && msg1._2 == 0 && msg2._1 == 0 && msg2._2 == 0){
+        (0f,0f)
+      }else{
+        (msg1._1 + msg1._2, msg2._1 + msg2._2)
+      }
     }
 
     val initialMessage = (0f, 0f)
-    val pregelGraph = Pregel(kGraph, initialMessage,
-      maxIterations, EdgeDirection.Either)(
+    val pregelGraph = MyPregel(structuredGraph, initialMessage,
+      100, EdgeDirection.Either)(
       vprog = vprog,
       sendMsg = sendMessage,
-      mergeMsg = (a, b) => a + b)
-    kGraph.unpersist()
+      mergeMsg = mergeMsg)
 
-    pregelGraph.mapVertices[Boolean]((id: VertexId, d: Int) => d>0)
+    println
+    println
+    pregelGraph.triplets.take(10).foreach(println)
 
-
-
+    structuredGraph.unpersist()
 
   }
 

@@ -1,36 +1,30 @@
+/*
 import java.io._
 import java.text.SimpleDateFormat
 
-import breeze.numerics.{pow, sqrt}
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.graphx._
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
 
 
-
-
-
-object NewTest_FR {
+object T2019626 {
 
   Logger.getLogger("org").setLevel(Level.ERROR)
 
-  val REMOTE_JOB = false
-  val WIDTH = 5000f
-  val GRAVTY = 3
-  val SPEED = 20f              //等于1时无效，默认无效   = FR
-  val SPEED_DIVISOR = 800f    //速度除数默认值   = FR
-
-
-
-  val AREA = WIDTH * WIDTH
-
-  val LIMITDIST = AREA / 10.0 * (SPEED / SPEED_DIVISOR)
 
   //type A = (String, (Float, Float), Map[String, (Float, Float)], Float, Int)
 
   def main(args: Array[String]): Unit = {
+    mainF(Array("OK"))
+  }
 
+  def mainF(args: Array[String]): Unit = {
+
+
+
+    val REMOTE_JOB = false
+    val WIDTH = 0f
 
     // ---------------------
 
@@ -58,10 +52,10 @@ object NewTest_FR {
     }
     val originGraph: Graph[Int, Int] = GraphLoader.edgeListFile(sc, "I:\\IDEA_PROJ\\Visualization\\resources\\facebook_combined.txt")
     // ---------------------
-    val formatVertexRDD: RDD[(VertexId, (String, (Float, Float), (Float, Float), Float, Int))] =
+    val formatVertexRDD: RDD[(VertexId, (String, (Float, Float), Map[String, (Float, Float)], Float, Int))] =
       originGraph.vertices.map {
         v =>
-          (v._1, (v._1.toString, (ran, ran), (0f, 0f), 0f, 0))
+          (v._1, (v._1.toString, (ran, ran), Map.empty, 0f, 0))
       }
     val formatEdgeRDD = originGraph.edges.map(e => Edge(e.srcId, e.dstId, 0f))
     val structuredGraph = Graph(formatVertexRDD, formatEdgeRDD, ("X", (0f, 0f), (0f, 0f), 0f, 0))
@@ -70,227 +64,99 @@ object NewTest_FR {
     structuredGraph.persist()
     // ---------------------
     val sizeOfGraph = structuredGraph.vertices.count()
+    val K = Math.sqrt(WIDTH * WIDTH / (sizeOfGraph +1)).toFloat
 
-
-    val gval = NewTest_Layout(structuredGraph, 10, false)
-
-    gval.triplets.take(10).foreach(println)
-
+    val repl_1_N = Map()
 
 
 
-    //pregelGraph.triplets.take(10).foreach(println)
+    def dist(loc1:(Float, Float), loc2:(Float, Float)):Float = {
+      val x = Math.pow((loc1._1 - loc2._1), 2)
+      val y = Math.pow((loc1._2 - loc2._2), 2)
+      Math.sqrt( x * x + y * y).toFloat
+    }
+
+
+    def vprog(vid: VertexId, vd: (String, (Float, Float), Map[String, (Float, Float)], Float, Int), msg: (Float, Float, Map[String, (Float, Float)])) = {
+      if(msg._1 == 0 && msg._2 == 0 ){
+        vd
+      }else{
+        val distance = dist(vd._2, msg)
+        if( distance > 10){
+
+          (vd._1, (msg._1, msg._2), vd._3, vd._4, vd._5)
+        }else{
+          vd
+        }
+      }
+    }
+
+    def sendMessage(edge: EdgeTriplet[(String, (Float, Float), Map[String, (Float, Float)], Float, Int), Float]): Iterator[(VertexId, (Float, Float, Map[String, (Float, Float)]))] = {
+
+      if (edge.srcAttr._5 == 0 && edge.dstAttr._5 == 0) {
+        val src = edge.srcAttr
+        val dst = edge.dstAttr
+        val xDist = src._2._1 - dst._2._1
+        val yDist = src._2._2 - dst._2._2
+        val d2 = (xDist * xDist + yDist * yDist)
+        val d = Math.sqrt(d2)
+        val attr = d2 / K
+        val attrX = xDist / d * attr
+        val attrY = yDist / d * attr
+
+        var replX = 0f
+        var replY = 0f
+
+        edge.srcAttr._3.foreach( x =>{
+          val v2 = x._2
+          val xDist = edge.srcAttr._2._1 - x._2._1
+          val yDist = edge.srcAttr._2._2 - x._2._2
+
+          val dist = Math.sqrt(xDist * xDist + yDist * yDist).toFloat
+          if (dist > 0) {
+            val repl = K * K / dist
+            // Force de répulsion
+            replX += xDist / dist * repl // on l'applique...
+            replY += yDist / dist * repl
+            //println(s"$yDist / $dist * $repulsiveF")
+          }
+
+        })
+
+        val forceX = attrX + replX
+        val forceY = attrY + replY
+
+        Iterator((edge.dstId, (forceX.toFloat,forceY.toFloat)))
+      }else
+        Iterator.empty
+
+    }
+
+
+    def mergeMsg(msg1:(Float, Float, Map[String, (Float, Float)]), msg2:(Float, Float, Map[String, (Float, Float)])): (Float, Float, Map[String, (Float, Float)]) = {
+      if(msg1._1 == 0 && msg1._2 == 0 && msg2._1 == 0 && msg2._2 == 0){
+        (0f,0f)
+      }else{
+        (msg1._1 + msg1._2, msg2._1 + msg2._2)
+      }
+    }
+
+    val initialMessage = (0f, 0f)
+    val pregelGraph = MyPregel(structuredGraph, initialMessage,
+      100, EdgeDirection.Either)(
+      vprog = vprog,
+      sendMsg = sendMessage,
+      mergeMsg = mergeMsg)
+
+    println
+    println
+    pregelGraph.triplets.take(10).foreach(println)
 
     structuredGraph.unpersist()
 
   }
-  def NewTest_Layout( g: Graph[(String, (Float, Float), (Float, Float), Float, Int), Float ],
-                      iterations: Int,
-                      diet:Boolean)
-  : Graph[(String, (Float, Float), (Float, Float), Float, Int), Float ] = {
 
 
-    println("> Start the Layout iteration: n=" + iterations + " (nr of iterations).")
-    var gs = g //shuffle( g )
-
-    //var temperature = 0.1 * math.sqrt(AREA) // current temperature
-    val K  = Math.sqrt(WIDTH * WIDTH / (g.vertices.count() +1)).toFloat
-    for (iteration <- 1 to 100) {
-
-
-      gs.cache().checkpoint()
-
-      //println("> Temperature: (T=" + temperature + ")")
-      // 大数据级别时不要collect操作，采用抽样 //
-      // 大数据级别时不要collect操作，采用度高节点（重要节点） //
-
-      val arrayNodes = gs.vertices.collect()
-
-      //gs.triplets.take(10).foreach(println)
-      //println("----------attractive")
-      //------------------------------------------------- 引 ------------------------------------------------------------
-      //------------------------------------------------- 力 ------------------------------------------------------------
-
-      val attr1: VertexRDD[(Float, Float)] = gs.aggregateMessages[(Float, Float)](
-        sendMsg = {
-          triplet => {
-            val Source = triplet.srcAttr
-            val Target = triplet.dstAttr
-            val xDist = Source._2._1 - Target._2._1
-            val yDist = Source._2._2 - Target._2._2
-
-            val dist = Math.sqrt(xDist * xDist + yDist * yDist)
-            val attractiveF = dist * dist / K
-
-            if (dist > 0) {
-              val dx = xDist / dist * attractiveF
-              val dy = yDist / dist * attractiveF
-              //println(s"attractiveF = $attractiveF, K = $K")
-              triplet.sendToDst(dx.toFloat, dy.toFloat)
-            }
-
-          }
-        },
-        mergeMsg = {
-          (m1, m2) => {
-            //println(m1+"----------"+m2)(NaN,NaN)----------(Infinity,-Infinity)
-            (m1._1 + m2._1, m1._2 + m2._2)
-          }
-
-        }
-      )
-
-      //println("------------------------------------------------attr")
-      //attr1.take(10).foreach(println)
-      //println("------------------------------------------------attr")
-      val after1 = gs.joinVertices(attr1)(
-        (_, a, b) => {
-
-          (a._1, a._2, (a._3._1 + b._1, a._3._2 + b._2), a._4, a._5)
-
-        }
-      )
-
-      val attr2: VertexRDD[(Float, Float)] = after1.aggregateMessages[(Float, Float)](
-        sendMsg = {
-          triplet => {
-            val Source = triplet.srcAttr
-            val Target = triplet.dstAttr
-            val xDist = Source._2._1 - Target._2._1
-            val yDist = Source._2._2 - Target._2._2
-
-            val dist = math.sqrt(xDist * xDist + yDist * yDist)
-            val attractiveF = dist * dist / K
-
-            if (dist > 0) {
-              val dx = xDist / dist * attractiveF
-              val dy = yDist / dist * attractiveF
-              //println(s"dx = $dx, dy = $dy")
-              triplet.sendToSrc(0f - dx.toFloat, 0f - dy.toFloat)
-            }
-          }
-        },
-        mergeMsg = {
-          (m1, m2) => ((m1._1 + m2._1).toFloat, (m1._2 + m2._2).toFloat)
-        }
-      )
-
-      val after2 = after1.joinVertices(attr2)(
-        (_, a, b) => {
-          (a._1, a._2, (a._3._1 + b._1, a._3._2 + b._2), a._4, a._5)
-        }
-      )
-
-      //after2.triplets.take(10).foreach(println)
-      //println("----------repulsive")
-      //------------------------------------------------------ 斥 ------------------------------------------------------
-      //------------------------------------------------------ 力 ------------------------------------------------------
-
-
-      val setC: VertexRDD[(String, (Float, Float), (Float, Float), Float, Int)]
-      = after2.vertices.mapValues(
-        locate => {
-          var bx = 0f
-          var by = 0f
-          arrayNodes.foreach(x => {
-            val v2 = x._2._2
-            val xDist = locate._2._1 - v2._1
-            val yDist = locate._2._2 - v2._2
-
-            val dist = Math.sqrt(xDist * xDist + yDist * yDist).toFloat
-            if (dist > 0) {
-              val repulsiveF = K * K / dist
-              // Force de répulsion
-              bx += xDist / dist * repulsiveF // on l'applique...
-              by += yDist / dist * repulsiveF
-              //println(s"$yDist / $dist * $repulsiveF")
-            }
-
-          })
-          //println(s"k = $k bx = $bx, by = $by")
-          (locate._1, locate._2, (locate._3._1 + bx, locate._3._2 + by), locate._4, locate._5)
-        }
-      )
-      val graphN = Graph(setC, gs.edges)
-
-
-      //graphN.triplets.take(10).foreach(println)
-      //println("----------gravity")
-      //------------------------------------------------------ 重 ------------------------------------------------------
-      //------------------------------------------------------ 力 ------------------------------------------------------
-
-
-      //var cnt = 0
-      val vNewPositions = graphN.vertices.mapValues(
-
-        (_, a) => {
-
-          val nx = a._2._1
-          val ny = a._2._2
-
-          val d = Math.sqrt(nx * nx + ny * ny)
-          val gf = 0.01f * K * GRAVTY * d
-
-          //添加上重力
-          val p = (a._3._1 - gf * nx / d) * SPEED / SPEED_DIVISOR
-          val q = (a._3._2 - gf * ny / d) * SPEED / SPEED_DIVISOR
-
-          val dist: Double = Math.sqrt(p * p + q * q)
-          //println(s"p = $p , q = $q")
-          if (dist > 0) {
-            //cnt = cnt + 1
-            //println(cnt)
-            val finalDist: Double = Math.min(LIMITDIST, dist)
-            //println(s"Math.min(${maxDisplace * (speed / SPEED_DIVISOR)}, $dist)   cnt = $iteration")
-            val x = p / dist * finalDist
-            val y = q / dist * finalDist
-            //println(s"dx = ${a._2+x} dy = ${a._3+y}  cnt = $iteration")
-            (a._1, (a._2._1 + x.toFloat, a._2._2 + y.toFloat), (0f, 0f), a._4, a._5)
-          } else {
-            a
-          }
-        }
-      )
-
-      gs = Graph(vNewPositions, gs.edges)
-      gs.cache().checkpoint()
-
-      println(s"> This iteration( $iteration ) of computing layout zb has finished ...")
-
-      ////
-      //// 可以每次迭代都保存布局结果
-      //if(!REMOTE_JOB){
-      //  dumpWithLayout(gs, output+"_of_"+iteration, diet)
-      //}
-      ////cool(iteration)
-    }
-
-    gs
-
-  }
-
-
-
-  def dumpWithLayout(g: Graph[(String, (Float, Float), (Float, Float), Float, Int), Float],
-                     fn: String,
-                     layers: Int)
-  : Unit = {
-
-
-    printToFile(new File(fn)) {
-      p => {
-        p.println("""{"nodes": [""")
-        g.vertices.collect.foreach(
-          x => p.println(s"""{"weight": "0","name": "o","value": "${x._2._4._3/10f}","cx":"${x._2._2}","cy": "${x._2._3}"}, """)
-        )
-        p.println("""{"weight": "0","name": "o","value": "0","cx":"0","cy": "0"}],    "links": [""")
-        g.triplets.collect.foreach(
-          x => p.println(s"""{"value": "0","x1": "${x.srcAttr._2}","y1": "${x.srcAttr._3}","x2": "${x.dstAttr._2}","y2": "${x.dstAttr._3}"},""")
-        )
-        p.println("""{"value": "0","x1": "0","y1": "0","x2": "0","y2": "0"}]}""")
-      }
-    }
-  }
 
   def mainOlder(args: Array[String]) {
 
@@ -1036,3 +902,8 @@ object NewTest_FR {
   }
 
 }
+
+
+
+
+*/

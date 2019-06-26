@@ -118,7 +118,7 @@ object MyPregel extends Logging {
    maxIterations: Int = Int.MaxValue,
    activeDirection: EdgeDirection = EdgeDirection.Either)
   (vprog: (VertexId, VD, A) => VD,
-   sendMsg: EdgeTriplet[VD, ED] => Iterator[(VertexId, A)],
+   sendMsg: (EdgeTriplet[VD, ED]) => Iterator[(VertexId, A)],
    mergeMsg: (A, A) => A)
   : Graph[VD, ED] =
   {

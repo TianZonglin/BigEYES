@@ -24,10 +24,12 @@
     </wildcardResourcePatterns>
   </component>
   <component name="CopyrightManager" default="" />
-  <component name="Encoding">
-    <file url="file://$PROJECT_DIR$/src/main/scala/TEST/Diameter_of_UndirectedGraph.java" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/src/main/scala/TEST/Graph.java" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/src/main/scala/TEST/Runner.java" charset="GBK" />
+  <component name="Encoding" defaultCharsetForPropertiesFiles="UTF-8">
+    <file url="file://$PROJECT_DIR$/src/main/scala/EVA00051.scala" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/scala/TEST/Diameter_of_UndirectedGraph.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/scala/TEST/Graph.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/scala/TEST/Runner.java" charset="UTF-8" />
+    <file url="PROJECT" charset="UTF-8" />
   </component>
   <component name="InspectionProjectProfileManager">
     <profile version="1.0" is_locked="true">

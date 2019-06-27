@@ -1,3 +1,4 @@
+
 import java.io._
 import java.text.SimpleDateFormat
 
@@ -7,7 +8,7 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
 
 
-object WS {
+object WOS {
 
   Logger.getLogger("org").setLevel(Level.ERROR)
 
@@ -325,7 +326,7 @@ object WS {
         // 大数据级别时不要collect操作，采用抽样 //
         // 大数据级别时不要collect操作，采用度高节点（重要节点） //
 
-        val sim = gs.vertices.sample(false, 0.2).collect()
+        val sim = gs.vertices.sample(withReplacement = false, 0.2).collect()
 
         val gRep = calcRepulsion( sim, gs )
 
@@ -389,7 +390,7 @@ object WS {
 
       // 用户设定，定义输入输出，分隔符，及迭代次数，注意路径  //
 
-      tab = " "
+      tab = "\t"
 
       if(REMOTE_JOB){
 
@@ -403,7 +404,7 @@ object WS {
       }else{
 
         // 本地项目相对路径
-        fname = "facebook_combined.txt"
+        fname = "Email-Enron.txt"
         input = "resources\\"+fname
         output = "output\\"+fname
 
@@ -460,72 +461,17 @@ object WS {
 
       k = math.sqrt(area * AREA_MULTIPLICATOR / (sizeOfGraph +1) )// 防止点为0
 
-      // 跳过图数据的采样流程 //
+      // 跳过图数据的采样流程 // 不采样的这是
 
-
-      //===================================================================
-      //获取超级节点
-      val distribution = cGraphS.degrees.map(t => (t._2, t._1 + "")).
-        reduceByKey(_ + "," + _).
-        sortBy(_._1, false).collect()
-      val counts = distribution.length
-      val theta = (counts * 0.5).toInt
-      val head_d = distribution.take(theta) //取前百分20
-      val d_max = head_d.take(1)(0)._1 //最大出入度
-      val head_nodes = head_d.reduce((a, b) => (1, a._2 + "," + b._2))._2.split(",")
-
-      //===================================================================
-      //Core分层
-      val G = KCore.run(cGraphS, 30, 1)
-      // 10 11924   30 3300  100  680
-      //达到最大次数（对于无法保证收敛的算法）或无消息传递时结束
-      //val CoreYES = G.vertices.map(t => (t._2, t._1))
-      val KC_RDD_cGraphS = G.vertices.filter(x => {x._2==true}).map(x => x._1)//.foreach(println)
-
-      //KC_RDD.foreach(println)
-      val KC_arrs  = KC_RDD_cGraphS.map(x=>x.toString).collect()
-
-      val layer = (KC_arrs++head_nodes).distinct
-      val getGbyNode = cGraphS.vertices.mapValues((_,x)=>{
-        if(layer.contains(x._1)){
-          (x._1,x._2,x._3,(x._4._1,x._4._2,x._4._3,1))
-        }else{
-          (x._1,x._2,x._3,(x._4._1,x._4._2,x._4._3,0))
-        }
-      })
-      val KC_Dgree_cGraphS = Graph(getGbyNode, cGraphS.edges, defaultNode)
-      //KC_Dgree_cGraphS.triplets.foreach(println(_))
-      println("D筛包含的点数："+head_nodes.length)
-      println("K核包含的点数："+KC_arrs.length)
-      println("K核+D筛包含的点数："+(KC_arrs++head_nodes).distinct.length)
-
-
-
-      // 【s使用采样结构】调用布局 //
-      val thisG = layoutFDFR2(KC_Dgree_cGraphS, iterations ,diet = true )
-      thisG.persist()
+      // 跳过采样直接调用布局 //
+      val end = layoutFDFR2(cGraphS, iterations ,diet = true )
       // 存文件
       if(REMOTE_JOB){
-        thisG.vertices.saveAsTextFile( output+"_WithoutSample_Vertices_rst")
-        thisG.edges.saveAsTextFile( output+"_WithoutSample_Edges_rst")
+        end.vertices.saveAsTextFile( output+"_WithoutSample_Vertices_rst")
+        end.edges.saveAsTextFile( output+"_WithoutSample_Edges_rst")
       }else{
-        dumpWithLayout(thisG, output+"_WithoutSample_end", isFirst = false)
+        dumpWithLayout(end, output+"_WithoutSample_end", isFirst = false)
       }
-      val nextG = KCore.run(thisG, 20, 1)
-      val nextArr = nextG.vertices.filter(x => {x._2==true}).map(x => x._1)//.foreach(println)
-      val nextKC  = nextArr.map(x=>x.toString).collect().distinct
-
-      val nextGbyNode = thisG.vertices.mapValues((_,x)=>{
-        if(nextKC.contains(x._1)){
-          (x._1,x._2,x._3,(x._4._1,x._4._2,x._4._3,1))
-        }else{
-          (x._1,x._2,x._3,(x._4._1,x._4._2,x._4._3,0))
-        }
-      })
-      val nextKCGraphS = Graph(nextGbyNode, KC_Dgree_cGraphS.edges, defaultNode)
-      layoutFDFR2(nextKCGraphS, iterations ,diet = true )
-
-      thisG.unpersist()
 
 
 

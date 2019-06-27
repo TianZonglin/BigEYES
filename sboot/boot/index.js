@@ -1033,7 +1033,7 @@ $(function(){
 	};
 	////发送信息
 	document.getElementById('testttt').onclick = function () {
-		canvasSocket.send("simple55.txt_of_@_without_300.json,1,300");
+		canvasSocket.send("facebook_combined.txt_of_@_without_300.json,1,150");
 		//canvasSocket.send("Vote.txt_of_@_without_800.json,760,800");
 	};
 	////发送信息

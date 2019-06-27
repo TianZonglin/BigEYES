@@ -1,8 +1,9 @@
+
 package TEST
 
-import TEST.Staff_CC._
+import TEST.Staff_CC.{Triangles, Triplets, Util}
 import org.apache.log4j.{Level, Logger}
-import org.apache.spark.graphx.{Graph, GraphLoader, _}
+import org.apache.spark.graphx.{GraphLoader, _}
 import org.apache.spark.{SparkConf, SparkContext}
 
 
@@ -70,7 +71,7 @@ object Value_CC{
     *      the second one (Int) represents the connected triplets of each vertices
     *
     * */
-  def countCC(graph: Graph[Int, Int]): (Graph[(Int, Int, Double), PartitionID], Double, Double) = {
+  def countCC(graph: org.apache.spark.graphx.Graph[Int, Int]): (org.apache.spark.graphx.Graph[(Int, Int, Double), PartitionID], Double, Double) = {
     /**
       * calculate the connected triangles, i.e. triplets
       * */

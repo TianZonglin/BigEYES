@@ -1,9 +1,7 @@
-import java.io.{File, FileWriter, PrintWriter}
+
+import java.io.{File, FileWriter}
 import java.text.SimpleDateFormat
 
-import NewTest_RN_RE_RW.mainF
-import TEST.Runner
-import TEST.Value_CC.countCC
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.graphx._
 import org.apache.spark.rdd.RDD
@@ -29,7 +27,7 @@ object NewTest_K_COre {
 
 
 
-
+/*
     NewTest_SS.mainF(tupleA, Array("10","Email-Enron.txt","\t"))
     NewTest_SS.mainF(tupleA, Array("9","Email-Enron.txt","\t"))
     NewTest_SS.mainF(tupleA, Array("8","Email-Enron.txt","\t"))
@@ -52,7 +50,7 @@ object NewTest_K_COre {
     NewTest_SS.mainF(tupleC, Array("65","facebook_combined.txt"," "))
     NewTest_SS.mainF(tupleC, Array("64","facebook_combined.txt"," "))
     NewTest_SS.mainF(tupleC, Array("63","facebook_combined.txt"," "))
-
+*/
 
 
 
@@ -445,7 +443,7 @@ object NewTest_K_COre {
 
     //===================================================================
     //vcc
-    val Vcc = countCC(graphtemp)
+    val Vcc = TEST.Value_CC.countCC(graphtemp)
 
     //===================================================================
     //av
@@ -468,5 +466,6 @@ object NewTest_K_COre {
   }
 
 }
+
 
 

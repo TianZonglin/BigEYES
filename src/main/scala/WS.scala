@@ -7,9 +7,9 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
 
 
-object WithoutSample {
+object WS {
 
-  Logger.getLogger("org").setLevel(Level.WARN)
+  Logger.getLogger("org").setLevel(Level.ERROR)
 
   def main(args: Array[String]) {
 
@@ -407,7 +407,7 @@ object WithoutSample {
         input = "resources\\"+fname
         output = "output\\"+fname
 
-        iterations = 30
+        iterations = 300
 
       }
 

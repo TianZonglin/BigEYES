@@ -1,3 +1,4 @@
+
 import java.io._
 import java.text.SimpleDateFormat
 
@@ -7,7 +8,7 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
 
 
-object WS {
+object WS_FINAL {
 
   Logger.getLogger("org").setLevel(Level.ERROR)
 
@@ -166,18 +167,18 @@ object WS {
     : Unit = {
 
       val furl = {
-        if(isFirst) fn + s"_One_Layer_$iterations.json"
-        else fn + s"_Two_Layer_$iterations.json"
+        if(isFirst) fn+s"_without_$iterations.json"
+        else fn+s"__without__$iterations.json"
       }
 
       printToFile(new File(furl)) {
         p => {
           p.println("""{"nodes": [""")
-          g.vertices.filter(x => {x._2._4._4 > 0.8}).collect.foreach(
+          g.vertices.collect.foreach(
             x => p.println(s"""{"weight": "0","name": "o","value": "${x._2._4._3/10f}","cx":"${x._2._2}","cy": "${x._2._3}"}, """)
           )
           p.println("""{"weight": "0","name": "o","value": "0","cx":"0","cy": "0"}],    "links": [""")
-          g.triplets.filter(x => { x.srcAttr._4._4 > 0.8 && x.dstAttr._4._4 > 0.8 }).collect.foreach(
+          g.triplets.collect.foreach(
             x => p.println(s"""{"value": "0","x1": "${x.srcAttr._2}","y1": "${x.srcAttr._3}","x2": "${x.dstAttr._2}","y2": "${x.dstAttr._3}"},""")
           )
           p.println("""{"value": "0","x1": "0","y1": "0","x2": "0","y2": "0"}]}""")
@@ -197,30 +198,26 @@ object WS {
       val setC: VertexRDD[(String, Double, Double, (Double,Double,Double,Double))]
       = g.vertices.mapValues(
         v => {
-          if(v._4._4 > 0.8) {
-            val v1 = (v._2, v._3)
-            var bx = 0D
-            var by = 0D
-            array.foreach(x => {
-              val v2 = (x._2._2, x._2._3)
-              val xDist = v1._1 - v2._1
-              val yDist = v1._2 - v2._2
+          val v1 = (v._2,v._3)
+          var bx = 0D
+          var by = 0D
+          array.foreach(x=>{
+            val v2 = (x._2._2,x._2._3)
+            val xDist = v1._1 - v2._1
+            val yDist = v1._2 - v2._2
 
-              val dist = math.sqrt(xDist * xDist + yDist * yDist)
-              if (dist > 0) {
-                val repulsiveF = k * k / dist
-                // Force de répulsion
-                bx += xDist / dist * repulsiveF // on l'applique...
-                by += yDist / dist * repulsiveF
-                //println(s"$yDist / $dist * $repulsiveF")
-              }
+            val dist = math.sqrt(xDist * xDist + yDist * yDist)
+            if (dist > 0) {
+              val repulsiveF = k * k / dist
+              // Force de répulsion
+              bx += xDist / dist * repulsiveF // on l'applique...
+              by += yDist / dist * repulsiveF
+              //println(s"$yDist / $dist * $repulsiveF")
+            }
 
-            })
-            //println(s"k = $k bx = $bx, by = $by")
-            (v._1, v._2, v._3, (v._4._1 + bx, v._4._2 + by, v._4._3, v._4._4))
-          }else{
-            v
-          }
+          })
+          //println(s"k = $k bx = $bx, by = $by")
+          (v._1, v._2, v._3, (v._4._1 + bx, v._4._2 + by, v._4._3, v._4._4))
         }
       )
       val graphN = Graph(setC, g.edges, defaultNode)
@@ -238,22 +235,19 @@ object WS {
 
         sendMsg = {
           triplet => {
-
             val Source = triplet.srcAttr
             val Target = triplet.dstAttr
-            if(Source._4._4 > 0.8 && Target._4._4 > 0.8) {
-              val xDist = Source._2 - Target._2
-              val yDist = Source._3 - Target._3
+            val xDist = Source._2 - Target._2
+            val yDist = Source._3 - Target._3
 
-              val dist = math.sqrt(xDist * xDist + yDist * yDist)
-              val attractiveF = dist * dist / k
+            val dist = math.sqrt(xDist * xDist + yDist * yDist)
+            val attractiveF = dist * dist / k
 
-              if (dist > 0) {
-                val dx = xDist / dist * attractiveF
-                val dy = yDist / dist * attractiveF
-                //println(s"dx = $dx, dy = $dy")
-                triplet.sendToDst(dx, dy)
-              }
+            if (dist > 0) {
+              val dx = xDist / dist * attractiveF
+              val dy = yDist / dist * attractiveF
+              //println(s"dx = $dx, dy = $dy")
+              triplet.sendToDst(dx, dy)
             }
 
           }
@@ -277,19 +271,17 @@ object WS {
           triplet => {
             val Source = triplet.srcAttr
             val Target = triplet.dstAttr
-            if(Source._4._4 > 0.8 && Target._4._4 > 0.8) {
-              val xDist = Source._2 - Target._2
-              val yDist = Source._3 - Target._3
+            val xDist = Source._2 - Target._2
+            val yDist = Source._3 - Target._3
 
-              val dist = math.sqrt(xDist * xDist + yDist * yDist)
-              val attractiveF = dist * dist / k
+            val dist = math.sqrt(xDist * xDist + yDist * yDist)
+            val attractiveF = dist * dist / k
 
-              if (dist > 0) {
-                val dx = xDist / dist * attractiveF
-                val dy = yDist / dist * attractiveF
-                //println(s"dx = $dx, dy = $dy")
-                triplet.sendToSrc(0D - dx, 0D - dy)
-              }
+            if (dist > 0) {
+              val dx = xDist / dist * attractiveF
+              val dy = yDist / dist * attractiveF
+              //println(s"dx = $dx, dy = $dy")
+              triplet.sendToSrc(0D-dx, 0D-dy)
             }
           }
         },
@@ -312,7 +304,8 @@ object WS {
 
     def layoutFDFR2( g: Graph[ (String, Double, Double, (Double,Double,Double,Double)), Double ],
                      ctime: Int,
-                     diet:Boolean)
+                     diet:Boolean,
+                     writeFIle:Boolean)
     : Graph[ (String, Double, Double, (Double,Double,Double,Double)), Double ] = {
 
       Pregel
@@ -334,7 +327,7 @@ object WS {
         // 大数据级别时不要collect操作，采用抽样 //
         // 大数据级别时不要collect操作，采用度高节点（重要节点） //
 
-        val sim = gs.vertices.filter(x => {x._2._4._4 > 0.8}).sample(false, 0.2).collect()
+        val sim = gs.vertices.sample(withReplacement = false, 0.2).collect()
 
         val gRep = calcRepulsion( sim, gs )
 
@@ -348,33 +341,30 @@ object WS {
         val vNewPositions = gBB.vertices.mapValues(
 
           (_, a) => {
-            if(a._4._4 > 0.8 && a._4._4 > 0.8) {
-              val nx = a._2
-              val ny = a._3
 
-              val d = Math.sqrt(nx * nx + ny * ny)
-              val gf = 0.01f * k * gravitys * d
+            val nx = a._2
+            val ny = a._3
 
-              //添加上重力
-              val p = (a._4._1 - gf * nx / d) * speed / SPEED_DIVISOR
-              val q = (a._4._2 - gf * ny / d) * speed / SPEED_DIVISOR
+            val d = Math.sqrt(nx * nx + ny * ny)
+            val gf = 0.01f * k * gravitys * d
 
-              val dist: Double = Math.sqrt(p * p + q * q)
-              //println(s"p = $p , q = $q")
-              if (dist > 0) {
-                //cnt = cnt + 1
-                //println(cnt)
-                val limitedDist: Double = Math.min(maxDisplace * (speed / SPEED_DIVISOR), dist)
-                //println(s"Math.min(${maxDisplace * (speed / SPEED_DIVISOR)}, $dist)   cnt = $iteration")
-                val x = p / dist * limitedDist
-                val y = q / dist * limitedDist
-                //println(s"dx = ${a._2+x} dy = ${a._3+y}  cnt = $iteration")
-                (a._1, a._2 + x, a._3 + y, (0.0, 0.0, a._4._3, a._4._4))
-              } else {
-                (a._1, a._2, a._3, (0.0, 0.0, a._4._3, a._4._4))
-              }
-            }else {
-              (a._1, a._2, a._3, (0.0, 0.0, a._4._3, a._4._4))
+            //添加上重力
+            val p = (a._4._1 - gf * nx / d) * speed / SPEED_DIVISOR
+            val q = (a._4._2 - gf * ny / d) * speed / SPEED_DIVISOR
+
+            val dist: Double = Math.sqrt( p * p + q * q)
+            //println(s"p = $p , q = $q")
+            if (dist > 0 ) {
+              //cnt = cnt + 1
+              //println(cnt)
+              val limitedDist: Double = Math.min(maxDisplace * (speed / SPEED_DIVISOR), dist)
+              //println(s"Math.min(${maxDisplace * (speed / SPEED_DIVISOR)}, $dist)   cnt = $iteration")
+              val x = p / dist * limitedDist
+              val y = q / dist * limitedDist
+              //println(s"dx = ${a._2+x} dy = ${a._3+y}  cnt = $iteration")
+              (a._1,a._2+x, a._3+y, (0.0, 0.0, a._4._3, a._4._4))
+            }else{
+              (a._1,a._2, a._3, (0.0, 0.0, a._4._3, a._4._4))
             }
           })
 
@@ -385,7 +375,7 @@ object WS {
 
         //
         // 可以每次迭代都保存布局结果
-        if(!REMOTE_JOB){
+        if(!REMOTE_JOB && writeFIle){
           dumpWithLayout(gs, output+"_of_"+iteration, diet)
         }
         cool(iteration)
@@ -401,7 +391,7 @@ object WS {
 
       // 用户设定，定义输入输出，分隔符，及迭代次数，注意路径  //
 
-      tab = " "
+      tab = "\t"
 
       if(REMOTE_JOB){
 
@@ -415,7 +405,7 @@ object WS {
       }else{
 
         // 本地项目相对路径
-        fname = "facebook_combined.txt"
+        fname = "Email-Enron.txt"
         input = "resources\\"+fname
         output = "output\\"+fname
 
@@ -459,7 +449,7 @@ object WS {
 
       val graphS = loadEdges( input )
 
-      println(graphS.vertices.count())
+      //println(graphS.vertices.count())
 
       // 图顶点绑定自定义信息 //
 
@@ -472,7 +462,8 @@ object WS {
 
       k = math.sqrt(area * AREA_MULTIPLICATOR / (sizeOfGraph +1) )// 防止点为0
 
-      // 跳过图数据的采样流程 //
+      // 跳过图数据的采样流程
+
 
 
       //===================================================================
@@ -492,7 +483,25 @@ object WS {
       val KC_RDD_cGraphS = G.vertices.filter(x => {x._2==true}).map(x => x._1)//.foreach(println)
 
 
-      println(cGraphS.vertices.count()+">>>>>>>>>"+KC_RDD_cGraphS.count())
+
+
+      //KC_RDD.foreach(println)
+      val KC_arrs  = KC_RDD_cGraphS.map(x=>x.toString).collect()
+
+      val layerOne = (KC_arrs++head_nodes).distinct
+
+      val Graph_ONE = cGraphS.subgraph(
+        vpred = {
+          (_,v) => layerOne.contains(v._1)
+        }
+      ).persist()
+
+      println(cGraphS.vertices.count()+">>>>>>>>>"+Graph_ONE.vertices.count())
+      println(cGraphS.edges.count()+">>>>>>>>>"+Graph_ONE.edges.count())
+
+/*
+
+
 
       //KC_RDD.foreach(println)
       val KC_arrs  = KC_RDD_cGraphS.map(x=>x.toString).collect()
@@ -546,6 +555,33 @@ object WS {
       }
 
       thisG.unpersist()
+
+
+
+*/
+
+
+
+
+
+
+
+
+
+
+
+      // 跳过采样直接调用布局 //
+      val end = layoutFDFR2(Graph_ONE, 100 ,diet = true, writeFIle = false )
+      // 存文件
+      if(REMOTE_JOB){
+        end.vertices.saveAsTextFile( output+"_WithoutSample_Vertices_rst")
+        end.edges.saveAsTextFile( output+"_WithoutSample_Edges_rst")
+      }else{
+        dumpWithLayout(end, output+"_11111111111111", isFirst = false)
+      }
+
+      cGraphS.unpersist()
+      Graph_ONE.unpersist()
 
 
 

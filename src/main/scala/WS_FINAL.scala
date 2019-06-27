@@ -413,7 +413,7 @@ object WS_FINAL {
         iterations = myargss(1).toInt
 
       }else{
-        myargss = Array("Email-Enron.txt","200","100","80","60","40","20")
+        myargss = Array("Email-Enron.txt","300","100","80","60","40","20")
         // 本地项目相对路径
         fname = myargss(0)
         input = "resources\\"+fname
@@ -438,9 +438,9 @@ object WS_FINAL {
       //area = 10000            //布局大小。最好是次方值，长宽均开根号得到 = FR
       //dbi = 0.2               //默认 [ 度筛选 ] 比率
       //sbi = 0.1               //默认 [ 采样比 ]
-      speed = 20.0              //等于1时无效，默认无效   = FR
+      speed = 30.0              //等于1时无效，默认无效   = FR
       SPEED_DIVISOR = 800d    //速度除数默认值   = FR
-      REP_SCALE = 4           //等于1时无效，默认无效
+      REP_SCALE = 10           //等于1时无效，默认无效
       ATT_SCALE = 1         //等于1时无效，默认无效
       gravitys = 1d          //向心力因子默认值    = FR
       epsilon = 0.001         //默认值，防止点重合时距离为0而不计算

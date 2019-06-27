@@ -322,10 +322,11 @@ object WS_FINAL {
 
       var vaval = 0.2
       thisLayer match {
-        case 1 => vaval = 0.8
-        case 2 => vaval = 0.6
-        case 3 => vaval = 0.4
+        case 1 => vaval = 0.5
+        case 2 => vaval = 0.4
+        case 3 => vaval = 0.3
         case 4 => vaval = 0.2
+        case 5 => vaval = 0.1
         case _ => println("\nE R R O R\n")
       }
 
@@ -394,7 +395,7 @@ object WS_FINAL {
     }
 
     def initialAlgorithm(): Unit = {
-
+      var myargss: Array[String] = null
       def date:String
       = new SimpleDateFormat("MM-dd_HH-mm_").format(System.currentTimeMillis())
 
@@ -403,22 +404,21 @@ object WS_FINAL {
       tab = "\t"
 
       if(REMOTE_JOB){
-
+        myargss = args
         // 集群HDFS绝对路径
-        fname = args(0)
+        fname = myargss(0)
         input = "hdfs://hadoop02:9000/SNAP/DATASET/"+fname
         output = "hdfs://hadoop02:9000/SNAP/OUTPUT/"+fname
 
-        iterations = args(1).toInt
+        iterations = myargss(1).toInt
 
       }else{
-
+        myargss = Array("Email-Enron.txt","200","100","80","60","40","20")
         // 本地项目相对路径
-        fname = "Email-Enron.txt"
+        fname = myargss(0)
         input = "resources\\"+fname
         output = "output\\"+fname
-
-        iterations = 300
+        iterations = myargss(1).toInt
 
       }
 
@@ -488,7 +488,7 @@ object WS_FINAL {
 
       //===================================================================
       //Core分层
-      val G = KCore.run(cGraphS, 40.toInt, 1)                                                                /////////////////////////////
+      val G = KCore.run(cGraphS, myargss(2).toInt, 1)                                                                /////////////////////////////
       val KC_RDD_cGraphS = G.vertices.filter(x => {x._2==true}).map(x => x._1)//.foreach(println)
 
 
@@ -528,7 +528,7 @@ object WS_FINAL {
 
 
       val cGraphS2 = cGraphS.joinVertices(ONE.vertices)( (_,_,b) => b )
-      val G2 = KCore.run(cGraphS2, 30, 1).vertices.filter(x => {x._2==true}).map(x => x._1)          /////////////////////////////////////
+      val G2 = KCore.run(cGraphS2, myargss(3).toInt, 1).vertices.filter(x => {x._2==true}).map(x => x._1)          /////////////////////////////////////
       val Arrs2  = G2.map(x=>x.toString).collect()
       val Graph_TWO = cGraphS2.subgraph(
         vpred = {
@@ -553,7 +553,7 @@ object WS_FINAL {
 
 
       val cGraphS3 = cGraphS.joinVertices(TWO.vertices)( (_,_,b) => b )
-      val G3 = KCore.run(cGraphS3,20, 1).vertices.filter(x => {x._2==true}).map(x => x._1)                 //////////////////////////////
+      val G3 = KCore.run(cGraphS3,myargss(4).toInt, 1).vertices.filter(x => {x._2==true}).map(x => x._1)                 //////////////////////////////
       val Arrs3  = G3.map(x=>x.toString).collect()
       val Graph_THREE = cGraphS3.subgraph(
         vpred = {
@@ -579,7 +579,7 @@ object WS_FINAL {
 
 
       val cGraphS4 = cGraphS.joinVertices(THREE.vertices)( (_,_,b) => b )
-      val G4 = KCore.run(cGraphS4, 10, 1).vertices.filter(x => {x._2==true}).map(x => x._1)                 //////////////////////////////
+      val G4 = KCore.run(cGraphS4, myargss(5).toInt, 1).vertices.filter(x => {x._2==true}).map(x => x._1)                 //////////////////////////////
       val Arrs4  = G4.map(x=>x.toString).collect()
       val Graph_FOUR = cGraphS4.subgraph(
         vpred = {
@@ -604,7 +604,7 @@ object WS_FINAL {
 
 
       val cGraphS5 = cGraphS.joinVertices(TWO.vertices)( (_,_,b) => b )
-      val G5 = KCore.run(cGraphS5, 5, 1).vertices.filter(x => {x._2==true}).map(x => x._1)                 //////////////////////////////
+      val G5 = KCore.run(cGraphS5, myargss(6).toInt, 1).vertices.filter(x => {x._2==true}).map(x => x._1)                 //////////////////////////////
       val Arrs5  = G5.map(x=>x.toString).collect()
       val Graph_FIVE = cGraphS5.subgraph(
         vpred = {
@@ -623,6 +623,17 @@ object WS_FINAL {
         FIVE.edges.saveAsTextFile( output+"_5555_Edges")
       }else{
         dumpWithLayout(FIVE, output+"5555555555", Layer = 5)
+      }
+
+
+      val finalx = cGraphS.joinVertices(FIVE.vertices)( (_,_,b) => b )
+      val finalxfinalx = layoutFDFR2(finalx, iterations ,thisLayer = 6, writeFIle = false )
+      // 存文件
+      if(REMOTE_JOB){
+        FIVE.vertices.saveAsTextFile( output+"_6666_Vertices")
+        FIVE.edges.saveAsTextFile( output+"_6666_Edges")
+      }else{
+        dumpWithLayout(FIVE, output+"6666666666666666", Layer = 5)
       }
 
 

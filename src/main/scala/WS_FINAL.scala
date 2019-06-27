@@ -163,12 +163,11 @@ object WS_FINAL {
 
     def dumpWithLayout(g: Graph[(String, Double, Double, (Double, Double, Double, Double)), Double],
                        fn: String,
-                       isFirst: Boolean)
+                       Layer: Int)
     : Unit = {
 
       val furl = {
-        if(isFirst) fn+s"_without_$iterations.json"
-        else fn+s"__without__$iterations.json"
+        fn+s"_${Layer}_$iterations.json"
       }
 
       printToFile(new File(furl)) {
@@ -304,7 +303,7 @@ object WS_FINAL {
 
     def layoutFDFR2( g: Graph[ (String, Double, Double, (Double,Double,Double,Double)), Double ],
                      ctime: Int,
-                     diet:Boolean,
+                     thisLayer:Int,
                      writeFIle:Boolean)
     : Graph[ (String, Double, Double, (Double,Double,Double,Double)), Double ] = {
 
@@ -321,13 +320,23 @@ object WS_FINAL {
 
       temperature = 0.1 * math.sqrt(area) // current temperature
 
+      var vaval = 0.2
+      thisLayer match {
+        case 1 => vaval = 0.8
+        case 2 => vaval = 0.6
+        case 3 => vaval = 0.4
+        case 4 => vaval = 0.2
+        case _ => println("\nE R R O R\n")
+      }
+
       for(iteration <- 1 to iterations) {
 
         //println("> Temperature: (T=" + temperature + ")")
         // 大数据级别时不要collect操作，采用抽样 //
         // 大数据级别时不要collect操作，采用度高节点（重要节点） //
 
-        val sim = gs.vertices.sample(withReplacement = false, 0.2).collect()
+
+        val sim = gs.vertices.sample(withReplacement = false, vaval).collect()
 
         val gRep = calcRepulsion( sim, gs )
 
@@ -376,7 +385,7 @@ object WS_FINAL {
         //
         // 可以每次迭代都保存布局结果
         if(!REMOTE_JOB && writeFIle){
-          dumpWithLayout(gs, output+"_of_"+iteration, diet)
+          dumpWithLayout(gs, output+"_of_"+iteration, thisLayer)
         }
         cool(iteration)
       }
@@ -391,21 +400,21 @@ object WS_FINAL {
 
       // 用户设定，定义输入输出，分隔符，及迭代次数，注意路径  //
 
-      tab = " "
+      tab = "\t"
 
       if(REMOTE_JOB){
 
         // 集群HDFS绝对路径
         fname = args(0)
         input = "hdfs://hadoop02:9000/SNAP/DATASET/"+fname
-        output = "hdfs://hadoop02:9000/SNAP/OUTPUT/"+date+"dump_"+fname+"_"+args(1).toInt
+        output = "hdfs://hadoop02:9000/SNAP/OUTPUT/"+fname
 
         iterations = args(1).toInt
 
       }else{
 
         // 本地项目相对路径
-        fname = "facebook_combined.txt"
+        fname = "Email-Enron.txt"
         input = "resources\\"+fname
         output = "output\\"+fname
 
@@ -479,7 +488,7 @@ object WS_FINAL {
 
       //===================================================================
       //Core分层
-      val G = KCore.run(cGraphS, 100, 1)
+      val G = KCore.run(cGraphS, 40.toInt, 1)                                                                /////////////////////////////
       val KC_RDD_cGraphS = G.vertices.filter(x => {x._2==true}).map(x => x._1)//.foreach(println)
 
 
@@ -506,20 +515,20 @@ object WS_FINAL {
       ATT_SCALE = 1         //等于1时无效，默认无效
       gravitys = 5d          //向心力因子默认值    = FR
       // 采样直接调用布局 //
-      val ONE = layoutFDFR2(Graph_ONE, 100 ,diet = true, writeFIle = false )
+      val ONE = layoutFDFR2(Graph_ONE, iterations ,thisLayer = 1, writeFIle = false )
       // 存文件
       if(REMOTE_JOB){
-        ONE.vertices.saveAsTextFile( output+"_WithoutSample_Vertices_rst")
-        ONE.edges.saveAsTextFile( output+"_WithoutSample_Edges_rst")
+        ONE.vertices.saveAsTextFile( output+"_1111_Vertices")
+        ONE.edges.saveAsTextFile( output+"_1111_Edges")
       }else{
-        dumpWithLayout(ONE, output+"_11111111111111", isFirst = true)
+        dumpWithLayout(ONE, output+"_11111111111111", Layer = 1)
       }
 
 
 
 
       val cGraphS2 = cGraphS.joinVertices(ONE.vertices)( (_,_,b) => b )
-      val G2 = KCore.run(cGraphS2, 60, 1).vertices.filter(x => {x._2==true}).map(x => x._1)
+      val G2 = KCore.run(cGraphS2, 30, 1).vertices.filter(x => {x._2==true}).map(x => x._1)          /////////////////////////////////////
       val Arrs2  = G2.map(x=>x.toString).collect()
       val Graph_TWO = cGraphS2.subgraph(
         vpred = {
@@ -531,20 +540,20 @@ object WS_FINAL {
       ATT_SCALE = 2         //等于1时无效，默认无效
       gravitys = 3d          //向心力因子默认值    = FR
       // 采样直接调用布局 //
-      val TWO = layoutFDFR2(Graph_TWO, 100 ,diet = true, writeFIle = false )
+      val TWO = layoutFDFR2(Graph_TWO, iterations ,thisLayer = 2, writeFIle = false )
       // 存文件
       if(REMOTE_JOB){
-        TWO.vertices.saveAsTextFile( output+"_WithoutSample_Vertices_rst")
-        TWO.edges.saveAsTextFile( output+"_WithoutSample_Edges_rst")
+        TWO.vertices.saveAsTextFile( output+"_2222_Vertices")
+        TWO.edges.saveAsTextFile( output+"_2222_Edges")
       }else{
-        dumpWithLayout(TWO, output+"222222222222222", isFirst = false)
+        dumpWithLayout(TWO, output+"222222222222222", Layer = 2)
       }
 
 
 
 
       val cGraphS3 = cGraphS.joinVertices(TWO.vertices)( (_,_,b) => b )
-      val G3 = KCore.run(cGraphS3, 30, 1).vertices.filter(x => {x._2==true}).map(x => x._1)
+      val G3 = KCore.run(cGraphS3,20, 1).vertices.filter(x => {x._2==true}).map(x => x._1)                 //////////////////////////////
       val Arrs3  = G3.map(x=>x.toString).collect()
       val Graph_THREE = cGraphS3.subgraph(
         vpred = {
@@ -556,23 +565,50 @@ object WS_FINAL {
       ATT_SCALE = 3         //等于1时无效，默认无效
       gravitys = 2d          //向心力因子默认值    = FR
       // 采样直接调用布局 //
-      val THREE = layoutFDFR2(Graph_THREE, 100 ,diet = true, writeFIle = false )
+      val THREE = layoutFDFR2(Graph_THREE, iterations ,thisLayer = 3, writeFIle = false )
       // 存文件
       if(REMOTE_JOB){
-        THREE.vertices.saveAsTextFile( output+"_WithoutSample_Vertices_rst")
-        THREE.edges.saveAsTextFile( output+"_WithoutSample_Edges_rst")
+        THREE.vertices.saveAsTextFile( output+"_3333_Vertices")
+        THREE.edges.saveAsTextFile( output+"_3333_Edges")
       }else{
-        dumpWithLayout(THREE, output+"33333333333", isFirst = false)
+        dumpWithLayout(THREE, output+"33333333333", Layer = 3)
       }
 
 
 
-      val cGraphS4 = cGraphS.joinVertices(TWO.vertices)( (_,_,b) => b )
-      //val G3 = KCore.run(cGraphS4, 30, 1).vertices.filter(x => {x._2==true}).map(x => x._1)
-      val Arrs4  = cGraphS4.map(x=>x.toString).collect()
-      val Graph_THREE = cGraphS3.subgraph(
+
+
+      val cGraphS4 = cGraphS.joinVertices(THREE.vertices)( (_,_,b) => b )
+      val G4 = KCore.run(cGraphS4, 10, 1).vertices.filter(x => {x._2==true}).map(x => x._1)                 //////////////////////////////
+      val Arrs4  = G4.map(x=>x.toString).collect()
+      val Graph_FOUR = cGraphS4.subgraph(
         vpred = {
-          (_,v) => Arrs3.contains(v._1)
+          (_,v) => Arrs4.contains(v._1)
+        }
+      ).persist()
+
+      //val Graph_FOUR = cGraphS.joinVertices(THREE.vertices)( (_,_,b) => b )
+
+      REP_SCALE = 8           //等于1时无效，默认无效
+      ATT_SCALE = 3         //等于1时无效，默认无效
+      gravitys = 2d          //向心力因子默认值    = FR
+      // 采样直接调用布局 //
+      val FOUR = layoutFDFR2(Graph_FOUR, iterations ,thisLayer = 4, writeFIle = false )
+      // 存文件
+      if(REMOTE_JOB){
+        FOUR.vertices.saveAsTextFile( output+"_4444_Vertices")
+        FOUR.edges.saveAsTextFile( output+"_4444_Edges")
+      }else{
+        dumpWithLayout(FOUR, output+"4444444444444444", Layer = 4)
+      }
+
+
+      val cGraphS5 = cGraphS.joinVertices(TWO.vertices)( (_,_,b) => b )
+      val G5 = KCore.run(cGraphS5, 5, 1).vertices.filter(x => {x._2==true}).map(x => x._1)                 //////////////////////////////
+      val Arrs5  = G5.map(x=>x.toString).collect()
+      val Graph_FIVE = cGraphS5.subgraph(
+        vpred = {
+          (_,v) => Arrs5.contains(v._1)
         }
       ).persist()
 
@@ -580,23 +616,22 @@ object WS_FINAL {
       ATT_SCALE = 3         //等于1时无效，默认无效
       gravitys = 2d          //向心力因子默认值    = FR
       // 采样直接调用布局 //
-      val THREE = layoutFDFR2(Graph_THREE, 100 ,diet = true, writeFIle = false )
+      val FIVE = layoutFDFR2(Graph_FIVE, iterations ,thisLayer = 5, writeFIle = false )
       // 存文件
       if(REMOTE_JOB){
-        THREE.vertices.saveAsTextFile( output+"_WithoutSample_Vertices_rst")
-        THREE.edges.saveAsTextFile( output+"_WithoutSample_Edges_rst")
+        FIVE.vertices.saveAsTextFile( output+"_5555_Vertices")
+        FIVE.edges.saveAsTextFile( output+"_5555_Edges")
       }else{
-        dumpWithLayout(THREE, output+"33333333333", isFirst = false)
+        dumpWithLayout(FIVE, output+"5555555555", Layer = 5)
       }
-
-
-
 
 
       cGraphS.unpersist()
       Graph_ONE.unpersist()
       Graph_TWO.unpersist()
       Graph_THREE.unpersist()
+      Graph_FOUR.unpersist()
+      Graph_FIVE.unpersist()
 
       println(s"> Area               : $area")
       println(s"> Spring constant    : $k")

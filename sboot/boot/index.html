@@ -534,7 +534,7 @@
  
 			<div class="col-md-12 column">
 				<div class="row clearfix">
-					<div class="col-md-5 column" style="padding-left:0px;padding-right:0px;">
+					<div class="col-md-6 column" style="padding-left:0px;padding-right:0px;">
 						<div id="canvas-central-left" style="width: 100%; height: 420px;" ></div><br>
 						<div class="alert alert-dismissable alert-info"  >
 							 <button type="button" class="close"  id="closeCVS">×</button>
@@ -548,45 +548,68 @@
 						
 
 					</div>
+					<div class="col-md-6 column" style="padding-right: 0px;">
+						<div id="canvas-central-mid" style="width: 100%; height: 420px;" ></div><br>
+						<div class="alert alert-dismissable alert-info"  >
+							<button type="button" class="close"  id="closeCVSmid">×</button>
+							<h4>
+								上传数据 & 下载结果
+							</h4>
+							<!--<strong>Import Files</strong><br>-->
+							首先需要&nbsp;<button type="button" class="btn btn-default toolbtn" id="fileSelet" style="display:inline-block;">选择上传文件</button><br>
+							然后选择&nbsp;
+							<input name="q" type="radio"style="display:inline-block;" checked="checked"/>Tab[\t]
+							<input name="q" type="radio"style="display:inline-block;" />BlankSpace[ ]
+							<input name="q" type="radio"style="display:inline-block;" />Comma[,]
+							<br>
+							最后点击&nbsp;<button type="button" class="btn btn-default toolbtn" id="fileUp" style="display:inline-block;">上传</button><br>
 
-					<div class="col-md-7 column" style="padding-right: 0px;">
+							<!--<strong>Export Results</strong><br>-->
+							如果需要导出所示布局结果，请点击以下格式导出：<br>
+							<button type="button" class="btn btn-default toolbtn" id="fileCsv" style="display:inline-block;">CSV</button>&nbsp;
+							<button type="button" class="btn btn-default toolbtn" id="fileGexf" style="display:inline-block;">GEXF</button>&nbsp;
+							<button type="button" class="btn btn-default toolbtn" id="fileJson" style="display:inline-block;">JSON(D3)</button><br>
+						</div>
+					</div>
+<!--					<div class="col-md-7 column" style="padding-right: 0px;">
 						<div id="canvas-central-mid" style="width: 100%; height: 420px;" ></div><br>
 						<div class="alert alert-dismissable alert-info"  >
 							 <button type="button" class="close"  id="closeCVSmid">×</button>
 							<h4>
 								View by mainly structural layer.
-							</h4> 
+							</h4>
 							<strong>查看布局骨架！</strong> 当前显示数据集的主要*拓扑结构<br>
 							[主要]： 由多种策略综合计算得到
 							<button type="button" class="btn btn-default toolbtn" id="checkBones" style="display:inline-block;">View</button>
 						</div>
-					</div>
+					</div>-->
 				</div>
 			</div>
- 
+
+
 			<!-- <a id="modal-803219" href="#modal-container-803219" role="button" class="btn" data-toggle="modal">触发遮罩窗体</a> -->
-			
+
 			<!-- <div class="modal fade" id="modal-container-803219" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"> -->
-				<!-- <div class="modal-dialog"> -->
-					<!-- <div class="modal-content"> -->
-						<!-- <div class="modal-header"> -->
-							 <!-- <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button> -->
-							<!-- <h4 class="modal-title" id="myModalLabel"> -->
-								<!-- 标题 -->
-							<!-- </h4> -->
-						<!-- </div> -->
-						<!-- <div class="modal-body"> -->
-							<!-- 内容... -->
-						<!-- </div> -->
-						<!-- <div class="modal-footer"> -->
-							 <!-- <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button> <button type="button" class="btn btn-primary">保存</button> -->
-						<!-- </div> -->
-					<!-- </div> -->
-					
-				<!-- </div> -->
-				
+			<!-- <div class="modal-dialog"> -->
+			<!-- <div class="modal-content"> -->
+			<!-- <div class="modal-header"> -->
+			<!-- <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button> -->
+			<!-- <h4 class="modal-title" id="myModalLabel"> -->
+			<!-- 标题 -->
+			<!-- </h4> -->
 			<!-- </div> -->
-			<div id="environment"></div>  
+			<!-- <div class="modal-body"> -->
+			<!-- 内容... -->
+			<!-- </div> -->
+			<!-- <div class="modal-footer"> -->
+			<!-- <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button> <button type="button" class="btn btn-primary">保存</button> -->
+			<!-- </div> -->
+			<!-- </div> -->
+
+			<!-- </div> -->
+
+			<!-- </div> -->
+			<div id="environment"></div>
 			<!-- 绑定变量 -->
 			<address> <strong>Northeastern Univ.  2019 ©</strong><br />Shenyang, China.<br /><br> </address>
 		</div>
@@ -617,8 +640,6 @@
 
 
 -->
-
-
 
 
 

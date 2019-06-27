@@ -391,7 +391,7 @@ object WS_FINAL {
 
       // 用户设定，定义输入输出，分隔符，及迭代次数，注意路径  //
 
-      tab = "\t"
+      tab = " "
 
       if(REMOTE_JOB){
 
@@ -405,7 +405,7 @@ object WS_FINAL {
       }else{
 
         // 本地项目相对路径
-        fname = "Email-Enron.txt"
+        fname = "facebook_combined.txt"
         input = "resources\\"+fname
         output = "output\\"+fname
 
@@ -479,7 +479,7 @@ object WS_FINAL {
 
       //===================================================================
       //Core分层
-      val G = KCore.run(cGraphS, 30, 1)
+      val G = KCore.run(cGraphS, 100, 1)
       val KC_RDD_cGraphS = G.vertices.filter(x => {x._2==true}).map(x => x._1)//.foreach(println)
 
 
@@ -499,91 +499,104 @@ object WS_FINAL {
       println(cGraphS.vertices.count()+">>>>>>>>>"+Graph_ONE.vertices.count())
       println(cGraphS.edges.count()+">>>>>>>>>"+Graph_ONE.edges.count())
 
-/*
 
 
 
-      //KC_RDD.foreach(println)
-      val KC_arrs  = KC_RDD_cGraphS.map(x=>x.toString).collect()
+      REP_SCALE = 10           //等于1时无效，默认无效
+      ATT_SCALE = 1         //等于1时无效，默认无效
+      gravitys = 5d          //向心力因子默认值    = FR
+      // 采样直接调用布局 //
+      val ONE = layoutFDFR2(Graph_ONE, 100 ,diet = true, writeFIle = false )
+      // 存文件
+      if(REMOTE_JOB){
+        ONE.vertices.saveAsTextFile( output+"_WithoutSample_Vertices_rst")
+        ONE.edges.saveAsTextFile( output+"_WithoutSample_Edges_rst")
+      }else{
+        dumpWithLayout(ONE, output+"_11111111111111", isFirst = true)
+      }
 
-      val layer = (KC_arrs++head_nodes).distinct
 
-      val getGbyNode = cGraphS.vertices.mapValues((_,x)=>{
-        if(layer.contains(x._1)){
-          (x._1,x._2,x._3,(x._4._1,x._4._2,x._4._3,1d))
-        }else{
-          (x._1,x._2,x._3,(x._4._1,x._4._2,x._4._3,0d))
+
+
+      val cGraphS2 = cGraphS.joinVertices(ONE.vertices)( (_,_,b) => b )
+      val G2 = KCore.run(cGraphS2, 60, 1).vertices.filter(x => {x._2==true}).map(x => x._1)
+      val Arrs2  = G2.map(x=>x.toString).collect()
+      val Graph_TWO = cGraphS2.subgraph(
+        vpred = {
+          (_,v) => Arrs2.contains(v._1)
         }
-      })
-      val KC_Dgree_cGraphS = Graph(getGbyNode, cGraphS.edges, defaultNode)
-      //KC_Dgree_cGraphS.triplets.foreach(println(_))
-      println("D筛包含的点数："+head_nodes.length)
-      println("K核包含的点数："+KC_arrs.length)
-      println("K核+D筛包含的点数："+(KC_arrs++head_nodes).distinct.length)
+      ).persist()
 
-
-
-      // 【s使用采样结构】调用布局 //
-      val thisG = layoutFDFR2(KC_Dgree_cGraphS, (iterations/3).toInt ,diet = true )
-      thisG.persist()
+      REP_SCALE = 8           //等于1时无效，默认无效
+      ATT_SCALE = 2         //等于1时无效，默认无效
+      gravitys = 3d          //向心力因子默认值    = FR
+      // 采样直接调用布局 //
+      val TWO = layoutFDFR2(Graph_TWO, 100 ,diet = true, writeFIle = false )
       // 存文件
       if(REMOTE_JOB){
-        thisG.vertices.saveAsTextFile( output+"_WithoutSample_Vertices_rst")
-        thisG.edges.saveAsTextFile( output+"_WithoutSample_Edges_rst")
+        TWO.vertices.saveAsTextFile( output+"_WithoutSample_Vertices_rst")
+        TWO.edges.saveAsTextFile( output+"_WithoutSample_Edges_rst")
       }else{
-        dumpWithLayout(thisG, output+"_WithoutSample_end", isFirst = true)
+        dumpWithLayout(TWO, output+"222222222222222", isFirst = false)
       }
-      val nextG = KCore.run(thisG, 20, 1)
-      val nextArr = nextG.vertices.filter(x => {x._2==true}).map(x => x._1)//.foreach(println)
-      val nextKC  = nextArr.map(x=>x.toString).collect().distinct
 
-      val nextGbyNode = thisG.vertices.mapValues((_,x)=>{
-        if(nextKC.contains(x._1)){
-          (x._1,x._2,x._3,(x._4._1,x._4._2,x._4._3,2d))
-        }else{
-          (x._1,x._2,x._3,(x._4._1,x._4._2,x._4._3,x._4._4))
+
+
+
+      val cGraphS3 = cGraphS.joinVertices(TWO.vertices)( (_,_,b) => b )
+      val G3 = KCore.run(cGraphS3, 30, 1).vertices.filter(x => {x._2==true}).map(x => x._1)
+      val Arrs3  = G3.map(x=>x.toString).collect()
+      val Graph_THREE = cGraphS3.subgraph(
+        vpred = {
+          (_,v) => Arrs3.contains(v._1)
         }
-      })
-      val nextKCGraphS = Graph(nextGbyNode, KC_Dgree_cGraphS.edges, defaultNode)
-      layoutFDFR2(nextKCGraphS, (iterations/3)*2.toInt ,diet = true )
+      ).persist()
+
+      REP_SCALE = 8           //等于1时无效，默认无效
+      ATT_SCALE = 3         //等于1时无效，默认无效
+      gravitys = 2d          //向心力因子默认值    = FR
+      // 采样直接调用布局 //
+      val THREE = layoutFDFR2(Graph_THREE, 100 ,diet = true, writeFIle = false )
       // 存文件
       if(REMOTE_JOB){
-        thisG.vertices.saveAsTextFile( output+"_WithoutSample_Vertices_rst")
-        thisG.edges.saveAsTextFile( output+"_WithoutSample_Edges_rst")
+        THREE.vertices.saveAsTextFile( output+"_WithoutSample_Vertices_rst")
+        THREE.edges.saveAsTextFile( output+"_WithoutSample_Edges_rst")
       }else{
-        dumpWithLayout(thisG, output+"_WithoutSample_end", isFirst = false)
+        dumpWithLayout(THREE, output+"33333333333", isFirst = false)
       }
 
-      thisG.unpersist()
 
 
+      val cGraphS4 = cGraphS.joinVertices(TWO.vertices)( (_,_,b) => b )
+      //val G3 = KCore.run(cGraphS4, 30, 1).vertices.filter(x => {x._2==true}).map(x => x._1)
+      val Arrs4  = cGraphS4.map(x=>x.toString).collect()
+      val Graph_THREE = cGraphS3.subgraph(
+        vpred = {
+          (_,v) => Arrs3.contains(v._1)
+        }
+      ).persist()
 
-*/
-
-
-
-
-
-
-
-
-
-
-
-      // 跳过采样直接调用布局 //
-      val end = layoutFDFR2(Graph_ONE, 100 ,diet = true, writeFIle = false )
+      REP_SCALE = 8           //等于1时无效，默认无效
+      ATT_SCALE = 3         //等于1时无效，默认无效
+      gravitys = 2d          //向心力因子默认值    = FR
+      // 采样直接调用布局 //
+      val THREE = layoutFDFR2(Graph_THREE, 100 ,diet = true, writeFIle = false )
       // 存文件
       if(REMOTE_JOB){
-        end.vertices.saveAsTextFile( output+"_WithoutSample_Vertices_rst")
-        end.edges.saveAsTextFile( output+"_WithoutSample_Edges_rst")
+        THREE.vertices.saveAsTextFile( output+"_WithoutSample_Vertices_rst")
+        THREE.edges.saveAsTextFile( output+"_WithoutSample_Edges_rst")
       }else{
-        dumpWithLayout(end, output+"_11111111111111", isFirst = false)
+        dumpWithLayout(THREE, output+"33333333333", isFirst = false)
       }
+
+
+
+
 
       cGraphS.unpersist()
       Graph_ONE.unpersist()
-
-
+      Graph_TWO.unpersist()
+      Graph_THREE.unpersist()
 
       println(s"> Area               : $area")
       println(s"> Spring constant    : $k")

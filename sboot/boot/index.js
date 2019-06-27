@@ -1038,7 +1038,7 @@ $(function(){
 	};
 	////发送信息
 	document.getElementById('testttt2').onclick = function () {
-		canvasSocket.send("demo2\\Vote.txt_of_@_without_500.json,1,500");
+		canvasSocket.send("facebook_combined.txt_of_1_without_200.json,1,200");
 		//canvasSocket.send("Vote.txt_of_@_without_800.json,760,800");
 	};
 

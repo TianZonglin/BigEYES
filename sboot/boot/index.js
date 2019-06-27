@@ -19,7 +19,7 @@ $(function(){
 
 	//let root = 'ws://219.216.65.14';
 	let wsroot = 'ws://localhost';
-	//let httproot = 'ws://localhost';
+	//let httproot = 'http://219.216.65.14';
 	let httproot = 'http://localhost';
 	let canvaslink = wsroot+':7001/';
 	let stdoutlink = wsroot+':8001/';
@@ -1120,7 +1120,7 @@ $(function(){
 		$.ajax({
 			type: "POST",
 			//url: "Wiki-Vote.txt_of_780_without_800.json",
-			url: "http://localhost:3000/getjson",
+			url: httproot + ":3000/getjson",
 			//url: "simple5.txt_of_800_without_800.json",
 			data: $('#select3').val(),
 			async: false,
@@ -1394,6 +1394,25 @@ $(function(){
 		update_CONST_CANVAS("#"+this.id,cpval);
 	});
 
+	//let Ccpunt = 1;
+    $("#resetZ").click(function(){
+        //environment.data("GrpZoomOut",1/Ccpunt);
+        //dataset = createImg(0,0,dataset,1/Ccpunt,false);
+    });
+    $("#cutZ").click(function(){
+        //Ccpunt *= 0.9
+        let ival = parseFloat(environment.data("GrpZoomOut"));
+        environment.data("GrpZoomOut",ival*0.9);
+        dataset = createImg(0,0,dataset,ival*0.9,false);
+    });
+    $("#addZ").click(function(){
+        //Ccpunt *= 1.2
+        let ival = parseFloat(environment.data("GrpZoomOut"));
+        environment.data("GrpZoomOut",ival*1.2);
+        dataset = createImg(0,0,dataset,ival*1.2,false);
+    });
+
+
 
 	///(function con() {  //con就是画每一帧动画的函数。
 	///    console.log(111);
@@ -1525,7 +1544,7 @@ $(function(){
 		$.ajax({
 			type: "GET",
 			//url: "Wiki-Vote.txt_of_780_without_800.json",
-			url: "http://localhost:3000/getlist",
+			url: httproot + ":3000/getlist",
 			//url: "simple5.txt_of_800_without_800.json",
 			async: false,
 			dataType: "json",

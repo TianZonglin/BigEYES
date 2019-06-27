@@ -517,9 +517,9 @@ object WS {
 
       val nextGbyNode = thisG.vertices.mapValues((_,x)=>{
         if(nextKC.contains(x._1)){
-          (x._1,x._2,x._3,(x._4._1,x._4._2,x._4._3,1))
+          (x._1,x._2,x._3,(x._4._1,x._4._2,x._4._3,2))
         }else{
-          (x._1,x._2,x._3,(x._4._1,x._4._2,x._4._3,0))
+          (x._1,x._2,x._3,(x._4._1,x._4._2,x._4._3,x._4._4))
         }
       })
       val nextKCGraphS = Graph(nextGbyNode, KC_Dgree_cGraphS.edges, defaultNode)

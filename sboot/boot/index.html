@@ -185,46 +185,49 @@
 			<div class="row clearfix">
 				<div class="col-md-2 column">
  
-					<div class="btn-group" style="width:100%;">
-						<h5 style="margin-top: 0px;">选择项A<br></h5>
+<!--					<div class="btn-group" style="width:100%;">
+						<h5 style="margin-top: 0px;">斥力系数<br></h5>
 						<select class="selectpicker" id="select1" data-width="100%" disabled>
-						  <option>0</option>
-						  <option>15</option>
-						  <option>20</option>
+						  <option>1</option>
+						  <option>2</option>
+						  <option>4</option>
+						  <option>6</option>
+						  <option>8</option>
 						</select>
-					</div>
+					</div>-->
+
+
 
 					<div class="btn-group" style="width:100%;">
-						<h5>选择项B<br></h5>
-						<select class="selectpicker" id="select2" data-width="100%" disabled>
-						  <option>255</option>
-						  <option>355</option>
-						  <option>455</option>
-						</select>
-					</div>
-
-					<div class="btn-group" style="width:100%;">
-						<h5>输入数据<br></h5>
+						<h5 style="margin-top:0px;">当前显示布局<br></h5>
 						<select class="selectpicker" id="select3" data-width="100%" >
 			 
 						</select>
 					</div>
+
+					<br>
 					<form role="form" class="form-inline">
 						<div class="form-group">
-							 <h5>配置项A<br></h5><input class="form-control" disabled id="pzxA" value="default"/>
+							<h5>目标文件<br></h5><input class="form-control"  id="pzxFile" value="facebook_combined.txt"/>
 						</div>
 						<div class="form-group">
-							 <h5>配置项B<br></h5><input class="form-control" disabled id="pzxB"  value="default"/>
+							 <h5>斥力系数<br></h5><input class="form-control"  id="pzxChi" value="4.0,1.0"/>
 						</div>
 						<div class="form-group">
-							 <h5>配置项C<br></h5><input class="form-control" disabled id="pzxC" value="default"/>
+							<h5>引力系数<br></h5><input class="form-control"  id="pzxA" value="4.0,1.0"/>
 						</div>
 						<div class="form-group">
-							 <h5>迭代次数<br></h5><input class="form-control" id="pzxD"  value="10"/>
+							 <h5>向心力系数<br></h5><input class="form-control"  id="pzxB"  value="1.0"/>
+						</div>
+						<div class="form-group">
+							 <h5>速度<br></h5><input class="form-control"  id="pzxC" value="20.0"/>
+						</div>
+						<div class="form-group">
+							 <h5>迭代次数<br></h5><input class="form-control" id="pzxD"  value="300"/>
 						</div>
 		 
 					</form> 
-					<div style="width: 100%;margin-right: 0px;margin-left: 0px;padding-left:0px;padding-right:0px;padding-top:0px;margin-top: 20px;">
+					<div style="width: 100%;margin-right: 0px;margin-left: 0px;padding-left:0px;padding-right:0px;padding-top:0px;margin-top: 10px;">
 						
 						<div class="progress active progress-striped" style="margin-top:5px;visibility:hidden;" id="proccesdiv">
 							<!-- <span id="proccestitle">Progress</span> -->
@@ -232,7 +235,7 @@
 							</div>
 						</div>
 					</div>
-					<button type="button" class="btn btn-default btn-block disabled" id="sendBtn" style="margin-top:20px;">Go!</button>
+					<button type="button" class="btn btn-default btn-block disabled" id="sendBtn" style="margin-top:30px;">Go!</button>
 
 				</div>
 				
@@ -280,7 +283,7 @@
 						<div style="height: 69px;width: 213px;margin-right: 0px;margin-left: 15px;padding-left:5px;padding-right:3px;padding-top:10px;margin-top: 0px;">	 
 							 <button id="testttt" type="button" class="btn btn-default toolbtn" style="margin-bottom: 1px;">TEST1</button>
 							 <button id="testttt2" type="button" class="btn btn-default toolbtn" style="margin-bottom: 1px;">TEST2</button>
-							 <div id="timerChart" style="margin-left: 0px;"></div>
+							 <div id="timerChart" style="margin-left: 0px;margin-top: 5px;"></div>
 							 <div id="timer" style="margin-left: 0px;"></div>
 							 
 						</div>
@@ -353,6 +356,16 @@
 						<!-- </td>   -->
 						<!-- <td width="10px;"><button id="reset5" type="button" class="btn btn-default toolbtn" style="margin-bottom: 1px;">Reset</button></td>  -->
 					<!-- </tr>  -->
+					<tr>
+						<td style="text-align:left;"><span>GrpZoom</span></td>
+						<td>
+							<button id="addZ" type="button" class="btn btn-default toolbtn" style="margin-bottom: 1px;margin-right:3px;">&nbsp;&nbsp;+&nbsp;&nbsp;</button>
+							<button id="cutZ" type="button" class="btn btn-default toolbtn" style="margin-bottom: 1px;padding:0px 6px 0px 6px !important;">&nbsp;&nbsp;-&nbsp;&nbsp;</button>
+						</td>
+						<td><button id="resetZ" type="button" class="btn btn-default toolbtn" style="margin-bottom: 1px;">Reset</button></td>
+					</tr>
+
+
 					<tr>
 						<td style="text-align:left;"><span>LineWidth</span></td>
 						<td>

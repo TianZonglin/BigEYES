@@ -9,7 +9,7 @@ import org.apache.spark.{SparkConf, SparkContext}
 
 object EVA0005 {
 
-  Logger.getLogger("org").setLevel(Level.WARN)
+  Logger.getLogger("org").setLevel(Level.ERROR)
 
   def main(args: Array[String]) {
 
@@ -745,34 +745,36 @@ object EVA0005 {
 
       for(iteration <- 1 to iterations) {
 
-        println("> Temperature: (T=" + temperature + ")")
+        //println("> Temperature: (T=" + temperature + ")")
 
-        var sim = gs.vertices.takeSample(withReplacement = false,(sizeOfGraph*0.01).toInt)
+        var sim:Array[(VertexId,(String, Double, Double, (Double, Double, Double, Double)))] = null
         // 大数据级别时不要collect操作，采用抽样 //
 
-        println("> xx - xxxxxxxxxxxxxx")
+        //println("> xx - xxxxxxxxxxxxxx")
 
         if(!REMOTE_JOB){
           sim = gs.vertices.collect()
+        }else{
+          sim = gs.vertices.takeSample(withReplacement = false,(sizeOfGraph*0.01).toInt)
         }
 
         val gRep = calcRepulsion( sim, gs )
 
-        println("> Repulsion computing finished ... ")
+        //println("> Repulsion computing finished ... ")
         //gRep.vertices.take(10).foreach(println)
 
         gRep.cache().checkpoint()
 
         val gBB = calcAttraction(gRep)
 
-        println("> Attraction computing finished ... ")
+        //println("> Attraction computing finished ... ")
         //gBB.vertices.take(10).foreach(println)
 
         gBB.cache().checkpoint()
 
         val gAttr = gravity(gBB)
 
-        println("> Gravity computing finished ... ")
+        //println("> Gravity computing finished ... ")
         //gAttr.vertices.take(10).foreach(println)
 
         gAttr.cache().checkpoint()
@@ -827,6 +829,7 @@ object EVA0005 {
 
       g.cache()
       g.checkpoint()
+/*
 
       // 计算图的度分布，并排序
 
@@ -900,9 +903,10 @@ object EVA0005 {
 
       //两次布局
       val iter = (iterations * 0.5).toInt
+*/
 
       //第一次布局 过滤的度20% + 剩余的20%
-      val layout1 = layoutFDFR2( g_first, iter , diet = true) //true 为第一次布局
+      val layout1 = layoutFDFR2( g, 100 , diet = false) //true 为第一次布局
 
       // 存文件
       if(REMOTE_JOB){
@@ -910,24 +914,24 @@ object EVA0005 {
         layout1.vertices.saveAsTextFile( output+"_1_Vertices_rst")
         layout1.edges.saveAsTextFile( output+"_1_Edges_rst")
       }else{
-        dumpWithLayout(layout1, output+"_end", isFirst = true)
+        dumpWithLayout(layout1, output+"_end", isFirst = false)
       }
 
-      // 用第一次布局后的坐标覆盖 原图中节点 得到 g_second
-      val g_second = g2_withall.joinVertices(layout1.vertices)(
-        (_,_,b) => b
-      )
+      //// 用第一次布局后的坐标覆盖 原图中节点 得到 g_second
+      //val g_second = g2_withall.joinVertices(layout1.vertices)(
+      //  (_,_,b) => b
+      //)
 
       //第二次布局 剩余节点，第一次布局的结果保留
-      val end = layoutFDFR2( g_second, iter ,  diet = false)//false 为第二次布局
+      //val end = layoutFDFR2( g_second, iter ,  diet = false)//false 为第二次布局
 
       // 存文件
-      if(REMOTE_JOB){
-        end.vertices.saveAsTextFile( output+"_2_Vertices_rst")
-        end.edges.saveAsTextFile( output+"_2_Edges_rst")
-      }else{
-        dumpWithLayout(end, output+"_end", isFirst = false)
-      }
+      //if(REMOTE_JOB){
+      //  end.vertices.saveAsTextFile( output+"_2_Vertices_rst")
+      //  end.edges.saveAsTextFile( output+"_2_Edges_rst")
+      //}else{
+      //  dumpWithLayout(end, output+"_end", isFirst = false)
+      //}
 
       g.unpersist(blocking = false)
 
@@ -951,7 +955,7 @@ object EVA0005 {
 
       // 用户设定，定义输入输出，分隔符，及迭代次数，注意路径  //
 
-      tab = "\t"
+      tab = " "
 
       if(REMOTE_JOB){
 
@@ -965,11 +969,11 @@ object EVA0005 {
       }else{
 
         // 本地项目相对路径
-        fname = "simple5.txt"
+        fname = "facebook_combined.txt"
         input = "resources\\"+fname
         output = "output\\dump_"+fname
 
-        iterations = 10
+        iterations = 300
       }
 
 

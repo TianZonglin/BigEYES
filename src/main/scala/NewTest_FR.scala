@@ -16,8 +16,8 @@ object NewTest_FR {
   Logger.getLogger("org").setLevel(Level.ERROR)
 
   val REMOTE_JOB = false
-  val WIDTH = 5000f
-  val GRAVTY = 3
+  val WIDTH = 1000f
+  val GRAVTY = 10
   val SPEED = 20f              //等于1时无效，默认无效   = FR
   val SPEED_DIVISOR = 800f    //速度除数默认值   = FR
   val AREA = WIDTH * WIDTH
@@ -26,6 +26,12 @@ object NewTest_FR {
   var IN_URL = ""
   var OUT_URL = ""
   //type A = (String, (Float, Float), Map[String, (Float, Float)], Float, Int)
+
+  val ATTRACT = 20
+  val REPULS = 100
+
+
+
 
   def main(args: Array[String]): Unit = {
 
@@ -57,8 +63,8 @@ object NewTest_FR {
     def date:String = new SimpleDateFormat("MM-dd_HH-mm_").format(System.currentTimeMillis())
 
 
-    FILENAME = "facebook_combined.txt"
-    val COUNT = 200
+    FILENAME = "simple55.txt"
+    val COUNT = 100
     if(REMOTE_JOB){
       // 集群HDFS绝对路径
       //FILENAME = args(0)
@@ -98,7 +104,7 @@ object NewTest_FR {
 
 
 
-    writeTo_JSON(gval, OUT_URL)
+
     //pregelGraph.triplets.take(10).foreach(println)
     structuredGraph.unpersist()
 
@@ -145,8 +151,8 @@ object NewTest_FR {
             val attractiveF = dist * dist / K
 
             if (dist > 0) {
-              val dx = xDist / dist * attractiveF
-              val dy = yDist / dist * attractiveF
+              val dx = xDist / dist * attractiveF * ATTRACT
+              val dy = yDist / dist * attractiveF * ATTRACT
               //println(s"attractiveF = $attractiveF, K = $K")
               triplet.sendToDst(dx.toFloat, dy.toFloat)
             }
@@ -185,15 +191,15 @@ object NewTest_FR {
             val attractiveF = dist * dist / K
 
             if (dist > 0) {
-              val dx = xDist / dist * attractiveF
-              val dy = yDist / dist * attractiveF
+              val dx = xDist / dist * attractiveF * ATTRACT
+              val dy = yDist / dist * attractiveF * ATTRACT
               //println(s"dx = $dx, dy = $dy")
               triplet.sendToSrc(0f - dx.toFloat, 0f - dy.toFloat)
             }
           }
         },
         mergeMsg = {
-          (m1, m2) => ((m1._1 + m2._1).toFloat, (m1._2 + m2._2).toFloat)
+          (m1, m2) => (m1._1 + m2._1, m1._2 + m2._2)
         }
       )
       attr2.cache().checkpoint()
@@ -223,8 +229,8 @@ object NewTest_FR {
             if (dist > 0) {
               val repulsiveF = K * K / dist
               // Force de répulsion
-              bx += xDist / dist * repulsiveF // on l'applique...
-              by += yDist / dist * repulsiveF
+              bx += xDist / dist * repulsiveF * REPULS
+              by += yDist / dist * repulsiveF * REPULS
               //println(s"$yDist / $dist * $repulsiveF")
             }
 
@@ -276,12 +282,15 @@ object NewTest_FR {
       )
 
       gs = Graph(vNewPositions, gs.edges)
-      attr1.unpersist()
-      attr2
-      after1
-      after2
-      setC
-      graphN
+
+      writeTo_JSON(gs, "output\\dump_"+FILENAME+"_"+iteration+".json")
+
+      attr1.unpersist(blocking = false)
+      attr2.unpersist(blocking = false)
+      after1.unpersist(blocking = false)
+      after2.unpersist(blocking = false)
+      setC.unpersist(blocking = false)
+      graphN.unpersist(blocking = false)
 
       println(s"> This iteration( $iteration ) of computing layout zb has finished ...")
 

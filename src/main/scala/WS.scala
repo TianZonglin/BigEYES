@@ -325,7 +325,7 @@ object WS {
         // 大数据级别时不要collect操作，采用抽样 //
         // 大数据级别时不要collect操作，采用度高节点（重要节点） //
 
-        val sim = gs.vertices.collect()
+        val sim = gs.vertices.sample(false, 0.2).collect()
 
         val gRep = calcRepulsion( sim, gs )
 
@@ -369,7 +369,7 @@ object WS {
         gs = Graph(vNewPositions, g.edges, defaultNode)
         gs.cache().checkpoint()
 
-        println(s"> This iteration( $iteration ) of computing layout zb has finished ...")
+        println(s"> This iteration( $iteration ) of computing layout was finished ...")
 
         //
         // 可以每次迭代都保存布局结果
@@ -389,7 +389,7 @@ object WS {
 
       // 用户设定，定义输入输出，分隔符，及迭代次数，注意路径  //
 
-      tab = "\t"
+      tab = " "
 
       if(REMOTE_JOB){
 
@@ -403,7 +403,7 @@ object WS {
       }else{
 
         // 本地项目相对路径
-        fname = "simple55.txt"
+        fname = "facebook_combined.txt"
         input = "resources\\"+fname
         output = "output\\"+fname
 
@@ -418,16 +418,24 @@ object WS {
 
       // 静态量赋值，可微调，默认不需要，变量意义参加开头注释  //
 
+      //speed = 20.0              //等于1时无效，默认无效   = FR
+      //SPEED_DIVISOR = 800d    //速度除数默认值   = FR
+      //REP_SCALE = 1           //等于1时无效，默认无效
+      //ATT_SCALE = 1         //等于1时无效，默认无效
+      //gravitys = 3d          //向心力因子默认值    = FR
+      //epsilon = 0.001         //默认值，防止点重合时距离为0而不计算
+      //area = 10000            //布局大小。最好是次方值，长宽均开根号得到 = FR
+      //dbi = 0.2               //默认 [ 度筛选 ] 比率
+      //sbi = 0.1               //默认 [ 采样比 ]
       speed = 20.0              //等于1时无效，默认无效   = FR
       SPEED_DIVISOR = 800d    //速度除数默认值   = FR
-      REP_SCALE = 1           //等于1时无效，默认无效
+      REP_SCALE = 2           //等于1时无效，默认无效
       ATT_SCALE = 1         //等于1时无效，默认无效
-      gravitys = 3d          //向心力因子默认值    = FR
+      gravitys = 0.2d          //向心力因子默认值    = FR
       epsilon = 0.001         //默认值，防止点重合时距离为0而不计算
       area = 10000            //布局大小。最好是次方值，长宽均开根号得到 = FR
       dbi = 0.2               //默认 [ 度筛选 ] 比率
       sbi = 0.1               //默认 [ 采样比 ]
-
       // 计算得到，默认不调整 //
 
       temperature = 0.1 * math.sqrt(area)

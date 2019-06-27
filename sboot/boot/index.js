@@ -15,7 +15,7 @@ $(function(){
 	environment.data("GridZoom",1.0);
 	environment.data("GridWidth",0.5);
 	environment.data("GridColor","#ccc");
-	environment.data("BkgdColor","#ffffff");
+	environment.data("BkgdColor","#ffffff");   
 
 	//let root = 'ws://219.216.65.14';
 	let wsroot = 'ws://localhost';

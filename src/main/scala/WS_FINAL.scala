@@ -413,7 +413,7 @@ object WS_FINAL {
         iterations = myargss(1).toInt
 
       }else{
-        myargss = Array("Email-Enron.txt","300","100","80","60","40","20")
+        myargss = Array("gemsec-Deezer.txt","300","50","40","30","20","10")
         // 本地项目相对路径
         fname = myargss(0)
         input = "resources\\"+fname
@@ -481,7 +481,7 @@ object WS_FINAL {
         reduceByKey(_ + "," + _).
         sortBy(_._1, false).collect()
       val counts = distribution.length
-      val theta = (counts * 0.5).toInt
+      val theta = (counts * 0.7).toInt
       val head_d = distribution.take(theta) //取前百分20
       val d_max = head_d.take(1)(0)._1 //最大出入度
       val head_nodes = head_d.reduce((a, b) => (1, a._2 + "," + b._2))._2.split(",")
@@ -492,6 +492,7 @@ object WS_FINAL {
       val KC_RDD_cGraphS = G.vertices.filter(x => {x._2==true}).map(x => x._1)//.foreach(println)
 
 
+      println(">>>>>>>>>>>>>>>>>"+KC_RDD_cGraphS.count())
 
 
       //KC_RDD.foreach(println)
@@ -603,7 +604,7 @@ object WS_FINAL {
       }
 
 
-      val cGraphS5 = cGraphS.joinVertices(TWO.vertices)( (_,_,b) => b )
+      val cGraphS5 = cGraphS.joinVertices(FOUR.vertices)( (_,_,b) => b )
       val G5 = KCore.run(cGraphS5, myargss(6).toInt, 1).vertices.filter(x => {x._2==true}).map(x => x._1)                 //////////////////////////////
       val Arrs5  = G5.map(x=>x.toString).collect()
       val Graph_FIVE = cGraphS5.subgraph(
@@ -630,10 +631,10 @@ object WS_FINAL {
       val finalxfinalx = layoutFDFR2(finalx, iterations ,thisLayer = 6, writeFIle = false )
       // 存文件
       if(REMOTE_JOB){
-        FIVE.vertices.saveAsTextFile( output+"_6666_Vertices")
-        FIVE.edges.saveAsTextFile( output+"_6666_Edges")
+        finalxfinalx.vertices.saveAsTextFile( output+"_6666_Vertices")
+        finalxfinalx.edges.saveAsTextFile( output+"_6666_Edges")
       }else{
-        dumpWithLayout(FIVE, output+"6666666666666666", Layer = 5)
+        dumpWithLayout(finalxfinalx, output+"6666666666666666", Layer = 5)
       }
 
 

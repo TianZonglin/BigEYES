@@ -14,7 +14,7 @@ object WS_FINAL {
 
   def main(args: Array[String]) {
 
-    val REMOTE_JOB: Boolean = false                 // 是否提交到集群运行
+    val REMOTE_JOB: Boolean = true                 // 是否提交到集群运行
     var dbi: Double = 0d                               // 度筛选比率
     var sbi: Double = 0d                               // 图节点采样比率
     var fname: String = ""                          // 输入文件名
@@ -438,9 +438,9 @@ object WS_FINAL {
       //area = 10000            //布局大小。最好是次方值，长宽均开根号得到 = FR
       //dbi = 0.2               //默认 [ 度筛选 ] 比率
       //sbi = 0.1               //默认 [ 采样比 ]
-      speed = 30.0              //等于1时无效，默认无效   = FR
+      speed = 50.0              //等于1时无效，默认无效   = FR
       SPEED_DIVISOR = 800d    //速度除数默认值   = FR
-      REP_SCALE = 10           //等于1时无效，默认无效
+      REP_SCALE = 15           //等于1时无效，默认无效
       ATT_SCALE = 1         //等于1时无效，默认无效
       gravitys = 1d          //向心力因子默认值    = FR
       epsilon = 0.001         //默认值，防止点重合时距离为0而不计算
@@ -481,7 +481,7 @@ object WS_FINAL {
         reduceByKey(_ + "," + _).
         sortBy(_._1, false).collect()
       val counts = distribution.length
-      val theta = (counts * 0.5).toInt
+      val theta = (counts * 0.7).toInt
       val head_d = distribution.take(theta) //取前百分20
       val d_max = head_d.take(1)(0)._1 //最大出入度
       val head_nodes = head_d.reduce((a, b) => (1, a._2 + "," + b._2))._2.split(",")
@@ -537,7 +537,7 @@ object WS_FINAL {
         }
       ).persist()
 
-      REP_SCALE = 8           //等于1时无效，默认无效
+      REP_SCALE = 11           //等于1时无效，默认无效
       ATT_SCALE = 2         //等于1时无效，默认无效
       gravitys = 3d          //向心力因子默认值    = FR
       // 采样直接调用布局 //
@@ -562,7 +562,7 @@ object WS_FINAL {
         }
       ).persist()
 
-      REP_SCALE = 8           //等于1时无效，默认无效
+      REP_SCALE = 12           //等于1时无效，默认无效
       ATT_SCALE = 3         //等于1时无效，默认无效
       gravitys = 2d          //向心力因子默认值    = FR
       // 采样直接调用布局 //
@@ -590,7 +590,7 @@ object WS_FINAL {
 
       //val Graph_FOUR = cGraphS.joinVertices(THREE.vertices)( (_,_,b) => b )
 
-      REP_SCALE = 8           //等于1时无效，默认无效
+      REP_SCALE = 13           //等于1时无效，默认无效
       ATT_SCALE = 3         //等于1时无效，默认无效
       gravitys = 2d          //向心力因子默认值    = FR
       // 采样直接调用布局 //
@@ -613,7 +613,7 @@ object WS_FINAL {
         }
       ).persist()
 
-      REP_SCALE = 8           //等于1时无效，默认无效
+      REP_SCALE = 14           //等于1时无效，默认无效
       ATT_SCALE = 3         //等于1时无效，默认无效
       gravitys = 2d          //向心力因子默认值    = FR
       // 采样直接调用布局 //

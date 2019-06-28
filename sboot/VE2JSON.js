@@ -3,7 +3,8 @@ const fs = require('fs');
 console.log("XXXXXXXX");
 
 let TYPE = new Array("Vertices","Edges")
-
+// let FENAME = "com-amazon"
+let FENAME = "com-youtube"
 for(let index = 1; index <=5; index++){
 
     let strALL = "";
@@ -11,7 +12,7 @@ for(let index = 1; index <=5; index++){
     let links = [];
     for(let k = 0; k <=1; k++) {
 
-        const filename = "com-youtube.txt_@_#"
+        const filename = FENAME+".txt_@_#"
             .replace("@", index + "" + index + "" + index + "" + index + "")
             .replace("#", TYPE[k]);
 
@@ -58,7 +59,7 @@ for(let index = 1; index <=5; index++){
                         lk.x1 = node1.cx;
                         lk.y1 = node1.cy;
                         lk.x2 = node2.cx;
-                        lk.x2 = node2.cy;
+                        lk.y2 = node2.cy;
                         links.push(lk);
                     }
                 }
@@ -73,7 +74,8 @@ for(let index = 1; index <=5; index++){
         "links": links
     }
     let toFIle = JSON.stringify(whole);
-    fs.writeFile("I:\\IDEA_PROJ\\Visualization\\output\\com-youtube-"+index+""+index+""+index+""+index+".json",
+
+    fs.writeFile("I:\\IDEA_PROJ\\Visualization\\output\\"+FENAME+"-"+index+""+index+""+index+""+index+".json",
         toFIle, {'flag': 'a'}, function (err) {
             if (err) {
                 throw err;

@@ -413,7 +413,7 @@ object WS_FINAL {
         iterations = myargss(1).toInt
 
       }else{
-        myargss = Array("gemsec-Deezer.txt","300","50","40","30","20","10")
+        myargss = Array("gemsec-Deezer.txt","300","40","30","20","10","5")
         // 本地项目相对路径
         fname = myargss(0)
         input = "resources\\"+fname
@@ -481,7 +481,7 @@ object WS_FINAL {
         reduceByKey(_ + "," + _).
         sortBy(_._1, false).collect()
       val counts = distribution.length
-      val theta = (counts * 0.7).toInt
+      val theta = (counts * 0.5).toInt
       val head_d = distribution.take(theta) //取前百分20
       val d_max = head_d.take(1)(0)._1 //最大出入度
       val head_nodes = head_d.reduce((a, b) => (1, a._2 + "," + b._2))._2.split(",")

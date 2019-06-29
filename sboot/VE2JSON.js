@@ -3,7 +3,7 @@ const fs = require('fs');
 console.log("XXXXXXXX");
 
 let TYPE = new Array("Vertices","Edges")
-let FENAME = "com-amazon"
+let FENAME = "gemsec-Deezer"
 // let FENAME = "com-youtube"
 for(let index = 1; index <=3; index++){
 

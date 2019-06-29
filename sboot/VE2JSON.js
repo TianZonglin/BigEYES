@@ -3,9 +3,9 @@ const fs = require('fs');
 console.log("XXXXXXXX");
 
 let TYPE = new Array("Vertices","Edges")
-// let FENAME = "com-amazon"
-let FENAME = "com-youtube"
-for(let index = 1; index <=5; index++){
+let FENAME = "com-amazon"
+// let FENAME = "com-youtube"
+for(let index = 1; index <=3; index++){
 
     let strALL = "";
     let nodes = [];
@@ -76,7 +76,7 @@ for(let index = 1; index <=5; index++){
     let toFIle = JSON.stringify(whole);
 
     fs.writeFile("I:\\IDEA_PROJ\\Visualization\\output\\"+FENAME+"-"+index+""+index+""+index+""+index+".json",
-        toFIle, {'flag': 'a'}, function (err) {
+        toFIle, {}, function (err) {
             if (err) {
                 throw err;
             }

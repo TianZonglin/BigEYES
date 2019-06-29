@@ -5,7 +5,7 @@ console.log("XXXXXXXX");
 let TYPE = new Array("Vertices","Edges")
 let FENAME = "gemsec-Deezer"
 // let FENAME = "com-youtube"
-for(let index = 1; index <=3; index++){
+for(let index = 1; index <=4; index++){
 
     let strALL = "";
     let nodes = [];

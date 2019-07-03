@@ -14,7 +14,7 @@ object WS_FINAL {
 
   def main(args: Array[String]) {
 
-    val REMOTE_JOB: Boolean = true                 // 是否提交到集群运行
+    val REMOTE_JOB: Boolean = false                 // 是否提交到集群运行
     var dbi: Double = 0d                               // 度筛选比率
     var sbi: Double = 0d                               // 图节点采样比率
     var fname: String = ""                          // 输入文件名

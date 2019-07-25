@@ -18,7 +18,7 @@ object NewTest_K_COre {
     val tupleC = Array(0.0049,0.3579,19.3)//,Gowalla_edges.txt
 
     val tupleD = Array(0.0281,0.0887,43.7)//,ego-facebook.txt
-
+    mainF(tupleD, Array("10","facebook_combined.txt"," "))// 50
 
 
    //NewTest_RN_RE_RW.mainF(tupleC, Array("0.6","Email-Enron.txt","\t","snowball"))
@@ -264,7 +264,7 @@ object NewTest_K_COre {
       sortBy(_._1, false).collect()
 
     val dfb_px = distribution2.map(t => (t._1, t._2.split(",").length))
-    //dfb.foreach(println)
+    dfb_px.foreach(println)
 
     //===================================================================
     //Core分层
@@ -392,6 +392,9 @@ object NewTest_K_COre {
 
     var SMd = 0.0
     var indexs = 0
+
+    //dfb_px.\\
+    //dfb_qx(0)._2
     for(indexs <- 0 to dfb_qx.length-1){
       val ind = Math.floor(indexs * reflect).toInt
       val vp = dfb_px(ind)._2
@@ -402,44 +405,7 @@ object NewTest_K_COre {
     SMd = (SMd/dfb_qx.length)
 
     //===================================================================
-    //SMt
-    var a = 0
-    var b = 0
-    var c = 0
-    var d = 0
-/*
-    var
 
-    val rddmapS = graphtemp.edges.map(x=>{
-      (x.srcId+""+x.dstId, 1)
-    }).collect()
-    val rddmapG = cGraphS.edges.map(x=>{
-      (x.srcId+""+x.dstId, 1)
-    }).collect()
-
-    graphtemp.
-
-
-    val mapS = rddmapS.toMap
-    var it = 0
-    for(it <- 0 to rddmapG.length-1){
-      val o1 = rddmapG(it)._2
-      var o2:Int = 0
-      try {
-        o2 = mapS(rddmapG(it)._1)
-        if(o1 == 1 && o2 == 1){ a = a + 1 }
-        else if(o1 == 1 && o2 == 0){ b = b + 1}
-        else if(o1 == 0 && o2 == 1){ c = c + 1}
-        else if(o1 == 0 && o2 == 0){ d = d + 1}
-      } catch {
-        case ex: Exception => {
-          System.err.println("ZZZZZZZZZZZZZZZz")  // 打印到标
-
-        }
-      }
-    }
-    val phi = (a*d-b*c)/(Math.sqrt((a + b)*(c + d)*(a + c)*(b + d)))
-    printf("==========================================phi: "+phi)        */
 
     //===================================================================
     //vcc

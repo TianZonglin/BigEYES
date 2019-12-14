@@ -100,9 +100,7 @@ That's all.
 
 ![BigEYES.png-1520.5kB][1]
 
-### Version 1.0
 
-![](http://static.zybuluo.com/EVA001/vg6swhpmqxiet5l8tk1q7sy8/image_1cf8beqjs1b1i1j5ntjftg31ric9.png)
 
 
   [1]: http://static.zybuluo.com/EVA001/ng5rcrpb5f76qpnd0e1z0flu/BigEYES.png

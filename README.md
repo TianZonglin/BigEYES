@@ -1,5 +1,3 @@
-#### Complicated and massive data are as turbulent as floods recently, which is particularly obvious at present. When dealing with related data, complex association often brings catastrophic nightmares to the extraction of the overall characteristics of data. The purpose of BigEYES is to see the sun through clouds, unravel complex entanglement and present clear features of chaos.
-
 ### Initial Works
 
 #### Web Container

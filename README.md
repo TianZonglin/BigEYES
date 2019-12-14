@@ -1,5 +1,41 @@
 #### Complicated and massive data are as turbulent as floods recently, which is particularly obvious at present. When dealing with related data, complex association often brings catastrophic nightmares to the extraction of the overall characteristics of data. The purpose of BigEYES is to see the sun through clouds, unravel complex entanglement and present clear features of chaos.
 
+### Initial Works
+
+#### Web Container
+
+- install http-server: `npm install http-server -g`
+- run `cd boot`
+- run `http-server -p 1234`
+- visit `localhost:1234` in Chrome
+
+Here, we can see the whole system, but no interaction we can do cause we still need to establish the connection between frontend and backend by using Websocket. Of course, there would have some red errors if you open the `console` part of debug functions by F12.
+
+
+#### Backend with Websocket
+
+- run `cd sboot`
+- change the local link of your datas, the first one located around `/getjson`, the another one is '/getlist'
+- run `node app.js` then you can see the output like `Canvas webSocket server listening on port 7001`
+- now, refresh the webpage without any cache, then you can find the red errors gone, and the console would show text like `canvasSocket open` 
+
+Here, you can use this system, but limited in using of drawing datas, if you want to link the function about executing tasks with Spark, then you need to do this below.
+Of course, if you click the button of `GO`, it would be crash cause no Spark cluster connected.
+
+#### Enhance the functions with Spark
+
+- presume that you have establish a normal Spark cluster.
+- put the computing zip package onto master node
+- modify the ip-address of `app.js`, including all places that have the ip `219.216...`
+
+Now, you can see it's okay if you click `GO`, and the part of `Monitor` could work as well.  
+
+
+That's all.
+
+### Previous Works
+
+
 #### To Do List
 
 - [ ] 4/03. Change SPARK/ GRAPHX codes to achieve A, B and C 

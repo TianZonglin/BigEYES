@@ -106,7 +106,7 @@ That's all.
 
 ### Version 2.0
 
-![BigEYES.png-1520.5kB](https://github.com/TianZonglin/TOUGAO/blob/master/LaTeX/Img/gvis-01.png?raw=true)
+![BigEYES.png-1520.5kB](https://github.com/TianZonglin/BigEYES/blob/master/resources/gvis-01.png?raw=true)
 
 
 
